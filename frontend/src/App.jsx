@@ -1,10 +1,21 @@
 import { useState } from 'react'
-
+import { Route, Routes } from 'react-router-dom'
+import Login from './pages/Login';
+import { ChakraProvider } from '@chakra-ui/react'
 
 function App() {
   return (
-    <h1>Hellow World!</h1>
-      
+    <>
+
+      <div>
+        This will appear on every page
+
+
+      <Routes>
+        <Route path="/" element={<Login />} />
+      </Routes>
+      </div>
+    </>
   )
 }
 
