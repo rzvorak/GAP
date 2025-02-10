@@ -5,6 +5,9 @@ yarn-error.log
 package-lock.json
 yarn.lock
 
+# chakra
+frontend/src/components/ui/
+
 # Build directories
 build/
 dist/
