@@ -3,6 +3,7 @@ import '../styles/Login.css'
 import { Box, Button, Input, VStack, IconButton } from '@chakra-ui/react'
 import { motion } from 'framer-motion';
 import { FaArrowLeft } from 'react-icons/fa'
+import { useNavigate } from 'react-router-dom'; 
 
 const MotionVStack = motion(VStack);
 
@@ -15,6 +16,12 @@ const Login = () => {
 
   const handleReturn = () => {
     setIsForgotPassword(false);
+  }
+
+  const navigate = useNavigate();
+  const handleSignIn = () => {
+    
+    navigate('/landing')
   }
 
   return (
@@ -44,7 +51,7 @@ const Login = () => {
             </Box>
             <Input 
             placeholder="Username"
-            shadow="2px 2px 3px 1px rgba(169, 169, 169, 0.2), -2px 2px 3px 1px rgba(169, 169, 169, 0.2) "
+            style={{ boxShadow: 'var(--box-shadow-classic)' }}
             border="none"
             borderRadius="0.5rem"
             marginBottom="0.3rem"
@@ -52,7 +59,7 @@ const Login = () => {
             _hover={{transform: "translateY(-3px)"}}></Input>
             <Input 
             placeholder="Password"
-            shadow="2px 2px 3px 1px rgba(169, 169, 169, 0.2), -2px 2px 3px 1px rgba(169, 169, 169, 0.2) "
+            style={{ boxShadow: 'var(--box-shadow-classic)' }}
             border="none"
             borderRadius="0.5rem"
             marginBottom="0.3rem"
@@ -63,7 +70,8 @@ const Login = () => {
             color="gray.100" 
             bg="green.500"
             borderRadius="0.5rem"
-            _hover={{bg: "green.600"}}>Sign In</Button>
+            _hover={{bg: "green.600"}}
+            onClick={handleSignIn}>Sign In</Button>
             <Button bg="none" 
             color="gray.400" 
             fontWeight="400" 
@@ -89,7 +97,7 @@ const Login = () => {
             </Box>
             <Input 
             placeholder="Username"
-            shadow="2px 2px 3px 1px rgba(169, 169, 169, 0.2), -2px 2px 3px 1px rgba(169, 169, 169, 0.2) "
+            style={{ boxShadow: 'var(--box-shadow-classic)' }}
             border="none"
             borderRadius="0.5rem"
             marginBottom="0.3rem"
