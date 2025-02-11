@@ -1,6 +1,6 @@
 import Header from '../components/Header'
 import React from 'react'
-import { Box, SimpleGrid, Button, Center, VStack, Heading } from '@chakra-ui/react'
+import { Box, SimpleGrid, useBreakpointValue, Center, VStack, Heading } from '@chakra-ui/react'
 import '../styles/App.css'
 import '../styles/Header.css'
 
@@ -31,6 +31,8 @@ const Landing = () => {
         navigate('/statistics')
     }
 
+    const iconSize = useBreakpointValue({sm: "5rem", md: "7rem", lg: "9rem"});
+
 
   return (
     
@@ -50,8 +52,8 @@ const Landing = () => {
         >
             <Center>
                 <Box 
-                h="14rem"
-                w="14rem"
+                h={{sm: "14rem", md: "16rem", lg: "17rem", xl: "17rem"}}
+                w={{sm: "14rem", md: "23rem", lg: "29rem", xl: "38rem"}}
                 bg="gray.100"
                 borderRadius={"1.25rem"}
                 display="flex"
@@ -64,21 +66,22 @@ const Landing = () => {
                             <Heading 
                             color="gray.600" 
                             fontWeight="400" 
-                            marginTop="1.5rem"
-                            marginBottom="1.5rem">
+                            marginTop={{sm: "1.5rem", md: "2rem", lg:"2rem"}}
+                            marginBottom={{sm: "1.5rem", md: "1.5rem", lg: "2rem" }}
+                            fontSize={{sm: "lg", md: "2xl", lg: "3xl"}}>
                                 View Students
                             </Heading>
                             <Box color="green.500">
-                            <FaRegUser size="5rem"/>
-                        </Box>
+                                <FaRegUser size={iconSize}/>
+                            </Box>
                     </VStack>
                 </Box>
             </Center>
 
             <Center>
                 <Box 
-                h="14rem"
-                w="14rem"
+                h={{sm: "14rem", md: "16rem", lg: "17rem", xl: "17rem"}}
+                w={{sm: "14rem", md: "23rem", lg: "29rem", xl: "38rem"}}
                 bg="gray.100"
                 borderRadius={"1.25rem"}
                 display="flex"
@@ -91,21 +94,22 @@ const Landing = () => {
                             <Heading 
                             color="gray.600" 
                             fontWeight="400" 
-                            marginTop="1.5rem"
-                            marginBottom="1.5rem">
+                            marginTop={{sm: "1.5rem", md: "2rem", lg:"2rem"}}
+                            marginBottom={{sm: "1.5rem", md: "1.5rem", lg: "2rem" }}
+                            fontSize={{sm: "lg", md: "2xl", lg: "3xl"}}>
                                 Enter Scores
                             </Heading>
                             <Box color="green.500">
-                            <GoPencil size="5rem"/>
-                        </Box>
+                                <GoPencil size={iconSize}/>
+                            </Box>
                     </VStack>
                 </Box>
             </Center>
 
             <Center>
                 <Box 
-                h="14rem"
-                w="14rem"
+                h={{sm: "14rem", md: "16rem", lg: "17rem", xl: "17rem"}}
+                w={{sm: "14rem", md: "23rem", lg: "29rem", xl: "38rem"}}
                 bg="gray.100"
                 borderRadius={"1.25rem"}
                 display="flex"
@@ -118,21 +122,22 @@ const Landing = () => {
                             <Heading 
                             color="gray.600" 
                             fontWeight="400" 
-                            marginTop="1.5rem"
-                            marginBottom="1.5rem">
+                            marginTop={{sm: "1.5rem", md: "2rem", lg:"2rem"}}
+                            marginBottom={{sm: "1.5rem", md: "1.5rem", lg: "2rem" }}
+                            fontSize={{sm: "lg", md: "2xl", lg: "3xl"}}>
                                 Create Reports
                             </Heading>
                             <Box color="green.500">
-                            <IoDocumentTextOutline size="5rem"/>
-                        </Box>
+                                <IoDocumentTextOutline size={iconSize}/>
+                            </Box>
                     </VStack>
                 </Box>
             </Center>
 
             <Center>
                 <Box 
-                h="14rem"
-                w="14rem"
+                h={{sm: "14rem", md: "16rem", lg: "17rem", xl: "17rem"}}
+                w={{sm: "14rem", md: "23rem", lg: "29rem", xl: "38rem"}}
                 bg="gray.100"
                 borderRadius={"1.25rem"}
                 display="flex"
@@ -145,13 +150,14 @@ const Landing = () => {
                             <Heading 
                             color="gray.600" 
                             fontWeight="400" 
-                            marginTop="1.5rem"
-                            marginBottom="1.5rem">
+                            marginTop={{sm: "1.5rem", md: "2rem", lg:"2rem"}}
+                            marginBottom={{sm: "1.5rem", md: "1.5rem", lg: "2rem" }}
+                            fontSize={{sm: "lg", md: "2xl", lg: "3xl"}}>
                                 See Statistics
                             </Heading>
                             <Box color="green.500">
-                            <SlGraph size="5rem"/>
-                        </Box>
+                                <SlGraph size={iconSize}/>
+                            </Box>
                     </VStack>
                 </Box>
             </Center>
