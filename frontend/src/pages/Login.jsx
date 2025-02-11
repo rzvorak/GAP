@@ -47,27 +47,32 @@ const Login = () => {
             shadow="2px 2px 3px 1px rgba(169, 169, 169, 0.2), -2px 2px 3px 1px rgba(169, 169, 169, 0.2) "
             border="none"
             borderRadius="0.5rem"
-            marginBottom="0.3rem"></Input>
+            marginBottom="0.3rem"
+            transition='all 0.3s'
+            _hover={{transform: "translateY(-3px)"}}></Input>
             <Input 
             placeholder="Password"
             shadow="2px 2px 3px 1px rgba(169, 169, 169, 0.2), -2px 2px 3px 1px rgba(169, 169, 169, 0.2) "
             border="none"
             borderRadius="0.5rem"
-            marginBottom="0.3rem"></Input>
+            marginBottom="0.3rem"
+            transition='all 0.3s'
+            _hover={{transform: "translateY(-3px)"}}></Input>
             <Button 
             w="100%" 
             color="gray.100" 
             bg="green.500"
-            borderRadius="0.5rem">Sign In</Button>
+            borderRadius="0.5rem"
+            _hover={{bg: "green.600"}}>Sign In</Button>
             <Button bg="none" 
             color="gray.400" 
             fontWeight="400" 
             textDecoration="underline"
+            _hover={{color: "gray.500"}}
             onClick={handleForgotPassword}>
                 Forgot Password?
             </Button>
         </MotionVStack>
-
 
         <MotionVStack 
         transition={{ type: "tween", duration: 0.8, ease: "easeInOut" }} 
@@ -87,16 +92,19 @@ const Login = () => {
             shadow="2px 2px 3px 1px rgba(169, 169, 169, 0.2), -2px 2px 3px 1px rgba(169, 169, 169, 0.2) "
             border="none"
             borderRadius="0.5rem"
-            marginBottom="0.3rem"></Input>
+            marginBottom="0.3rem"
+            transition='all 0.3s'
+            _hover={{transform: "translateY(-3px)"}}></Input>
             <Button 
             w="100%" 
             color="gray.100" 
             bg="green.500"
             borderRadius="0.5rem"
             marginBottom="1rem"
+            _hover={{bg: "green.600"}}
             >Request New Password</Button>
             <Button bg="none" onClick={handleReturn}>
-                <FaArrowLeft color="lightgray" size="1.5rem" />
+                <FaArrowLeft size="1.5rem" className='FaArrowLeft'/>
             </Button>
         </MotionVStack>
 
