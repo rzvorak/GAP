@@ -2,23 +2,28 @@ import { Box, Center, Button } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { Squash as Hamburger } from 'hamburger-react'
 import '../styles/header.css'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const Header = () => {
   // for hamburger
   const [isOpen, setOpen] = useState(false);
+
+  const [homeHover, setHomeHover] = useState(false);
+  const [settingsHover, setSettingsHover] = useState(false);
+  const [signOutHover, setSignOutHover] = useState(false);
 
   const menuContainer = {
     position: 'fixed',
     height: "60%",
     width: "10rem",
     backgroundColor: "#f4f4f5",
-    
     bottom: "0rem",
     width: "100%",
     transition: "all 0.3s ease-in-out",
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
+    alignItems: "center",
     paddingTop: '0rem',
     transform: isOpen ? "translateY(0px)" : "translateY(100%)",
     zIndex: "2"
@@ -35,28 +40,69 @@ const Header = () => {
   }
 
   const menuButtonContainer = {
-    width: "100%",
     height: "15%",
     minHeight: "2rem",
     maxHeight: "3rem",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-
-    // visibility: "hidden",
-    // position: "fixed",
-    // height: "0rem",
-    
+    cursor: "pointer"
   }
 
-  const menuButton = {
-    // visibility: "hidden",
-    // position: "fixed",
-    // height: "0rem",
+  const homeButton = {
+    fontSize: "1.5rem",
+    paddingLeft: "1rem",
+    paddingRight: "1rem",
+    cursor: "pointer",
+    transition: "all 0.2s ease-in-out",
+    userSelect: "none",
+    color: homeHover ? "gray" : "black"
+  }
+
+  const settingsButton = {
+    fontSize: "1.5rem",
+    paddingLeft: "1rem",
+    paddingRight: "1rem",
+    cursor: "pointer",
+    userSelect: "none",
+    transition: "all 0.2s ease-in-out",
+    color: settingsHover ? "gray" : "black"
+  }
+
+  const signOutButton = {
+    fontSize: "1.5rem",
+    paddingLeft: "1rem",
+    paddingRight: "1rem",
+    cursor: "pointer",
+    userSelect: "none",
+    transition: "all 0.2s ease-in-out",
+    color: signOutHover ? "gray" : "black"
   }
 
   const hamburger = {
     zIndex: "3"
+  }
+
+  const location = useLocation()
+  const navigate = useNavigate()
+  const handleHome = () => {
+    if (location.pathname !== '/landing') {
+      navigate('/landing');
+    } else {
+      setOpen(false);
+    }
+  }
+
+  const handleSettings = () => {
+    if (location.pathname !== '/landing') {
+      navigate('/landing');
+    } else {
+      setOpen(false);
+    }
+  }
+
+  const handleSignOut = () => {
+    navigate('/');
   }
 
   return (
@@ -86,16 +132,16 @@ const Header = () => {
       <div style={menuBackground}></div>
 
       <div style={menuContainer}>
-        <div style={menuButtonContainer}>
-          <button style={menuButton} >Home</button>
+        <div style={menuButtonContainer} onMouseEnter={() => setHomeHover(true)} onMouseLeave={() => setHomeHover(false)}>
+          <button style={homeButton} onClick={handleHome}>Home</button>
         </div>
 
-        <div style={menuButtonContainer}> 
-          <button style={menuButton}>Settings</button>
+        <div style={menuButtonContainer} onMouseEnter={() => setSettingsHover(true)} onMouseLeave={() => setSettingsHover(false)}> 
+          <button style={settingsButton} onClick={handleSettings}>Settings</button>
         </div>
 
-        <div style={menuButtonContainer}>
-          <button style={menuButton} >Sign Out </button>
+        <div style={menuButtonContainer} onMouseEnter={() => setSignOutHover(true)} onMouseLeave={() => setSignOutHover(false)}>
+          <button style={signOutButton} onClick={handleSignOut}>Sign Out</button>
         </div>
       </div>
 
