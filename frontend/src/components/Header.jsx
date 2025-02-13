@@ -1,6 +1,5 @@
 import { Box, Center } from '@chakra-ui/react'
 import React, {useState} from 'react'
-import { IoMenu } from "react-icons/io5";
 import { Squash as Hamburger } from 'hamburger-react'
 
 const Header = () => {

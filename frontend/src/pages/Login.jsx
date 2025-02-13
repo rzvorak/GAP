@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { FaArrowLeft } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'; 
 
-const MotionVStack = motion(VStack);
+const MotionVStack = motion.create(VStack);
 
 const Login = () => {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
@@ -56,7 +56,8 @@ const Login = () => {
             borderRadius="0.5rem"
             marginBottom="0.3rem"
             transition='all 0.3s'
-            _hover={{transform: "translateY(-3px)"}}></Input>
+            _hover={{transform: "translateY(-3px)"}}
+            ></Input>
             <Input 
             placeholder="Password"
             style={{ boxShadow: 'var(--box-shadow-classic)' }}
