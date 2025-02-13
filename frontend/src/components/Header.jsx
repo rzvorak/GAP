@@ -36,8 +36,14 @@ const Header = () => {
     backgroundColor: isOpen ? "hsla(0, 0%, 20%, 0.6)" : "hsla(0, 0%, 0%, 0)",
     transition: "all 0.3s ease-in-out",
     zIndex: "1",
-    pointerEvents: "none",
+    pointerEvents: isOpen ? "all" : "none",
   }
+
+  // easy mobile functionality to click out of menu
+  const handleMenuBackground = () => {
+    setOpen(false)
+  }
+
 
   const menuButtonContainer = {
     height: "15%",
@@ -129,7 +135,7 @@ const Header = () => {
           </div>
       </Center>  
 
-      <div style={menuBackground}></div>
+      <div onClick={handleMenuBackground} style={menuBackground}></div>
 
       <div style={menuContainer}>
         <div style={menuButtonContainer} onMouseEnter={() => setHomeHover(true)} onMouseLeave={() => setHomeHover(false)}>
