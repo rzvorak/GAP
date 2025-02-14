@@ -1,12 +1,38 @@
 import Header from '../components/Header'
 import ClassButton from '../components/ClassButton'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import '../styles/App.css'
-import { Box, VStack, Heading, HStack, Input, Button, Text } from '@chakra-ui/react'
+import { Box, VStack, Heading, HStack, Input, Button, Text, Center, TextPropsProvider } from '@chakra-ui/react'
+
+import { useStudentStore } from '../store/student.js';
 
 
 const Students = () => {
+
+    const { fetchStudents, students } = useStudentStore();
+    // forces react to re-rended properly when a new student is added
+    const [localStudents, setLocalStudents] = useState([])
+
+    // runs once on initial render, re-calls every time a dependency (in array) changes
+    useEffect(() => {
+        fetchStudents();
+    }, [fetchStudents]);
+
+    // runs every time students are updated
+    useEffect(() => {
+        setLocalStudents(students);
+    }, [students]);
+
+
+    const handleAddStudent = () => {
+        fetchStudents();
+    }
+
+
+
+
+
     return (
         <Box
             minH={"100vh"}
@@ -108,18 +134,18 @@ const Students = () => {
                         alignItems={"center"}
                     >
 
-                        <Button 
+                        <Button
                             borderRadius={"4rem"}
                             w="12rem"
                             bg="green.500"
                             color="gray.100"
                             fontSize={{ sm: "lg", lg: "xl" }}
                             transition="all 0.3s"
-                            _hover={{transform: "translateY(-3px)"}}
+                            _hover={{ transform: "translateY(-3px)" }}
                             marginRight="1.5rem"
                         >Get Students</Button>
 
-                        <Button 
+                        <Button
                             borderRadius={"4rem"}
                             w="12rem"
                             borderWidth="2px"
@@ -128,43 +154,80 @@ const Students = () => {
                             color="green.500"
                             fontSize={{ sm: "lg", lg: "xl" }}
                             transition="all 0.3s"
-                            _hover={{transform: "translateY(-3px)"}}
+                            onClick={handleAddStudent}
+                            _hover={{ transform: "translateY(-3px)" }}
                         >Add a Student</Button>
                     </HStack>
                 </Box>
 
                 <VStack
-                w="100%"
-                flex="1"
-                //bg="red"
-                display="flex"
-                paddingBottom="2rem"
+                    w="100%"
+                    flex="1"
+                    gap="0rem"
+                    display="flex"
+                    paddingBottom="2rem"
                 >
-                    <HStack 
-                    flex="1" 
-                    minH="4rem" 
-                     
-                    w="80%" 
-                    maxW="40rem">
-                        <Text>Name</Text>
-                        <Text>Class</Text>
-                        <Text>Grade</Text>
-
+                    <HStack
+                        flex="1"
+                        minH="4rem"
+                        gap="0"
+                        w="80%"
+                        maxW="40rem"
+                    >
+                        <Box flex="4">
+                            <Text ml="1rem" maxW="10rem">Name</Text>
+                        </Box>
+                        <Center flex="1">
+                            <Text  >Class</Text>
+                        </Center>
+                        <Center flex="1">
+                            <Text >Grade</Text>
+                        </Center>
+                        <Center flex="1">
+                            <Text></Text>
+                        </Center>
                     </HStack>
 
-                    <VStack 
-                    flex="4" 
-                    bg="gray.200" 
-                    w="80%"
-                    maxW="40rem"
-                    minH="12rem"
-                    alignItems={"center"} >
-                        <Text marginTop="5rem" color="gray.500">No Students Found</Text>
-                        
+                    <VStack
+                        flex="10"
+                        bg="gray.100"
+                        w="80%"
+                        maxW="40rem"
+                        minH="12rem"
+                        gap="0rem"
+                        alignItems={"center"} >
+
+                        {localStudents.map((student, index) => (
+                        <Box
+                        w="100%"
+                        h="3rem"
+                        bg={index % 2 === 0 ? "gray.200" : "gray.300"}
+                        display="flex"
+                        alignItems="center">
+                            <HStack 
+                            display="flex" 
+                            w="100%" 
+                            gap="0">
+                                <Box flex="4">
+                                    <Text 
+                                    ml="1rem" 
+                                    maxW={{sm: "12rem", md: "20rem"}} 
+                                    truncate>{student.name}</Text>
+                                </Box>
+                                <Center flex="1">
+                                    <Text>{student.class}</Text>
+                                </Center>
+                                <Center flex="1">
+                                    <Text>A</Text>
+                                </Center>
+                                <Center flex="1">
+                                    <Text>View</Text>
+                                </Center>
+                            </HStack>
+                        </Box>
+                        ))}
                     </VStack>
-
                 </VStack>
-
             </VStack>
         </Box>
     )
