@@ -1,4 +1,4 @@
-import { Box, Center, Button } from '@chakra-ui/react'
+import { Box, Center } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { Squash as Hamburger } from 'hamburger-react'
 import '../styles/header.css'

@@ -1,5 +1,5 @@
 import React from 'react'
-import {Box, VStack, Heading, Button} from '@chakra-ui/react'
+import {Box, VStack, Heading} from '@chakra-ui/react'
 import Header from '../components/Header'
 
 const Scores_Terminal = () => {
