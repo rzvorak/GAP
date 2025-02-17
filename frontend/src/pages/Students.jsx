@@ -11,7 +11,7 @@ import Dialog from '../components/Dialog.jsx'
 
 const Students = () => {
 
-    const { fetchStudents, students } = useStudentStore();
+    const { fetchStudents, createStudent, students } = useStudentStore();
     // forces react to re-rended properly when a new student is added
     const [localStudents, setLocalStudents] = useState([])
 
@@ -26,8 +26,30 @@ const Students = () => {
     }, [students]);
 
 
+    const [dialog, setDialog] = useState(false);
+
     const handleAddStudent = () => {
         fetchStudents();
+        setDialog(!dialog);
+    }
+
+    const [newStudent, setNewStudent] = useState({
+        name: "",
+        id: "",
+        class: "",
+    })
+
+    const handleSubmitStudent = async (studentName, studentClass) => {
+        console.log('function called in students')
+        setNewStudent({
+            name: studentName,
+            id: "-1",
+            class: studentClass,
+        })
+        console.log('student created: ', newStudent.name, newStudent.id, newStudent.class)
+        const {success, message} = await createStudent(newStudent);
+        fetchStudents();
+        console.log(success, message);
     }
 
     return (
@@ -39,7 +61,7 @@ const Students = () => {
                 display="flex"
                 flexDir={"column"}
             >
-                <Dialog></Dialog>
+                {dialog && <Dialog handleSubmitStudent={handleSubmitStudent} setDialog={setDialog}></Dialog>}
 
                 <Header></Header>
 

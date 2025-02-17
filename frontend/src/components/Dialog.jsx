@@ -1,7 +1,11 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import { Input, Button } from '@chakra-ui/react'
+import { IoClose } from "react-icons/io5";
+import '../styles/Dialog.css'
 
-const Dialog = () => {
+const Dialog = ({ setDialog, handleSubmitStudent }) => {
+  const [fade, setFade] = useState(false);
+  const [currentName, setCurrentName] = useState("");
 
   const dialogContainer = {
     position: "fixed",
@@ -11,7 +15,10 @@ const Dialog = () => {
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "hsla(0, 0%, 20%, 0.6)",
-    zIndex: "4"
+    zIndex: "4",
+    opacity: fade ? "1" : "0",
+    transition: "all 0.1s ease-in-out"
+    
   }
 
   const dialog = {
@@ -22,7 +29,7 @@ const Dialog = () => {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    userSelect: "none"
+    userSelect: "none",  
   }
 
   const dialogHeader = {
@@ -32,7 +39,9 @@ const Dialog = () => {
     paddingTop: "1rem",
     display: "flex",
     alignItems: "center",
-    fontSize: "1.2rem"
+    fontSize: "1.2rem",
+    justifyContent: "space-between",
+    paddingRight: "2.5rem"
   }
 
   const dialogBody = {
@@ -111,11 +120,30 @@ const Dialog = () => {
     } 
   };
 
+  const handleSubmitButton = () => {
+    console.log("Button clicked in dialog")
+    handleSubmitStudent("testing here", 8);
+  }
+
+  const handleExit = () => {
+    setFade(false);
+    setTimeout(() => {
+      setDialog(false);
+    }, 100)
+  };
+
+  useEffect(() => {
+    setFade(true)
+  }, []);
+
   return (
     <div style={dialogContainer}>
       <div style={dialog}>
         <div style={dialogHeader}>
           <h1>Add a Student</h1>
+          <div onClick={() => handleExit()}>
+            <IoClose size="2rem" className="IoClose" />
+          </div>
         </div>
 
         <div style={dialogBody}>
@@ -128,6 +156,8 @@ const Dialog = () => {
             borderRadius="0.5rem"
             marginBottom="2rem"
             transition='all 0.3s'
+            value={currentName}
+            onChange={(e) => setCurrentName(e.target.value)}
             _hover={{ transform: "translateY(-3px)" }}></Input>
 
           <div style={dialogBodyText}><p>Class: </p></div>
@@ -157,6 +187,7 @@ const Dialog = () => {
             fontSize="lg"
             transition="all 0.3s"
             _hover={{ bg: "green.600" }}
+            onClick={handleSubmitButton}
           >Add Student</Button>
 
         </div>

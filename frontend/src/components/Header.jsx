@@ -15,7 +15,6 @@ const Header = () => {
   const menuContainer = {
     position: 'fixed',
     height: "60%",
-    width: "10rem",
     backgroundColor: "#f4f4f5",
     bottom: "0rem",
     width: "100%",
