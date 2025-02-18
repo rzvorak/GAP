@@ -21,7 +21,7 @@ const Scores_Type = () => {
   }
 
   const handleForward = (type) => {
-    navigate(`/scores/${type.toLowerCase()}`)
+    navigate(`/scores/${type.toLowerCase()}`, { state: {selectedType: type.toLowerCase(), selectedClass: selectedClass}})
   }
 
   return (
@@ -80,6 +80,7 @@ const Scores_Type = () => {
             alignItems={"center"}
             justifyContent={"space-between"}
             onClick={handleBack}
+            cursor="pointer"
             className='backContainer'>
               <FaArrowLeft size="1.5rem" className='FaArrowLeft'/>
 
@@ -98,7 +99,6 @@ const Scores_Type = () => {
                 <Text marginRight={"0.5rem"}>{selectedClass}</Text>
                 <GoPencil size="1rem"/>
               </Box>
-            
             </Box>
 
         </VStack>
