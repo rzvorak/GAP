@@ -14,6 +14,25 @@ const Students = () => {
     const { fetchStudents, createStudent, students } = useStudentStore();
     // forces react to re-rended properly when a new student is added
     const [localStudents, setLocalStudents] = useState([])
+    const [allStudents, setAllStudents] = useState([])
+
+    // track which class are currently selected for filter
+    const [selectedClasses, setSelectedClasses] = useState({
+        1: false,
+        2: false,
+        3: false,
+        4: false,
+        5: false,
+        6: false,
+        7: false,
+    })
+
+    const handleClassSelect = (classId) => {
+        setSelectedClasses(prevState => ({
+            ...prevState,
+            [classId]: !selectedClasses[classId]
+        }))
+    }
 
     // runs once on initial render, re-calls every time a dependency (in array) changes
     useEffect(() => {
@@ -23,31 +42,40 @@ const Students = () => {
     // runs every time students are updated
     useEffect(() => {
         setLocalStudents(students);
+        setAllStudents(students);
     }, [students]);
 
 
     const [dialog, setDialog] = useState(false);
-
     const handleAddStudent = () => {
         fetchStudents();
         setDialog(!dialog);
     }
 
-    const [newStudent, setNewStudent] = useState({
-        name: "",
-        id: "",
-        class: "",
-    })
+    // logic for filtering students during search
+    const [search, setSearch] = useState("")
+    const handleGetStudents = async () => {
+        if (Object.values(selectedClasses).some(selected => selected) && search !== "") {
+            setLocalStudents(allStudents)
+            setLocalStudents(allStudents.filter((student) => {return selectedClasses[student.class] && student.name.toLowerCase().includes(search.toLowerCase())}))
+        } else if (Object.values(selectedClasses).some(selected => selected) && search === "") {
+            setLocalStudents(allStudents)
+            setLocalStudents(allStudents.filter((student) => {return selectedClasses[student.class]}))
+        } else if (!Object.values(selectedClasses).some(selected => selected) && search !== "") {
+            setLocalStudents(allStudents)
+            setLocalStudents(allStudents.filter((student) => {return student.name.toLowerCase().includes(search.toLowerCase())}))
+        } else {
+            setLocalStudents(allStudents)
+        }
+    }
 
     const handleSubmitStudent = async (studentName, studentClass) => {
-        console.log('function called in students')
-        setNewStudent({
+        console.log('function called in students (name class):', studentName, studentClass)
+        const {success, message} = await createStudent({
             name: studentName,
             id: "-1",
             class: studentClass,
-        })
-        console.log('student created: ', newStudent.name, newStudent.id, newStudent.class)
-        const {success, message} = await createStudent(newStudent);
+        });
         fetchStudents();
         console.log(success, message);
     }
@@ -102,13 +130,13 @@ const Students = () => {
                                 fontSize="xl"
                             >Class: </Heading>
 
-                            <ClassButton class="1"></ClassButton>
-                            <ClassButton class="2"></ClassButton>
-                            <ClassButton class="3"></ClassButton>
-                            <ClassButton class="4"></ClassButton>
-                            <ClassButton class="5"></ClassButton>
-                            <ClassButton class="6"></ClassButton>
-                            <ClassButton class="7"></ClassButton>
+                            <ClassButton handleClassSelect={handleClassSelect} class="1"></ClassButton>
+                            <ClassButton handleClassSelect={handleClassSelect} class="2"></ClassButton>
+                            <ClassButton handleClassSelect={handleClassSelect} class="3"></ClassButton>
+                            <ClassButton handleClassSelect={handleClassSelect} class="4"></ClassButton>
+                            <ClassButton handleClassSelect={handleClassSelect} class="5"></ClassButton>
+                            <ClassButton handleClassSelect={handleClassSelect} class="6"></ClassButton>
+                            <ClassButton handleClassSelect={handleClassSelect} class="7"></ClassButton>
 
                         </HStack>
                     </Box>
@@ -140,6 +168,8 @@ const Students = () => {
                                 transition='all 0.3s'
                                 w="22rem"
                                 _hover={{ transform: "translateY(-3px)" }}
+                                value={search}
+                                onChange={(e)=> {setSearch(e.target.value)}}
                             ></Input>
                         </HStack>
                     </Box>
@@ -164,6 +194,7 @@ const Students = () => {
                                 transition="all 0.3s"
                                 _hover={{ transform: "translateY(-3px)" }}
                                 marginRight="1.5rem"
+                                onClick={handleGetStudents}
                             >Get Students</Button>
 
                                 <Button
@@ -219,7 +250,9 @@ const Students = () => {
                             gap="0rem"
                             alignItems={"center"} >
 
-                            {localStudents.map((student, index) => (
+                            {localStudents.length !== 0 && localStudents.sort((a, b) => a.class - b.class) ? 
+
+                            localStudents.map((student, index) => (
                                 <Box
                                     w="100%"
                                     h="3rem"
@@ -247,7 +280,18 @@ const Students = () => {
                                         </Center>
                                     </HStack>
                                 </Box>
-                            ))}
+                            )) : 
+                                <Box
+                                w="100%"
+                                h="6rem"
+                                bg="gray.200"
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="center">
+                                    No Students Found
+                                </Box>
+                            }
+
                         </VStack>
                     </VStack>
                 </VStack>

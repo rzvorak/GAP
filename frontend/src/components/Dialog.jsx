@@ -75,6 +75,7 @@ const Dialog = ({ setDialog, handleSubmitStudent }) => {
     height: "4rem",
     display: "flex",
     flexDirection: "row",
+    cursor: "pointer",
   }
 
   const dialogClass = {
@@ -114,15 +115,19 @@ const Dialog = ({ setDialog, handleSubmitStudent }) => {
     }));
   }
 
+  // ensure only one class bubble can be selected
   const handleClassSelect = (classId) => {
     if (selectedClass !== classId) {
       setSelectedClass(classId);
     } 
   };
 
-  const handleSubmitButton = () => {
+  const handleSubmitButton = async () => {
     console.log("Button clicked in dialog")
-    handleSubmitStudent("testing here", 8);
+    if (currentName !== "") {
+      await handleSubmitStudent(currentName, selectedClass);
+      handleExit();
+    } 
   }
 
   const handleExit = () => {
@@ -156,6 +161,7 @@ const Dialog = ({ setDialog, handleSubmitStudent }) => {
             borderRadius="0.5rem"
             marginBottom="2rem"
             transition='all 0.3s'
+            
             value={currentName}
             onChange={(e) => setCurrentName(e.target.value)}
             _hover={{ transform: "translateY(-3px)" }}></Input>
@@ -182,11 +188,12 @@ const Dialog = ({ setDialog, handleSubmitStudent }) => {
             h="2.5rem"
             borderRadius={"4rem"}
             borderWidth="2px"
-            bg="green.500"
-            color="gray.100"
+            bg={currentName === "" ? "gray.300" : "green.500"}
+            color="gray.100" 
             fontSize="lg"
             transition="all 0.3s"
-            _hover={{ bg: "green.600" }}
+            cursor={currentName === "" ? "auto" : "pointer"}
+            _hover={{bg: currentName === "" ? "gray.300" : "green.600"}}
             onClick={handleSubmitButton}
           >Add Student</Button>
 

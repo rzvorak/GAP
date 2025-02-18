@@ -26,11 +26,15 @@ const ClassButton = (props) => {
     userSelect: "none"
   }
 
+  
   return (
     <div style={containerStyle}
     onMouseEnter = {() => setIsHovered(true)}
     onMouseLeave = {() => setIsHovered(false)}
-    onClick={() => setIsSelected(!isSelected)}>
+    onClick={() => {
+      setIsSelected(!isSelected);
+      props.handleClassSelect(props.class)
+      }}>
         <p style={numStyle}>{props.class}</p>
     </div>
   )
