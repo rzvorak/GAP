@@ -36,7 +36,7 @@ const Scores_Homework = () => {
             color="gray.900"
         >
             {dialog && <Dialog_Homework setDialog={setDialog}></Dialog_Homework>}
-            
+
             <Header></Header>
 
             <VStack
@@ -56,8 +56,6 @@ const Scores_Homework = () => {
                 </Box>
 
                 <Box onClick={handleAdd}><AddButton></AddButton></Box>
-
-                
 
                 <Box
                     position="absolute"
