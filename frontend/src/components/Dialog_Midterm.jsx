@@ -3,7 +3,7 @@ import { Input, Button } from '@chakra-ui/react'
 import { IoClose } from "react-icons/io5";
 import '../styles/Dialog.css'
 
-const Dialog_Monthly = ({ setDialog }) => {
+const Dialog_Midterm = ({ setDialog }) => {
   const [fade, setFade] = useState(false);
   const [currentName, setCurrentName] = useState("");
   const [currentPoints, setCurrentPoints] = useState("");
@@ -156,7 +156,7 @@ const Dialog_Monthly = ({ setDialog }) => {
             cursor={currentName === "" ? "auto" : "pointer"}
             _hover={{ bg: currentName === "" ? "gray.300" : "green.600" }}
             onClick={handleSubmitButton}
-          >Create Monthly</Button>
+          >Create Midterm</Button>
 
         </div>
       </div>
@@ -164,4 +164,4 @@ const Dialog_Monthly = ({ setDialog }) => {
   )
 }
 
-export default Dialog_Monthly
+export default Dialog_Midterm
