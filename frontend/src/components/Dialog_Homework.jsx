@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react'
-import { Input, Button } from '@chakra-ui/react'
+import { Input, Button, createListCollection } from '@chakra-ui/react'
 import { IoClose } from "react-icons/io5";
+import { SelectContent, SelectItem, SelectRoot, SelectTrigger, SelectValueText } from '../components/ui/select';
+import { NumberInputField, NumberInputRoot, NumberInputLabel } from '../components/ui/number-input';
 import '../styles/Dialog.css'
+import '../styles/Dialog_Homework.css'
 
-const Dialog_Homework = ({ setDialog }) => {
+const Dialog_Homework = (props) => {
   const [fade, setFade] = useState(false);
   const [currentName, setCurrentName] = useState("");
-  const [currentPoints, setCurrentPoints] = useState("");
+  const [currentPoints, setCurrentPoints] = useState(10);
+  const [currentSubject, setCurrentSubject] = useState("")
 
   const dialogContainer = {
     position: "fixed",
@@ -30,6 +34,7 @@ const Dialog_Homework = ({ setDialog }) => {
     flexDirection: "column",
     alignItems: "center",
     userSelect: "none",
+    marginBottom: "9rem"
   }
 
   const dialogHeader = {
@@ -42,7 +47,6 @@ const Dialog_Homework = ({ setDialog }) => {
     fontSize: "1.2rem",
     justifyContent: "space-between",
     paddingRight: "2.5rem",
-    //backgroundColor: "pink"
   }
 
   const dialogBody = {
@@ -52,7 +56,6 @@ const Dialog_Homework = ({ setDialog }) => {
     flexDirection: "column",
     paddingTop: "1rem",
     alignItems: "center",
-    //backgroundColor: "lightyellow"
   }
 
   const dialogBodyText = {
@@ -70,25 +73,44 @@ const Dialog_Homework = ({ setDialog }) => {
     display: "flex",
     justifyContent: 'center',
     alignItems: "center",
-    //backgroundColor: "tomato"
   }
 
   const handleSubmitButton = async () => {
-    console.log("Button clicked in dialog")
+    console.log(currentName, currentPoints, currentSubject[0])
 
     handleExit();
   }
 
   const handleExit = () => {
+    console.log(props.selectedClass)
+
     setFade(false);
     setTimeout(() => {
-      setDialog(false);
+      props.setDialog(false);
     }, 100)
   };
 
   useEffect(() => {
     setFade(true)
   }, []);
+
+  // make global at some point
+  const subjects = {
+    "Class 1": ["Kiswahili", "Writing", "Numeracy", "Health", "Sports and Arts", "Reading"],
+    "Class 2": ["Kiswahili", "Writing", "Arithmetic", "Health", "Sports and Arts", "Reading"],
+    "Class 3": ["Kiswahili", "English", "Mathematics", "Science", "Geography", "History", "Sports and Arts"],
+    "Class 4": ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies"],
+    "Class 5": ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"],
+    "Class 6": ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"],
+    "Class 7": ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"]
+  }
+
+  // specifically for functionality with chakra select
+  const frameworks = createListCollection({
+    items: subjects[props.selectedClass].map((subject) => {
+      return ({ label: subject, value: subject });
+    })
+  })
 
   return (
     <div style={dialogContainer}>
@@ -115,32 +137,59 @@ const Dialog_Homework = ({ setDialog }) => {
             _hover={{ transform: "translateY(-3px)" }}></Input>
 
           <div style={dialogBodyText}><p>Points: </p></div>
-          <Input
-            placeholder="Enter a Number"
-            style={{ boxShadow: 'var(--box-shadow-classic)' }}
-            border="none"
+          <NumberInputRoot
+            defaultValue="10"
             w="80%"
             borderRadius="0.5rem"
             marginBottom="1rem"
-            transition='all 0.3s'
+            transition="all 0.3s"
             value={currentPoints}
-            onChange={(e) => setCurrentPoints(e.target.value)}
-            _hover={{ transform: "translateY(-3px)" }}></Input>
-          
+            onValueChange={(e) => setCurrentPoints(e.value)}
+            min={1}
+            max={100}
+            style={{ boxShadow: 'var(--box-shadow-classic)' }}
+            _hover={{ transform: "translateY(-3px)" }}
+          >
+            <NumberInputField borderWidth={"0"} />
+          </NumberInputRoot>
 
           <div style={dialogBodyText}><p>Subject: </p></div>
-          <Input
-            placeholder="Name (First Middle Sur)"
-            style={{ boxShadow: 'var(--box-shadow-classic)' }}
-            border="none"
+          <SelectRoot
+            collection={frameworks}
+            value={currentSubject}
+            onValueChange={(e) => setCurrentSubject(e.value)}
             w="80%"
             borderRadius="0.5rem"
-            marginBottom="1rem"
-            transition='all 0.3s'
-
-            value={currentName}
-            onChange={(e) => setCurrentName(e.target.value)}
-            _hover={{ transform: "translateY(-3px)" }}></Input>
+            border="none"
+            transition="all 0.3s"
+            positioning={{ placement: "bottom", flip: false }}
+            _hover={{ transform: "translateY(-3px)" }}
+            style={{ boxShadow: 'var(--box-shadow-classic)' }}>
+            <SelectTrigger>
+              <SelectValueText
+                placeholder="Select subject" />
+            </SelectTrigger>
+            <SelectContent padding="0" backgroundColor="gray.100">
+              {frameworks.items.map((subject) => {
+                return (
+                  <SelectItem
+                    cursor="pointer"
+                    paddingLeft="1rem"
+                    paddingTop="0.6rem"
+                    paddingBottom="0.6rem"
+                    backgroundColor="gray.100"
+                    borderWidth="0rem"
+                    color="black"
+                    transition="all 0.2s"
+                    _hover={{ backgroundColor: "gray.200" }}
+                    item={subject}
+                    key={subject.value}>
+                    {subject.label}
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </SelectRoot>
         </div>
 
         <div style={dialogFooter}>
@@ -149,7 +198,7 @@ const Dialog_Homework = ({ setDialog }) => {
             h="2.5rem"
             borderRadius={"4rem"}
             borderWidth="2px"
-            bg={currentName === "" ? "gray.300" : "green.500"}
+            bg={currentName === "" || currentSubject === "" ? "gray.300" : "green.500"}
             color="gray.100"
             fontSize="lg"
             transition="all 0.3s"

@@ -35,7 +35,7 @@ const Scores_Homework = () => {
             bg={"gray.100"}
             color="gray.900"
         >
-            {dialog && <Dialog_Homework setDialog={setDialog}></Dialog_Homework>}
+            {dialog && <Dialog_Homework setDialog={setDialog} selectedClass={selectedClass}></Dialog_Homework>}
 
             <Header></Header>
 
