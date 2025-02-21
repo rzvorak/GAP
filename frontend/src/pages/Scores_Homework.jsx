@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Box, VStack, Heading, Text, } from '@chakra-ui/react'
 import Header from '../components/Header'
 import { useNavigate, useLocation } from 'react-router-dom'
@@ -9,10 +9,25 @@ import { GoPencil } from "react-icons/go";
 import AddButton from '../components/AddButton'
 import Dialog_Homework from '../components/Dialog_Homework'
 
+import { useHomeworkStore } from '../store/homework.js'
+
 const Scores_Homework = () => {
     const location = useLocation();
     const selectedType = location.state?.selectedType;
     const selectedClass = location.state?.selectedClass;
+
+    const { fetchHomeworks, createHomework, homeworks } = useHomeworkStore();
+    const [localHomeworks, setLocalHomeworks] = useState([])
+    const [allHomeworks, setAllHomeworks] = useState([])
+
+    useEffect(() => {
+        fetchHomeworks();
+    }, [fetchHomeworks]);
+
+    useEffect(() => {
+        setLocalHomeworks(homeworks);
+        setAllHomeworks(homeworks);
+    }, [homeworks]);
 
     const navigate = useNavigate();
     const handleBack = () => {
@@ -28,6 +43,17 @@ const Scores_Homework = () => {
         setDialog(!dialog);
     }
 
+    const handleSubmitHomework = async (homeworkName, homeworkPoints, homeworkSubject, homeworkClass, homeworkMeanGrade) => {
+        const { success, message } = await createHomework({
+            name: homeworkName,
+            points: homeworkPoints,
+            subject: homeworkSubject,
+            class: homeworkClass,
+            meanGrade: homeworkMeanGrade
+        });
+        fetchHomeworks();
+    }
+
     return (
         <Box
             minH={"100vh"}
@@ -35,7 +61,7 @@ const Scores_Homework = () => {
             bg={"gray.100"}
             color="gray.900"
         >
-            {dialog && <Dialog_Homework setDialog={setDialog} selectedClass={selectedClass}></Dialog_Homework>}
+            {dialog && <Dialog_Homework handleSubmitHomework={handleSubmitHomework} setDialog={setDialog} selectedClass={selectedClass}></Dialog_Homework>}
 
             <Header></Header>
 

@@ -77,7 +77,7 @@ const Dialog_Homework = (props) => {
 
   const handleSubmitButton = async () => {
     console.log(currentName, currentPoints, currentSubject[0])
-
+    await props.handleSubmitHomework(currentName, currentPoints, currentSubject[0], props.selectedClass, -1)
     handleExit();
   }
 
