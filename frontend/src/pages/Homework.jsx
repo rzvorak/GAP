@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react'
-import { Box, VStack, Heading, Text, HStack, Input, Center, Button } from '@chakra-ui/react'
+import { Box, VStack, Heading, Text, HStack, Input, Center, Button, Spinner } from '@chakra-ui/react'
 import Header from '../components/Header'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import { useStudentStore } from '../store/student.js'
+import { useHomeworkStore } from '../store/homework.js'
 import { FaArrowLeft } from 'react-icons/fa';
+
+import Dialog_Delete from '../components/Dialog_Delete.jsx'
 
 
 const Homework = () => {
@@ -15,23 +18,55 @@ const Homework = () => {
     const navigate = useNavigate();
     const handleBack = () => {
         console.log(homeworkId)
-        navigate('/scores/homework', {state: {selectedClass: selectedClass}})
+        navigate('/scores/homework', { state: { selectedClass: selectedClass } })
 
     }
+
+    const { fetchHomeworks, updateHomework, deleteHomework, homeworks } = useHomeworkStore()
 
     const { fetchStudents, students } = useStudentStore()
 
     const [localStudents, setLocalStudents] = useState([])
     const [allStudents, setAllStudents] = useState([])
 
+    const [currentHomework, setCurrentHomework] = useState({})
+
+    useEffect(() => {
+        fetchHomeworks()
+    }, [fetchHomeworks])
+
+    useEffect(() => {
+        setCurrentHomework(homeworks.filter(homework => { return homework._id === homeworkId })[0])
+    })
+
     useEffect(() => {
         fetchStudents()
     }, [fetchStudents])
 
     useEffect(() => {
-        setLocalStudents(students)
-        setAllStudents(students)
+        setAllStudents(students.filter(student => { return student.class == Number(selectedClass.slice(-1)) }))
+        setLocalStudents(students.filter(student => { return student.class == Number(selectedClass.slice(-1)) }))
     }, [students])
+
+    const [search, setSearch] = useState("")
+
+    useEffect(() => {
+        setLocalStudents(allStudents.filter(student => { return student.name.toLowerCase().includes(search.toLowerCase()) }))
+
+    }, [search, allStudents])
+
+    const [dialog, setDialog] = useState(false);
+    const handleDeleteButton = () => {
+        setDialog(!dialog);
+    }
+
+    if (!currentHomework) {
+        return (
+            <Center minH="100vh" bg="gray.100">
+                <Spinner color="green.500" borderWidth="4px" cosize="xl" />
+            </Center>
+        );
+    }
 
     return (
         <Box
@@ -43,6 +78,8 @@ const Homework = () => {
             color="gray.900"
         >
             <Header></Header>
+
+            {dialog && <Dialog_Delete setDialog={setDialog}></Dialog_Delete>}
 
             <VStack
                 w="100%">
@@ -56,7 +93,7 @@ const Homework = () => {
                         color="gray.600"
                         fontSize="2xl"
                         fontWeight={"400"}
-                    >View Homework</Heading>
+                    >{currentHomework.name}</Heading>
                 </Box>
             </VStack>
 
@@ -74,10 +111,10 @@ const Homework = () => {
                         display="flex"
                         flexDir="column"
                         bg="gray.200">
-                        <Text marginTop="1rem">Points: </Text>
-                        <Text marginTop="1rem">Subject: </Text>
-                        <Text marginTop="1rem">Class Mean Grade: </Text>
-                        <Text marginY="1rem">Date Created: </Text>
+                        <Text marginTop="1rem">Points: {currentHomework.points}</Text>
+                        <Text marginTop="1rem">Subject: {currentHomework.subject}</Text>
+                        <Text marginTop="1rem">Class Mean Grade: {currentHomework.meanGrade == -1 ? "Not yet scored" : currentHomework.meanGrade} </Text>
+                        <Text marginY="1rem">Date Created: {String(currentHomework.createdAt).slice(0, 10)} </Text>
                     </Box>
                 </Box>
 
@@ -105,8 +142,8 @@ const Homework = () => {
                             transition='all 0.3s'
                             w="22rem"
                             _hover={{ transform: "translateY(-3px)" }}
-                        //value={search}
-                        //onChange={(e) => { setSearch(e.target.value) }}
+                            value={search}
+                            onChange={(e) => { setSearch(e.target.value) }}
                         ></Input>
 
                     </HStack>
@@ -160,6 +197,7 @@ const Homework = () => {
 
                                 localStudents.map((student, index) => (
                                     <Box
+                                        key={index}
                                         w="100%"
                                         h="3rem"
                                         bg={index % 2 === 0 ? "gray.200" : "gray.300"}
@@ -205,11 +243,11 @@ const Homework = () => {
                 </Box>
 
                 <HStack
-                justifyContent="space-between" 
-                maxW="40rem" 
-                w="80%" 
-                flex="1"
-                marginBottom="2rem">
+                    justifyContent="space-between"
+                    maxW="40rem"
+                    w="80%"
+                    flex="1"
+                    marginBottom="2rem">
                     <Box onClick={handleBack} p="0.5rem" cursor="pointer">
                         <FaArrowLeft size="1.5rem" className='FaArrowLeft' />
                     </Box>
@@ -224,7 +262,7 @@ const Homework = () => {
                             color="green.500"
                             fontSize={{ sm: "lg", lg: "xl" }}
                             transition="all 0.3s"
-                            //onClick={handleAddStudent}
+                            onClick={handleDeleteButton}
                             _hover={{ transform: "translateY(-3px)" }}
                         >Delete Homework</Button>
 

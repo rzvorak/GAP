@@ -133,7 +133,7 @@ const Scores_Homework = () => {
                                             <Text fontSize="sm" p="0.4rem">Points:  {homework.points} </Text>
                                             <Text fontSize="sm" p="0.4rem">Subject:  {homework.subject} </Text>
                                             <Text fontSize="sm" p="0.4rem">Class Mean Grade:  {homework.meanGrade == -1 ? "Not yet scored" : homework.meanGrade} </Text>
-                                            <Text fontSize="sm" p="0.4rem">Date Created: {homework.createdAt.slice(0, 10)}</Text>
+                                            <Text fontSize="sm" p="0.4rem">Date Created: {String(homework.createdAt).slice(0, 10)}</Text>
                                         </Box>
 
                                         <Box

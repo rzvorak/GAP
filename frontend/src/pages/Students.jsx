@@ -6,7 +6,7 @@ import '../styles/App.css'
 import { Box, VStack, Heading, HStack, Input, Button, Text, Center } from '@chakra-ui/react'
 
 import { useStudentStore } from '../store/student.js';
-import Dialog from '../components/Dialog.jsx'
+import Dialog_Student from '../components/Dialog_Student.jsx'
 
 
 const Students = () => {
@@ -89,7 +89,7 @@ const Students = () => {
                 display="flex"
                 flexDir={"column"}
             >
-                {dialog && <Dialog handleSubmitStudent={handleSubmitStudent} setDialog={setDialog}></Dialog>}
+                {dialog && <Dialog_Student handleSubmitStudent={handleSubmitStudent} setDialog={setDialog}></Dialog_Student>}
 
                 <Header></Header>
 
