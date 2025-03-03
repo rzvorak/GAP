@@ -82,8 +82,6 @@ const Dialog_Homework = (props) => {
   }
 
   const handleExit = () => {
-    console.log(props.selectedClass)
-
     setFade(false);
     setTimeout(() => {
       props.setDialog(false);

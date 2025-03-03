@@ -8,6 +8,7 @@ export const useHomeworkStore = create((set) => ({
         if (!newHomework.name || !newHomework.points || !newHomework.subject || !newHomework.class || !newHomework.meanGrade) {
             return {success: false, message: "Please fill in all fields."}
         }
+        console.log("made it to the store")
         const res = await fetch("/api/homework", {
             method:"POST",
             headers:{

@@ -24,7 +24,7 @@ const AddButton = () => {
         <div style={containerStyle}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
-            onClick={() => (console.log('test'))}>
+            >
             <FaPlus size="1.5rem" className="FaPlus"/>
         </div>
     )
