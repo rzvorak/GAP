@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Box, VStack, Heading, Text, Stack } from '@chakra-ui/react'
+import { Box, VStack, Heading, Text, HStack, Center } from '@chakra-ui/react'
 import Header from '../components/Header'
 import { useNavigate, useLocation } from 'react-router-dom'
 
@@ -15,20 +15,17 @@ import { AccordionItem, AccordionItemContent, AccordionItemTrigger, AccordionRoo
 
 const Scores_Homework = () => {
     const location = useLocation();
-    const selectedType = location.state?.selectedType;
     const selectedClass = location.state?.selectedClass;
 
     const { fetchHomeworks, createHomework, homeworks } = useHomeworkStore();
     const [localHomeworks, setLocalHomeworks] = useState([])
-    const [allHomeworks, setAllHomeworks] = useState([])
 
     useEffect(() => {
         fetchHomeworks();
     }, [fetchHomeworks]);
 
     useEffect(() => {
-        setLocalHomeworks(homeworks);
-        setAllHomeworks(homeworks);
+        setLocalHomeworks(homeworks.filter(homework => { return homework.class == Number(selectedClass.slice(-1)) }));
     }, [homeworks]);
 
     const navigate = useNavigate();
@@ -36,8 +33,9 @@ const Scores_Homework = () => {
         navigate('/scores/type', { state: { selectedClass: selectedClass } })
     }
 
-    const handleForward = () => {
-
+    const handleForward = (homeworkId) => {
+        console.log(homeworkId)
+        navigate('/scores/homework-view', { state: { homeworkId: homeworkId, selectedClass: selectedClass}})
     }
 
     const [dialog, setDialog] = useState(false);
@@ -54,14 +52,9 @@ const Scores_Homework = () => {
             class: Number(homeworkClass.slice(-1)),
             meanGrade: homeworkMeanGrade
         });
+        console.log(success, message)
         fetchHomeworks();
     }
-
-    const items = [
-        { value: "a", title: "First Item", text: "Some value 1..." },
-        { value: "b", title: "Second Item", text: "Some value 2..." },
-        { value: "c", title: "Third Item", text: "Some value 3..." },
-    ]
 
     return (
         <Box
@@ -75,7 +68,7 @@ const Scores_Homework = () => {
             <Header></Header>
 
 
-            <VStack // all the vertical layout could use adjustment, works fine
+            <VStack // all the vertical layout could use adjustment, works fine -> use flex = 1 and flex, column in the very outer box
                 w="100%"
                 paddingBottom="4rem"
 
@@ -107,30 +100,62 @@ const Scores_Homework = () => {
                         multiple
                         borderRadius="0"
                     >
-                        {items.map((item, index) => (
+
+
+                        {localHomeworks.map((homework, index) => (
                             <AccordionItem
                                 borderRadius="0"
                                 bg="gray.200"
                                 marginBottom="1rem"
                                 key={index}
-                                value={item.value}>
+                                value={homework.name}>
                                 <AccordionItemTrigger
-                                    p="0.5rem"
+                                    p="0.75rem"
                                     cursor="pointer"
                                     h="3.5rem"
-
                                     bg="gray.100"
                                     fontWeight="400"
+                                    display="flex"
                                     style={{ boxShadow: 'var(--box-shadow-classic)' }}
-                                >{item.title}</AccordionItemTrigger>
+                                >
+                                    <HStack justifyContent="space-between" h="1.5rem" w="100%">
+                                        {homework.name}
+                                        <Box fontSize="sm" bg="gray.200" p="0.5rem" borderRadius="0.7rem" marginRight="1rem">{homework.subject.slice(0, 2)}</Box>
+                                    </HStack>
+                                </AccordionItemTrigger>
                                 <AccordionItemContent
-                                    h="8rem"
+                                    h="9.5rem"
                                     bg="gray.200"
                                     p="0.5rem"
-                                >{item.text}</AccordionItemContent>
+                                >
+                                    <HStack position="relative">
+                                        <Box>
+                                            <Text fontSize="sm" p="0.4rem">Points:  {homework.points} </Text>
+                                            <Text fontSize="sm" p="0.4rem">Subject:  {homework.subject} </Text>
+                                            <Text fontSize="sm" p="0.4rem">Class Mean Grade:  {homework.meanGrade == -1 ? "Not yet scored" : homework.meanGrade} </Text>
+                                            <Text fontSize="sm" p="0.4rem">Date Created: {homework.createdAt.slice(0, 10)}</Text>
+                                        </Box>
+
+                                        <Box
+                                            position="absolute"
+                                            bottom="0.7rem"
+                                            right="1.5rem"
+                                            w="3rem"
+                                            h="3rem"
+                                            cursor="pointer"
+                                            color="green.500"
+                                            onClick={() => handleForward(homework._id)}
+                                            transition="all 0.2s ease-in-out"
+                                            _hover={{transform: "translateY(-3px)"}}
+                                        >
+                                            <Center h="100%"><GoPencil size="2rem" /></Center>
+                                                
+                                        </Box>
+                                    </HStack>
+
+                                </AccordionItemContent>
                             </AccordionItem>
                         ))}
-
                     </AccordionRoot>
 
                     <Box onClick={handleAdd}><AddButton></AddButton></Box>
@@ -169,7 +194,7 @@ const Scores_Homework = () => {
                             transition="all 0.3s"
                             _hover={{ bg: "green.600" }}
                         >
-                            <Text marginRight={"0.5rem"}>{selectedType.charAt(0).toUpperCase() + selectedType.slice(1)}: {selectedClass}</Text>
+                            <Text marginRight={"0.5rem"}>Homework: {selectedClass}</Text>
                             <GoPencil size="1rem" />
                         </Box>
                     </Box>
