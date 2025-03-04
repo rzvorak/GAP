@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import { connectDB } from './config/db.js'
 import studentRoutes from './routes/student.route.js';
 import homeworkRoutes from './routes/homework.route.js';
+import settingsRoutes from './routes/settings.route.js';
 
 dotenv.config();
 
@@ -12,6 +13,7 @@ app.use(express.json()); // allows JSON data in body
 
 app.use('/api/students', studentRoutes)
 app.use('/api/homework', homeworkRoutes)
+app.use('/api/settings', settingsRoutes)
 
 const PORT = process.env.PORT || 5000
 

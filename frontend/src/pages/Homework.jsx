@@ -7,6 +7,7 @@ import { useStudentStore } from '../store/student.js'
 import { useHomeworkStore } from '../store/homework.js'
 import { FaArrowLeft } from 'react-icons/fa';
 
+import { NumberInputField, NumberInputRoot, NumberInputLabel } from '../components/ui/number-input';
 import Dialog_Delete from '../components/Dialog_Delete.jsx'
 
 
@@ -79,7 +80,7 @@ const Homework = () => {
         >
             <Header></Header>
 
-            {dialog && <Dialog_Delete setDialog={setDialog}></Dialog_Delete>}
+            {dialog && <Dialog_Delete currentAssignment={currentHomework.name} setDialog={setDialog}></Dialog_Delete>}
 
             <VStack
                 w="100%">
@@ -170,17 +171,17 @@ const Homework = () => {
                             w="100%"
                             maxW="40rem"
                         >
-                            <Box flex="4">
+                            <Box flex="3">
                                 <Text ml="1rem" maxW="10rem">Name</Text>
                             </Box>
-                            <Center flex="1">
-                                <Text  >Class</Text>
+                            <Center flex="2">
+                                <Text>Score</Text>
                             </Center>
                             <Center flex="1">
-                                <Text >Grade</Text>
+                                <Text>Grade</Text>
                             </Center>
                             <Center flex="1">
-                                <Text></Text>
+                                <Text>Rank</Text>
                             </Center>
                         </HStack>
 
@@ -207,14 +208,29 @@ const Homework = () => {
                                             display="flex"
                                             w="100%"
                                             gap="0">
-                                            <Box flex="4">
+                                            <Box flex="3">
                                                 <Text
                                                     ml="1rem"
                                                     maxW={{ sm: "12rem", md: "20rem" }}
                                                     truncate>{student.name}</Text>
                                             </Box>
-                                            <Center flex="1">
-                                                <Text>{student.class}</Text>
+                                            <Center flex="2">
+                                                <NumberInputRoot
+                                                    defaultValue={currentHomework.points}
+                                                    w="100%"
+                                                    h="90%"
+                                                    borderRadius="0.25rem"
+                                                    step={1}
+                                                    
+                                                
+                                                    //value={currentPoints}
+                                                    //onValueChange={(e) => setCurrentPoints(e.value)}
+                                                    min={0}
+                                                    max={currentHomework.points}
+                                                    style={{ boxShadow: 'var(--box-shadow-classic)' }}
+                                                >
+                                                    <NumberInputField borderWidth={"0"} />
+                                                </NumberInputRoot>
                                             </Center>
                                             <Center flex="1">
                                                 <Text>A</Text>
