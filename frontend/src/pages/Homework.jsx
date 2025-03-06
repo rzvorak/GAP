@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Box, VStack, Heading, Text, HStack, Input, Center, Button, Spinner } from '@chakra-ui/react'
+import { Box, VStack, Heading, Text, HStack, Input, Center, Button, Spinner, SegmentGroupItemHiddenInput } from '@chakra-ui/react'
 import Header from '../components/Header'
 import { useLocation, useNavigate } from 'react-router-dom'
 
@@ -11,6 +11,7 @@ import { NumberInputField, NumberInputRoot, NumberInputLabel } from '../componen
 import Dialog_Delete from '../components/Dialog_Delete.jsx'
 
 
+
 const Homework = () => {
     const location = useLocation();
     const homeworkId = location.state?.homeworkId;
@@ -18,39 +19,53 @@ const Homework = () => {
 
     const navigate = useNavigate();
     const handleBack = () => {
-        console.log(homeworkId)
         navigate('/scores/homework', { state: { selectedClass: selectedClass } })
-
     }
 
     const { fetchHomeworks, updateHomework, deleteHomework, homeworks } = useHomeworkStore()
-
     const { fetchStudents, students } = useStudentStore()
 
     const [localStudents, setLocalStudents] = useState([])
     const [allStudents, setAllStudents] = useState([])
 
     const [currentHomework, setCurrentHomework] = useState({})
+    const [settings, setSettings] = useState({})
 
+    // page init, run once on startup
     useEffect(() => {
-        fetchHomeworks()
-    }, [fetchHomeworks])
-
-    useEffect(() => {
+        async function fetchSettings() {
+            console.log("fetching")
+            const res = await fetch("/api/settings");
+            const data = await res.json();
+            setSettings(data.data)
+        }
+        fetchSettings();
         setCurrentHomework(homeworks.filter(homework => { return homework._id === homeworkId })[0])
-    })
+    }, [])
+
+    useEffect(() => {
+        fetchHomeworks();
+    }, [fetchHomeworks])
 
     useEffect(() => {
         fetchStudents()
     }, [fetchStudents])
 
+    // filter students down to only current class
     useEffect(() => {
         setAllStudents(students.filter(student => { return student.class == Number(selectedClass.slice(-1)) }))
+        // handle case in which input is not changed before saving
+        const defaultScores = {};
+        allStudents.forEach(student => {
+            defaultScores[student._id] = String(currentHomework.points);
+        }) 
+        setStudentScores(defaultScores)
+
         setLocalStudents(students.filter(student => { return student.class == Number(selectedClass.slice(-1)) }))
     }, [students])
 
+    // filter students based on search
     const [search, setSearch] = useState("")
-
     useEffect(() => {
         setLocalStudents(allStudents.filter(student => { return student.name.toLowerCase().includes(search.toLowerCase()) }))
 
@@ -59,6 +74,45 @@ const Homework = () => {
     const [dialog, setDialog] = useState(false);
     const handleDeleteButton = () => {
         setDialog(!dialog);
+    }
+
+    const [studentScores, setStudentScores] = useState({})
+    const [studentGrades, setStudentGrades] = useState({})
+    const [studentRanks, setStudentRanks] = useState({})
+    const handleSaveButton = () => {
+        console.log(studentScores)
+        const {A, B, C, D, F} = settings.cutoffs;
+
+        allStudents.forEach(student => {
+            let percent = 100 * (studentScores[student._id] / currentHomework.points);
+            console.log(student.name, percent, A, B, C, D, F)
+            let grade = null;
+
+            switch (true) {
+                case percent >= Number(A):
+                    grade = "A";
+                    break;
+                case percent >= Number(B):
+                    grade = "B";
+                    break;
+                case percent >= Number(C):
+                    grade = "C";
+                    break;
+                case percent >= Number(D):
+                    grade = "D";
+                    break;
+                default:
+                    grade = "F";
+            }
+
+            setStudentGrades(prevGrades => ({
+                ...prevGrades,
+                [student._id]: grade
+            }))
+        })
+
+        localStudents.sort((a, b) => studentScores[b._id] - studentScores[a._id])
+
     }
 
     if (!currentHomework) {
@@ -80,7 +134,7 @@ const Homework = () => {
         >
             <Header></Header>
 
-            {dialog && <Dialog_Delete currentAssignment={currentHomework.name} setDialog={setDialog}></Dialog_Delete>}
+            {dialog && <Dialog_Delete handleBack={handleBack} delete={deleteHomework} id={homeworkId} currentAssignment={currentHomework.name} setDialog={setDialog}></Dialog_Delete>}
 
             <VStack
                 w="100%">
@@ -103,7 +157,6 @@ const Homework = () => {
                 <Box
                     w="80%"
                     flex="1"
-                    //bg="red.100"
                     maxW="40rem"
                 >
                     <Box
@@ -221,10 +274,11 @@ const Homework = () => {
                                                     h="90%"
                                                     borderRadius="0.25rem"
                                                     step={1}
-                                                    
-                                                
-                                                    //value={currentPoints}
-                                                    //onValueChange={(e) => setCurrentPoints(e.value)}
+                                                    value={studentScores[student._id] || currentHomework.points}
+                                                    onValueChange={(e) => setStudentScores(prevScores => ({
+                                                        ...prevScores,
+                                                        [student._id]: e.value
+                                                    }))}
                                                     min={0}
                                                     max={currentHomework.points}
                                                     style={{ boxShadow: 'var(--box-shadow-classic)' }}
@@ -233,10 +287,10 @@ const Homework = () => {
                                                 </NumberInputRoot>
                                             </Center>
                                             <Center flex="1">
-                                                <Text>A</Text>
+                                                <Text>{studentGrades[student._id] || "-"}</Text>
                                             </Center>
                                             <Center flex="1">
-                                                <Text>View</Text>
+                                                <Text>{studentRanks[student._id] || "-"}</Text>
                                             </Center>
                                         </HStack>
                                     </Box>
@@ -291,7 +345,7 @@ const Homework = () => {
                             transition="all 0.3s"
                             _hover={{ transform: "translateY(-3px)" }}
                             marginLeft="1.5rem"
-                        //onClick={handleGetStudents}
+                            onClick={handleSaveButton}
                         >Save</Button>
                     </Box>
 

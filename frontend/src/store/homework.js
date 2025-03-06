@@ -8,7 +8,6 @@ export const useHomeworkStore = create((set) => ({
         if (!newHomework.name || !newHomework.points || !newHomework.subject || !newHomework.class || !newHomework.meanGrade) {
             return {success: false, message: "Please fill in all fields."}
         }
-        console.log("made it to the store")
         const res = await fetch("/api/homework", {
             method:"POST",
             headers:{
@@ -38,7 +37,7 @@ export const useHomeworkStore = create((set) => ({
         return {success: true, message: data.message};
     },
 
-    updateHomework: async (pid) => {
+    updateHomework: async (pid, updatedHomework) => {
         const res = await fetch(`/api/homework/${pid}`, {
             method: "PUT",
             headers: {

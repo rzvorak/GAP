@@ -4,6 +4,7 @@ import { connectDB } from './config/db.js'
 import studentRoutes from './routes/student.route.js';
 import homeworkRoutes from './routes/homework.route.js';
 import settingsRoutes from './routes/settings.route.js';
+import Settings from './models/settings.model.js';
 
 dotenv.config();
 
@@ -15,9 +16,26 @@ app.use('/api/students', studentRoutes)
 app.use('/api/homework', homeworkRoutes)
 app.use('/api/settings', settingsRoutes)
 
+const initializeSettings = async () => {
+    try {
+        const existingSettings = await Settings.findById("global");
+        
+        if (!existingSettings) {
+            await Settings.create({
+                _id: "global",
+                distribution: { "Homework": 10, "Monthly": 20, "Midterm": 20, "Terminal": 50 },
+                cuttoffs: {"A": 81, "B": 61, "C": 41, "D": 21, "F": 0}
+            });
+        }
+    } catch (error) {
+        console.error('Error initializing settings:', error);
+    }
+};
+
 const PORT = process.env.PORT || 5000
 
-app.listen(PORT, () => {
-    connectDB();
+app.listen(PORT, async () => {
+    await connectDB();
+    await initializeSettings();
     console.log("Server started...")
 })

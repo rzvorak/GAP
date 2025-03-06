@@ -73,8 +73,11 @@ const Students = () => {
         console.log('function called in students (name class):', studentName, studentClass)
         const {success, message} = await createStudent({
             name: studentName,
-            id: "-1",
             class: studentClass,
+            homeworkLog: {},
+            monthlyLog: {},
+            midtermLog: {},
+            terminalLog: {}
         });
         fetchStudents();
         console.log(success, message);

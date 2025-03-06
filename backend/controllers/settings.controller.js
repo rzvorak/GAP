@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
 import Settings from '../models/settings.model.js'
 
+// primarily for postman testing
 export const createSettings = async (req, res) => {
     const settings = req.body;
 

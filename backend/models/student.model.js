@@ -5,17 +5,26 @@ const studentSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    id: {
-        type: Number,
-        required: true
-    },
     class: {
         type: Number,
         required: true
     },
-    dob: {
-        type: Date,
+    homeworkLog: {
+        type: Map,
+        required: true
     },
+    monthlyLog: {
+        type: Map,
+        required: true
+    },
+    midtermLog: {
+        type: Map,
+        required: true
+    },
+    terminalLog: {
+        type: Map,
+        required: true
+    }
 }, {
     timestamps: true
 });

@@ -54,9 +54,9 @@ const Dialog_Delete = (props) => {
   }
 
   const handleConfirmButton = async () => {
-   
-    
+    await props.delete(props.id);  
     handleExit();
+    props.handleBack();
   }
 
   const handleExit = () => {
