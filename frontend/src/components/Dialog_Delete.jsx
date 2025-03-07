@@ -23,7 +23,7 @@ const Dialog_Delete = (props) => {
   }
 
   const dialog = {
-    height: "10rem",
+    height: "7rem",
     width: "20rem",
     backgroundColor: "#f4f4f5",
     borderRadius: "1rem",
@@ -36,21 +36,13 @@ const Dialog_Delete = (props) => {
   const dialogHeader = {
     width: "100%",
     flex: "1",
-    paddingLeft: "2.2rem",
-    paddingTop: "1rem",
+    paddingLeft: "2rem",
     display: "flex",
     alignItems: "center",
     fontSize: "1.2rem",
     justifyContent: "space-between",
-    paddingRight: "2.5rem",
-  }
-
-  const dialogFooter = {
-    width: "100%",
-    flex: "2",
-    display: "flex",
-    justifyContent: 'center',
-    alignItems: "center",
+    paddingRight: "2rem",
+    paddingTop: "0.25rem"
   }
 
   const handleConfirmButton = async () => {
@@ -74,15 +66,8 @@ const Dialog_Delete = (props) => {
     <div style={dialogContainer}>
       <div style={dialog}>
         <div style={dialogHeader}>
-          <h1>Delete Assignment?</h1>
-          <div onClick={() => handleExit()}>
-            <IoClose size="2rem" className="IoClose" />
-          </div>
-        </div>
-
-        <div style={dialogFooter}>
           <Button
-            w="60%"
+            w="80%"
             h="2.5rem"
             borderRadius={"4rem"}
             borderWidth="2px"
@@ -94,7 +79,9 @@ const Dialog_Delete = (props) => {
             _hover={{bg: "green.600" }}
             onClick={handleConfirmButton}
           >Confirm Deletion</Button>
-
+          <div onClick={() => handleExit()}>
+            <IoClose size="2rem" className="IoClose" />
+          </div>
         </div>
       </div>
     </div>

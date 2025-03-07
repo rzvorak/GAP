@@ -37,6 +37,7 @@ const Homework = () => {
     const [search, setSearch] = useState("")
     const [triggerLoad, setTriggerLoad] = useState(false)
     const [triggerSave, setTriggerSave] = useState(false)
+    const [pressedSave, setPressedSave] = useState(false)
     
     // launch once on load, get students, homeworks, and settings
     useEffect(() => {
@@ -80,8 +81,10 @@ const Homework = () => {
                 else if (percent >= settings.cutoffs.B) grade = "B";
                 else if (percent >= settings.cutoffs.C) grade = "C";
                 else if (percent >= settings.cutoffs.D) grade = "D";
+
+                console.log(student.homeworkLog[homeworkId] == null)
         
-                newGrades[student._id] = student.homeworkLog[homeworkId] ? grade : "-";
+                newGrades[student._id] = student.homeworkLog[homeworkId] == null ? grade : "-";
             });
 
         }, 0)
@@ -125,14 +128,11 @@ const Homework = () => {
             else if (percent >= settings.cutoffs.C) grade = "C";
             else if (percent >= settings.cutoffs.D) grade = "D";
     
-            updatedGrades[student._id] = grade;
+            updatedGrades[student._id] = grade
     
             return {
                 ...student,
-                homeworkLog: {
-                    ...student.homeworkLog,
-                    [currentHomework._id]: newScore,
-                },
+                homeworkLog: {...student.homeworkLog, [currentHomework._id]: newScore},
             };
         });
     
@@ -147,6 +147,20 @@ const Homework = () => {
     const handleDeleteButton = () => {
         setDialog(!dialog);
     }
+
+    const handleDeleteHomework = () => {
+        students.forEach(student => {
+            if (student.homeworkLog[homeworkId] != null) {
+                delete student.homeworkLog[homeworkId]
+            }
+        })
+
+
+
+        deleteHomework();
+    }
+
+
 
     if (!currentHomework || !localStudents ) {
         return (
@@ -167,7 +181,7 @@ const Homework = () => {
         >
             <Header></Header>
 
-            {dialog && <Dialog_Delete handleBack={handleBack} delete={deleteHomework} id={homeworkId} currentAssignment={currentHomework.name} setDialog={setDialog}></Dialog_Delete>}
+            {dialog && <Dialog_Delete handleBack={handleBack} delete={handleDeleteHomework} id={homeworkId} setDialog={setDialog}></Dialog_Delete>}
 
             <VStack
                 w="100%">
@@ -378,7 +392,11 @@ const Homework = () => {
                             transition="all 0.3s"
                             _hover={{ transform: "translateY(-3px)" }}
                             marginLeft="1.5rem"
-                            onClick={handleSaveButton}
+                            onClick={() => {
+                                console.log("clicked")
+                                setPressedSave(true)
+                                handleSaveButton()
+                            }}
                         >Save</Button>
                     </Box>
 

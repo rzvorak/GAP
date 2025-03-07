@@ -1,9 +1,9 @@
 .IoClose:hover {
-    color: gray
+    color: rgb(177, 177, 177)
 }
 
 .IoClose{
-    color: lightgray;
+    color: gray;
     cursor: pointer;
     transition: all 0.1s ease-in-out;
 }
