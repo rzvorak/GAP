@@ -131,7 +131,7 @@ const Scores_Homework = () => {
                                         <Box>
                                             <Text fontSize="sm" p="0.4rem">Points:  {homework.points} </Text>
                                             <Text fontSize="sm" p="0.4rem">Subject:  {homework.subject} </Text>
-                                            <Text fontSize="sm" p="0.4rem">Class Mean Grade:  {homework.meanGrade == -1 ? "Not yet scored" : homework.meanGrade} </Text>
+                                            <Text fontSize="sm" p="0.4rem">Class Mean Grade:  {homework.meanGrade == -1 ? "Not yet scored" : (((homework.meanGrade/homework.points) * 100).toFixed(1) + "%   ,  " + homework.meanGrade.toFixed(2) + " / " + homework.points)} </Text>
                                             <Text fontSize="sm" p="0.4rem">Date Created: {String(homework.createdAt).slice(0, 10)}</Text>
                                         </Box>
 

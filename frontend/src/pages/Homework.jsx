@@ -10,8 +10,6 @@ import { FaArrowLeft } from 'react-icons/fa';
 import { NumberInputField, NumberInputRoot, NumberInputLabel } from '../components/ui/number-input';
 import Dialog_Delete from '../components/Dialog_Delete.jsx'
 
-
-
 const Homework = () => {
     const location = useLocation();
     const homeworkId = location.state?.homeworkId;
@@ -22,13 +20,14 @@ const Homework = () => {
         navigate('/scores/homework', { state: { selectedClass: selectedClass } })
     }
 
-    const { fetchHomeworks, deleteHomework, homeworks } = useHomeworkStore()
+    const { fetchHomeworks, deleteHomework, updateHomework, homeworks } = useHomeworkStore()
     const { fetchStudents, updateStudent, students } = useStudentStore()
 
     const [localStudents, setLocalStudents] = useState([])
     const [allStudents, setAllStudents] = useState([])
 
     const [currentHomework, setCurrentHomework] = useState({})
+    const [currentMeanGrade, setCurrentMeanGrade] = useState(-1)
     const [settings, setSettings] = useState({})
 
     const [studentScores, setStudentScores] = useState({})
@@ -37,6 +36,7 @@ const Homework = () => {
     const [search, setSearch] = useState("")
     const [triggerLoad, setTriggerLoad] = useState(false)
     const [triggerSave, setTriggerSave] = useState(false)
+    // maybe use to make "-" on entry possible for grades
     const [pressedSave, setPressedSave] = useState(false)
     
     // launch once on load, get students, homeworks, and settings
@@ -103,17 +103,6 @@ const Homework = () => {
         handleSaveButton()
     }, [triggerSave]);
 
-    
-    useEffect(() => {
-        if (search === "") return;
-        console.log("setting local students in problem")
-        
-        setLocalStudents(allStudents.filter(student => student.name.toLowerCase().includes(search.toLowerCase())));
-        console.log("finished setting local students in problem")
-        
-    }, [search, allStudents]);
-
-    
     const handleSaveButton = () => {
         console.log("Saving student scores...");
     
@@ -140,7 +129,44 @@ const Homework = () => {
     
         setStudentGrades(updatedGrades);
         setLocalStudents(updatedStudents.sort((a, b) => studentScores[b._id] - studentScores[a._id]));
+
+        let currentRank = 1;
+        const newRanks = {};
+        let sum = 0;
+
+        let sorted = Object.entries(studentScores).sort((a, b) => b[1] - a[1])
+
+        for (let i = 0; i < sorted.length; ++i) {
+            let [id, score] = sorted[i];
+            console.log(score)
+            
+            sum += Number(score);
+
+            if (i > 0 && score === sorted[i-1][1]) {
+                newRanks[id] = newRanks[sorted[i-1][0]];
+            } else {
+                newRanks[id] = currentRank;
+            }
+
+            currentRank++;
+        }
+
+        setStudentRanks(newRanks);
+
+        updateHomework(homeworkId, {
+            ...currentHomework,
+            meanGrade: sum / sorted.length
+        })
+
+        console.log("sum:", sum)
+
+        setCurrentMeanGrade(sum / sorted.length);
     };
+
+    useEffect(() => {
+        setLocalStudents(allStudents.filter(student => student.name.toLowerCase().includes(search.toLowerCase())))
+        
+    }, [search])
 
 
     const [dialog, setDialog] = useState(false);
@@ -150,16 +176,17 @@ const Homework = () => {
 
     const handleDeleteHomework = () => {
         students.forEach(student => {
-            if (student.homeworkLog[homeworkId] != null) {
-                delete student.homeworkLog[homeworkId]
-            }
-        })
-
-
-
-        deleteHomework();
-    }
-
+            const updatedHomeworkLog = { ...student.homeworkLog };
+            delete updatedHomeworkLog[homeworkId];
+    
+            updateStudent(student._id, {
+                ...student,
+                homeworkLog: updatedHomeworkLog
+            });
+        });
+    
+        deleteHomework(homeworkId);
+    };
 
 
     if (!currentHomework || !localStudents ) {
@@ -214,7 +241,7 @@ const Homework = () => {
                         bg="gray.200">
                         <Text marginTop="1rem">Points: {currentHomework.points}</Text>
                         <Text marginTop="1rem">Subject: {currentHomework.subject}</Text>
-                        <Text marginTop="1rem">Class Mean Grade: {currentHomework.meanGrade == -1 ? "Not yet scored" : currentHomework.meanGrade} </Text>
+                        <Text marginTop="1rem">Class Mean Grade: {currentMeanGrade == -1 ? "Not yet scored" : (((currentMeanGrade/currentHomework.points) * 100).toFixed(1) + "%   ,  " + currentMeanGrade.toFixed(2) + " / " + currentHomework.points)} </Text>
                         <Text marginY="1rem">Date Created: {String(currentHomework.createdAt).slice(0, 10)} </Text>
                     </Box>
                 </Box>
@@ -294,7 +321,7 @@ const Homework = () => {
                             gap="0rem"
                             alignItems={"center"} >
 
-                            {localStudents.length !== 0  ?
+                            {localStudents.length !== 0 ?
 
                                 localStudents.map((student, index) => (
                                     <Box
