@@ -22,8 +22,8 @@ const Homework = () => {
         navigate('/scores/homework', { state: { selectedClass: selectedClass } })
     }
 
-    const { fetchHomeworks, updateHomework, deleteHomework, homeworks } = useHomeworkStore()
-    const { fetchStudents, students } = useStudentStore()
+    const { fetchHomeworks, deleteHomework, homeworks } = useHomeworkStore()
+    const { fetchStudents, updateStudent, students } = useStudentStore()
 
     const [localStudents, setLocalStudents] = useState([])
     const [allStudents, setAllStudents] = useState([])
@@ -31,91 +31,124 @@ const Homework = () => {
     const [currentHomework, setCurrentHomework] = useState({})
     const [settings, setSettings] = useState({})
 
-    // page init, run once on startup
+    const [studentScores, setStudentScores] = useState({})
+    const [studentGrades, setStudentGrades] = useState({})
+    const [studentRanks, setStudentRanks] = useState({})
+    const [search, setSearch] = useState("")
+    const [triggerLoad, setTriggerLoad] = useState(false)
+    const [triggerSave, setTriggerSave] = useState(false)
+    
+    // launch once on load, get students, homeworks, and settings
     useEffect(() => {
-        async function fetchSettings() {
-            console.log("fetching")
+        async function fetchAll() {
+            console.log("Fetching settings, homeworks, and students...");
             const res = await fetch("/api/settings");
             const data = await res.json();
-            setSettings(data.data)
+            setSettings(data.data);
+
+            await fetchStudents();
+            await fetchHomeworks();
+            setTriggerLoad(true);
         }
-        fetchSettings();
-        setCurrentHomework(homeworks.filter(homework => { return homework._id === homeworkId })[0])
-    }, [])
-
+    
+        fetchAll();
+    }, []);
+    
+    // wait for students, homework, and settings then execute
     useEffect(() => {
-        fetchHomeworks();
-    }, [fetchHomeworks])
-
-    useEffect(() => {
-        fetchStudents()
-    }, [fetchStudents])
-
-    // filter students down to only current class
-    useEffect(() => {
-        setAllStudents(students.filter(student => { return student.class == Number(selectedClass.slice(-1)) }))
-        // handle case in which input is not changed before saving
+        if (!homeworkId || !settings.cutoffs || homeworks.length === 0 || students.length === 0) return;
+    
+        console.log("Processing students and homeworks...");
+    
+        const homework = homeworks.find(hw => hw._id === homeworkId);
+        setCurrentHomework(homework);
+    
+        const classStudents = students.filter(student => student.class === Number(selectedClass.slice(-1)));
+    
         const defaultScores = {};
-        allStudents.forEach(student => {
-            defaultScores[student._id] = String(currentHomework.points);
-        }) 
-        setStudentScores(defaultScores)
+        const newGrades = {};
+    
+        // fetch existing saved scores or default to full points
+        setTimeout(() => {
+            classStudents.forEach(student => {
+                const savedScore = student.homeworkLog?.[homeworkId] ?? homework.points;
+                defaultScores[student._id] = savedScore;
+        
+                const percent = (savedScore / homework.points) * 100;
+                let grade = "F";
+                if (percent >= settings.cutoffs.A) grade = "A";
+                else if (percent >= settings.cutoffs.B) grade = "B";
+                else if (percent >= settings.cutoffs.C) grade = "C";
+                else if (percent >= settings.cutoffs.D) grade = "D";
+        
+                newGrades[student._id] = student.homeworkLog[homeworkId] ? grade : "-";
+            });
 
-        setLocalStudents(students.filter(student => { return student.class == Number(selectedClass.slice(-1)) }))
-    }, [students])
+        }, 0)
 
-    // filter students based on search
-    const [search, setSearch] = useState("")
+        setAllStudents(classStudents);
+        setStudentScores(defaultScores);
+        setStudentGrades(newGrades);
+        setLocalStudents(classStudents.sort((a, b) => studentScores[b._id] - studentScores[a._id]));
+        setTriggerSave(true);
+        
+    }, [triggerLoad]);
+
+    // trigger save to properly load everything
     useEffect(() => {
-        setLocalStudents(allStudents.filter(student => { return student.name.toLowerCase().includes(search.toLowerCase()) }))
+        if (!triggerSave) return;
+        handleSaveButton()
+    }, [triggerSave]);
 
-    }, [search, allStudents])
+    
+    useEffect(() => {
+        if (search === "") return;
+        console.log("setting local students in problem")
+        
+        setLocalStudents(allStudents.filter(student => student.name.toLowerCase().includes(search.toLowerCase())));
+        console.log("finished setting local students in problem")
+        
+    }, [search, allStudents]);
+
+    
+    const handleSaveButton = () => {
+        console.log("Saving student scores...");
+    
+        const updatedGrades = {};
+        const updatedStudents = allStudents.map(student => {
+            const newScore = studentScores[student._id];
+            const percent = (newScore / currentHomework.points) * 100;
+    
+            let grade = "F";
+            if (percent >= settings.cutoffs.A) grade = "A";
+            else if (percent >= settings.cutoffs.B) grade = "B";
+            else if (percent >= settings.cutoffs.C) grade = "C";
+            else if (percent >= settings.cutoffs.D) grade = "D";
+    
+            updatedGrades[student._id] = grade;
+    
+            return {
+                ...student,
+                homeworkLog: {
+                    ...student.homeworkLog,
+                    [currentHomework._id]: newScore,
+                },
+            };
+        });
+    
+        updatedStudents.forEach(student => updateStudent(student._id, student));
+    
+        setStudentGrades(updatedGrades);
+        setLocalStudents(updatedStudents.sort((a, b) => studentScores[b._id] - studentScores[a._id]));
+    };
+
 
     const [dialog, setDialog] = useState(false);
     const handleDeleteButton = () => {
         setDialog(!dialog);
     }
 
-    const [studentScores, setStudentScores] = useState({})
-    const [studentGrades, setStudentGrades] = useState({})
-    const [studentRanks, setStudentRanks] = useState({})
-    const handleSaveButton = () => {
-        console.log(studentScores)
-        const {A, B, C, D, F} = settings.cutoffs;
-
-        allStudents.forEach(student => {
-            let percent = 100 * (studentScores[student._id] / currentHomework.points);
-            console.log(student.name, percent, A, B, C, D, F)
-            let grade = null;
-
-            switch (true) {
-                case percent >= Number(A):
-                    grade = "A";
-                    break;
-                case percent >= Number(B):
-                    grade = "B";
-                    break;
-                case percent >= Number(C):
-                    grade = "C";
-                    break;
-                case percent >= Number(D):
-                    grade = "D";
-                    break;
-                default:
-                    grade = "F";
-            }
-
-            setStudentGrades(prevGrades => ({
-                ...prevGrades,
-                [student._id]: grade
-            }))
-        })
-
-        localStudents.sort((a, b) => studentScores[b._id] - studentScores[a._id])
-
-    }
-
-    if (!currentHomework) {
+    if (!currentHomework || !localStudents ) {
         return (
             <Center minH="100vh" bg="gray.100">
                 <Spinner color="green.500" borderWidth="4px" cosize="xl" />
@@ -247,7 +280,7 @@ const Homework = () => {
                             gap="0rem"
                             alignItems={"center"} >
 
-                            {localStudents.length !== 0 && localStudents.sort((a, b) => a.class - b.class) ?
+                            {localStudents.length !== 0  ?
 
                                 localStudents.map((student, index) => (
                                     <Box
@@ -274,7 +307,7 @@ const Homework = () => {
                                                     h="90%"
                                                     borderRadius="0.25rem"
                                                     step={1}
-                                                    value={studentScores[student._id] || currentHomework.points}
+                                                    value={studentScores[student._id]}
                                                     onValueChange={(e) => setStudentScores(prevScores => ({
                                                         ...prevScores,
                                                         [student._id]: e.value

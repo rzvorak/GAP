@@ -34,7 +34,6 @@ const Scores_Homework = () => {
     }
 
     const handleForward = (homeworkId) => {
-        console.log(homeworkId)
         navigate('/scores/homework-view', { state: { homeworkId: homeworkId, selectedClass: selectedClass}})
     }
 
