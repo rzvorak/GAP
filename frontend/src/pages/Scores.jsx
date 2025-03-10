@@ -1,15 +1,17 @@
 import React from 'react'
-import { Box, VStack, Heading, Button, Text } from '@chakra-ui/react'
+import { Box, VStack, Heading, Button, useBreakpointValue } from '@chakra-ui/react'
 import Header from '../components/Header'
 import { useNavigate } from 'react-router-dom'
 
 import { FaArrowLeft } from 'react-icons/fa';
 
-const classNames = [
-  'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7'
-]
-
 const Scores = () => {
+
+  const disappearOnMin = useBreakpointValue({ "min": "none", "xxs": "flex" })
+
+  const classNames = [
+    'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7'
+  ]
 
   const navigate = useNavigate();
   const handleForward = (className) => {
@@ -27,13 +29,15 @@ const Scores = () => {
       maxW={"100vw"}
       bg={"gray.100"}
       color="gray.900"
+      display="flex"
+      flexDir="column"
     >
       <Header />
 
-      <VStack w="100%">
+      <VStack w="100%" flex="1" display={disappearOnMin}>
         <Box
           w="100%"
-          h={{ sm: "4rem" }}
+          h="4rem"
           display="flex"
           alignItems={"center"}
         >
@@ -69,17 +73,23 @@ const Scores = () => {
             </Button>
           ))}
         </VStack>
-
-        <Box
-          position="absolute"
-          bottom="4rem"
-          
-          cursor={"pointer"}
-          onClick={handleBack}>
-          <FaArrowLeft size="1.5rem" className='FaArrowLeft' />         
-        </Box>
-
       </VStack>
+
+      <Box
+          w="100%"
+          display={disappearOnMin}
+          h="8rem"
+          paddingTop="2rem" // control how close plus can get
+          paddingBottom="2rem"
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Box
+            cursor={"pointer"}
+            onClick={handleBack}>
+            <FaArrowLeft size="1.5rem" className='FaArrowLeft' />
+          </Box>
+        </Box>
 
     </Box>
   )

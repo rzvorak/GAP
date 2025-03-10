@@ -3,7 +3,7 @@ import ClassButton from '../components/ClassButton'
 
 import React, { useEffect, useState } from 'react'
 import '../styles/App.css'
-import { Box, VStack, Heading, HStack, Input, Button, Text, Center } from '@chakra-ui/react'
+import { Box, VStack, Heading, HStack, Input, Button, Text, Center, useBreakpointValue, SimpleGrid, Spinner } from '@chakra-ui/react'
 import { IoClose } from "react-icons/io5";
 
 import { useStudentStore } from '../store/student.js';
@@ -13,10 +13,13 @@ import Dialog_Delete from '../components/Dialog_Delete.jsx'
 
 const Students = () => {
 
+    const disappearOnMin = useBreakpointValue({ "min": "none", "xxs": "flex" })
+
     const { fetchStudents, createStudent, deleteStudent, students } = useStudentStore();
     // forces react to re-rended properly when a new student is added
     const [localStudents, setLocalStudents] = useState([])
     const [allStudents, setAllStudents] = useState([])
+    const [isStudentsLoading, setIsStudentsLoading] = useState(true)
 
     // track which class are currently selected for filter
     const [selectedClasses, setSelectedClasses] = useState({
@@ -38,7 +41,7 @@ const Students = () => {
 
     // runs once on initial render, re-calls every time a dependency (in array) changes
     useEffect(() => {
-        fetchStudents();
+        fetchStudents().then(() => setIsStudentsLoading(false));
     }, [fetchStudents]);
 
     // runs every time students are updated
@@ -114,14 +117,17 @@ const Students = () => {
             <VStack
                 w="100%"
                 h="100%"
-                display="flex"
+                display={disappearOnMin}
                 flexDir={"column"}
-                flex="1">
+                flex="1"
+            >
+
                 <Box
                     w="100%"
-                    h={{ sm: "4rem" }}
+                    h={{ "xxs": "4rem", "xs": "4rem", sm: "4rem" }}
                     display="flex"
-                    alignItems={"center"}>
+                    alignItems="center"
+                >
                     <Heading
                         marginLeft="1rem"
                         color="gray.600"
@@ -132,7 +138,7 @@ const Students = () => {
 
                 <Box
                     w="100%"
-                    h={{ sm: "4rem" }}
+                    h={{ "xxs": "7rem", "xs": "7rem", sm: "4rem" }}
                     display="flex"
                     alignItems={"center"}
                     justifyContent={"center"}
@@ -145,23 +151,23 @@ const Students = () => {
                             marginBottom="0.3rem"
                             color="gray.600"
                             fontWeight={"400"}
-                            fontSize="xl"
+                            fontSize={{ "xxs": "lg", sm: "xl" }}
                         >Class: </Heading>
 
-                        <ClassButton handleClassSelect={handleClassSelect} class="1"></ClassButton>
-                        <ClassButton handleClassSelect={handleClassSelect} class="2"></ClassButton>
-                        <ClassButton handleClassSelect={handleClassSelect} class="3"></ClassButton>
-                        <ClassButton handleClassSelect={handleClassSelect} class="4"></ClassButton>
-                        <ClassButton handleClassSelect={handleClassSelect} class="5"></ClassButton>
-                        <ClassButton handleClassSelect={handleClassSelect} class="6"></ClassButton>
-                        <ClassButton handleClassSelect={handleClassSelect} class="7"></ClassButton>
+                        <SimpleGrid
+                            columns={useBreakpointValue({ "xxs": 4, "xs": 4, sm: 7 })}>
+                            {["1", "2", "3", "4", "5", "6", "7"].map((classNum, index) => (
+                                <ClassButton key={index} handleClassSelect={handleClassSelect} class={classNum}></ClassButton>
+                            ))}
+                        </SimpleGrid>
+
 
                     </HStack>
                 </Box>
 
                 <Box
                     w="100%"
-                    h={{ sm: "4rem" }}
+                    h={{ "xxs": "4rem" }}
                     display="flex"
                     alignItems={"center"}
                     justifyContent={"center"}
@@ -174,7 +180,7 @@ const Students = () => {
                             marginBottom="0.3rem"
                             color="gray.600"
                             fontWeight={"400"}
-                            fontSize="xl"
+                            fontSize={{ "xxs": "lg", sm: "xl" }}
                         >Search: </Heading>
 
                         <Input
@@ -184,7 +190,7 @@ const Students = () => {
                             borderRadius="0.5rem"
                             marginBottom="0.3rem"
                             transition='all 0.3s'
-                            w="22rem"
+                            w={{ "xxs": "10rem", "xs": "15rem", sm: "22rem" }}
                             _hover={{ transform: "translateY(-3px)" }}
                             value={search}
                             onChange={(e) => { setSearch(e.target.value) }}
@@ -194,7 +200,7 @@ const Students = () => {
 
                 <Box
                     w="100%"
-                    h={{ sm: "4rem" }}
+                    h={{ "xxs": "4rem" }}
                     display="flex"
                     alignItems={"center"}
                     justifyContent={"center"}
@@ -205,24 +211,24 @@ const Students = () => {
 
                         <Button
                             borderRadius={"4rem"}
-                            w="12rem"
+                            w={{ "xxs": "6rem", "xs": "9rem", sm: "12rem" }}
                             bg="green.500"
                             color="gray.100"
-                            fontSize={{ sm: "lg", lg: "xl" }}
+                            fontSize={{ "xxs": "xs", "xs": "base", sm: "lg", lg: "xl" }}
                             transition="all 0.3s"
                             _hover={{ transform: "translateY(-3px)" }}
-                            marginRight="1.5rem"
+                            marginRight={{ "xxs": "0.7rem", "xs": "1rem", sm: "1.5rem" }}
                             onClick={handleGetStudents}
                         >Get Students</Button>
 
                         <Button
                             borderRadius={"4rem"}
-                            w="12rem"
+                            w={{ "xxs": "6rem", "xs": "9rem", sm: "12rem" }}
                             borderWidth="2px"
                             borderColor={"green.500"}
                             bg="none"
                             color="green.500"
-                            fontSize={{ sm: "lg", lg: "xl" }}
+                            fontSize={{ "xxs": "xs", "xs": "base", sm: "lg", lg: "xl" }}
                             transition="all 0.3s"
                             onClick={handleAddStudent}
                             _hover={{ transform: "translateY(-3px)" }}
@@ -249,10 +255,10 @@ const Students = () => {
                             <Text ml="1rem" maxW="10rem">Name</Text>
                         </Box>
                         <Center flex="1">
-                            <Text  >Class</Text>
+                            <Text paddingRight={{ "xxs": "0.4rem", sm: "0rem" }} >Class</Text>
                         </Center>
                         <Center flex="1">
-                            <Text >Grade</Text>
+                            <Text paddingLeft={{ "xxs": "0.4rem", sm: "0rem" }} >Grade</Text>
                         </Center>
                         <Center flex="1">
                             <Text></Text>
@@ -268,51 +274,54 @@ const Students = () => {
                         gap="0rem"
                         alignItems={"center"} >
 
-                        {localStudents.length !== 0 && localStudents.sort((a, b) => a.class - b.class) ?
+                        {isStudentsLoading ? (
+                            <Spinner marginTop="2rem" color="gray.400" borderWidth="4px" cosize="xl" />
+                        ) : (
+                            localStudents.length !== 0 && localStudents.sort((a, b) => a.class - b.class) ?
 
-                            localStudents.map((student, index) => (
+                                localStudents.map((student, index) => (
+                                    <Box
+                                        w="100%"
+                                        h="3rem"
+                                        bg={index % 2 === 0 ? "gray.200" : "gray.300"}
+                                        display="flex"
+                                        alignItems="center"
+                                        key={index}>
+                                        <HStack
+                                            display="flex"
+                                            w="100%"
+                                            gap="0">
+                                            <Box flex="4">
+                                                <Text
+                                                    ml="1rem"
+                                                    maxW={{ sm: "12rem", md: "20rem" }}
+                                                    truncate>{student.name}</Text>
+                                            </Box>
+                                            <Center flex="1">
+                                                <Text>{student.class}</Text>
+                                            </Center>
+                                            <Center flex="1">
+                                                <Text>A</Text>
+                                            </Center>
+                                            <Center flex="1">
+                                                <Box onClick={() => handleDeleteButton(student._id)}>
+                                                    <IoClose size="2rem" className="IoClose" />
+
+                                                </Box>
+                                            </Center>
+                                        </HStack>
+                                    </Box>
+                                )) :
                                 <Box
                                     w="100%"
-                                    h="3rem"
-                                    bg={index % 2 === 0 ? "gray.200" : "gray.300"}
+                                    h="6rem"
+                                    bg="gray.200"
                                     display="flex"
                                     alignItems="center"
-                                    key={index}>
-                                    <HStack
-                                        display="flex"
-                                        w="100%"
-                                        gap="0">
-                                        <Box flex="4">
-                                            <Text
-                                                ml="1rem"
-                                                maxW={{ sm: "12rem", md: "20rem" }}
-                                                truncate>{student.name}</Text>
-                                        </Box>
-                                        <Center flex="1">
-                                            <Text>{student.class}</Text>
-                                        </Center>
-                                        <Center flex="1">
-                                            <Text>A</Text>
-                                        </Center>
-                                        <Center flex="1">
-                                            <Box onClick={() => handleDeleteButton(student._id)}>
-                                                <IoClose size="2rem" className="IoClose" />
-
-                                            </Box>
-                                        </Center>
-                                    </HStack>
+                                    justifyContent="center">
+                                    No Students Found
                                 </Box>
-                            )) :
-                            <Box
-                                w="100%"
-                                h="6rem"
-                                bg="gray.200"
-                                display="flex"
-                                alignItems="center"
-                                justifyContent="center">
-                                No Students Found
-                            </Box>
-                        }
+                        )}
 
                     </VStack>
                 </VStack>

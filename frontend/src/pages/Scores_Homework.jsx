@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Box, VStack, Heading, Text, HStack, Center } from '@chakra-ui/react'
+import { Box, VStack, Heading, Text, HStack, Center, useBreakpointValue, Spinner } from '@chakra-ui/react'
 import Header from '../components/Header'
 import { useNavigate, useLocation } from 'react-router-dom'
 
@@ -14,14 +14,18 @@ import { useHomeworkStore } from '../store/homework.js'
 import { AccordionItem, AccordionItemContent, AccordionItemTrigger, AccordionRoot } from '../components/ui/accordion'
 
 const Scores_Homework = () => {
+
+    const disappearOnMin = useBreakpointValue({ "min": "none", "xxs": "flex" })
+
     const location = useLocation();
     const selectedClass = location.state?.selectedClass;
 
     const { fetchHomeworks, createHomework, homeworks } = useHomeworkStore();
     const [localHomeworks, setLocalHomeworks] = useState([])
+    const [isHomeworkLoading, setIsHomeworkLoading] = useState(true)
 
     useEffect(() => {
-        fetchHomeworks();
+        fetchHomeworks().then(() => setIsHomeworkLoading(false));
     }, [fetchHomeworks]);
 
     useEffect(() => {
@@ -34,7 +38,7 @@ const Scores_Homework = () => {
     }
 
     const handleForward = (homeworkId) => {
-        navigate('/scores/homework-view', { state: { homeworkId: homeworkId, selectedClass: selectedClass}})
+        navigate('/scores/homework-view', { state: { homeworkId: homeworkId, selectedClass: selectedClass } })
     }
 
     const [dialog, setDialog] = useState(false);
@@ -71,18 +75,18 @@ const Scores_Homework = () => {
             <VStack
                 w="100%"
                 paddingBottom="0rem"
-                display="flex"
+                display={disappearOnMin}
                 gap="0"
                 flexDir="column"
                 flex="1"
             >
                 <Box
                     w="100%"
-                    h="4rem" 
+                    h="4rem"
                     display="flex"
                     alignItems="center"
                     marginBottom="1rem"
-                    >
+                >
                     <Heading
                         marginLeft="1rem"
                         color="gray.600"
@@ -94,70 +98,79 @@ const Scores_Homework = () => {
 
                 <VStack w="100%" flex="1">
 
-                    <AccordionRoot
-                        w="80%"
-                        variant={"plain"}
-                        collapsible
-                        multiple
-                        borderRadius="0"
-                    >
-                        {localHomeworks.map((homework, index) => (
-                            <AccordionItem
-                                borderRadius="0"
-                                bg="gray.200"
-                                marginBottom="1rem"
-                                key={index}
-                                value={homework.name}>
-                                <AccordionItemTrigger
-                                    p="0.75rem"
-                                    cursor="pointer"
-                                    h="3.5rem"
-                                    bg="gray.100"
-                                    fontWeight="400"
-                                    display="flex"
-                                    style={{ boxShadow: 'var(--box-shadow-classic)' }}
-                                >
-                                    <HStack justifyContent="space-between" h="1.5rem" w="100%">
-                                        {homework.name}
-                                        <Box fontSize="sm" bg="gray.200" p="0.5rem" borderRadius="0.7rem" marginRight="1rem">{homework.subject.slice(0, 2)}</Box>
-                                    </HStack>
-                                </AccordionItemTrigger>
-                                <AccordionItemContent
-                                    h="9.5rem"
+                    {!isHomeworkLoading ? (
+                        <AccordionRoot
+                            w="80%"
+                            variant={"plain"}
+                            collapsible
+                            multiple
+                            borderRadius="0"
+                        >
+                            {localHomeworks.map((homework, index) => (
+                                <AccordionItem
+                                    borderRadius="0"
                                     bg="gray.200"
-                                    p="0.5rem"
-                                >
-                                    <HStack position="relative">
-                                        <Box>
-                                            <Text fontSize="sm" p="0.4rem">Points:  {homework.points} </Text>
-                                            <Text fontSize="sm" p="0.4rem">Subject:  {homework.subject} </Text>
-                                            <Text fontSize="sm" p="0.4rem">Class Mean Grade:  {homework.meanGrade == -1 || homework.meanGrade == null ? "Not yet scored" : (((homework.meanGrade/homework.points) * 100).toFixed(1) + "%   ,  " + homework.meanGrade.toFixed(2) + " / " + homework.points)} </Text>
-                                            <Text fontSize="sm" p="0.4rem">Date Created: {String(homework.createdAt).slice(0, 10)}</Text>
+                                    marginBottom="1rem"
+                                    key={index}
+                                    value={homework.name}>
+                                    <AccordionItemTrigger
+                                        p="0.75rem"
+                                        cursor="pointer"
+                                        h="3.5rem"
+                                        bg="gray.100"
+                                        fontWeight="400"
+                                        display="flex"
+                                        style={{ boxShadow: 'var(--box-shadow-classic)' }}
+                                    >
+                                        <HStack justifyContent="space-between" h="1.5rem" w="100%">
+                                            <Text lineClamp="1" marginRight="1rem" >{homework.name}</Text>
+                                            <Box fontSize="sm" bg="gray.200" p="0.5rem" borderRadius="0.7rem" marginRight="1rem">{homework.subject.slice(0, 2)}</Box>
+                                        </HStack>
+                                    </AccordionItemTrigger>
+                                    <AccordionItemContent
+                                        h={{ sm: "9.5rem" }}
+                                        bg="gray.200"
+                                        p="0.5rem"
+                                    >
+                                        <Box display="flex" flexDir="column" position="relative" >
+                                            <Box>
+                                                <Text lineClamp="1" fontSize="sm" p="0.4rem">Points:  {homework.points} </Text>
+                                                <Text lineClamp="1" fontSize="sm" p="0.4rem">Subject:  {homework.subject} </Text>
+                                                <Text lineClamp="1" fontSize="sm" p="0.4rem">Class Mean Grade:  {homework.meanGrade == -1 || homework.meanGrade == null ? "Not yet scored" : (((homework.meanGrade / homework.points) * 100).toFixed(1) + "%   ,  " + homework.meanGrade.toFixed(2) + " / " + homework.points)} </Text>
+                                                <Text lineClamp="1" fontSize="sm" p="0.4rem">Date Created: {String(homework.createdAt).slice(0, 10)}</Text>
+                                            </Box>
+
+                                            <Box
+                                                position={{ "xxs": "relative", sm: "absolute" }}
+                                                bottom={{ "xxs": "0rem", sm: "0.7rem" }}
+                                                right={{ "xxs": "0rem", sm: "1.5rem" }}
+                                                w="3rem"
+                                                h="3rem"
+                                                cursor="pointer"
+                                                color="green.500"
+                                                onClick={() => handleForward(homework._id)}
+                                                transition="all 0.2s ease-in-out"
+                                                _hover={{ transform: "translateY(-3px)" }}
+                                            >
+                                                <Center h="100%"><GoPencil size="2rem" /></Center>
+
+                                            </Box>
                                         </Box>
 
-                                        <Box
-                                            position="absolute"
-                                            bottom="0.7rem"
-                                            right="1.5rem"
-                                            w="3rem"
-                                            h="3rem"
-                                            cursor="pointer"
-                                            color="green.500"
-                                            onClick={() => handleForward(homework._id)}
-                                            transition="all 0.2s ease-in-out"
-                                            _hover={{transform: "translateY(-3px)"}}
-                                        >
-                                            <Center h="100%"><GoPencil size="2rem" /></Center>
-                                                
-                                        </Box>
-                                    </HStack>
+                                    </AccordionItemContent>
+                                </AccordionItem>
+                            ))}
+                        </AccordionRoot>
 
-                                </AccordionItemContent>
-                            </AccordionItem>
-                        ))}
-                    </AccordionRoot>
+                    ) :
+                        <Box marginBottom="2rem">
+                            <Spinner color="green.500" borderWidth="4px" cosize="xl" />
+                        </Box>
+                    }
 
-                    <Box  onClick={handleAdd}><AddButton></AddButton></Box>
+
+
+                    <Box onClick={handleAdd}><AddButton></AddButton></Box>
 
                 </VStack>
 
@@ -169,9 +182,9 @@ const Scores_Homework = () => {
                     paddingBottom="2rem"
                     justifyContent="center"
                     alignItems="center"
-                    >
+                >
                     <Box
-                        w="15rem"
+                        w={{ "xxs": "12rem", "xs": "14rem", sm: "15rem" }}
                         h="3rem"
                         display="flex"
                         alignItems="center"
@@ -193,7 +206,7 @@ const Scores_Homework = () => {
                             transition="all 0.3s"
                             _hover={{ bg: "green.600" }}
                         >
-                            <Text marginRight={"0.5rem"}>Homework: {selectedClass}</Text>
+                            <Text marginRight={"0.5rem"}>{useBreakpointValue({ "xxs": "HW:", sm: "Homework:" })} {selectedClass}</Text>
                             <GoPencil size="1rem" />
                         </Box>
                     </Box>
@@ -201,7 +214,7 @@ const Scores_Homework = () => {
 
             </VStack>
 
-        </Box>
+        </Box >
     )
 }
 

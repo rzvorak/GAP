@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Box, VStack, Heading, Text, HStack, Input, Center, Button, Spinner, SegmentGroupItemHiddenInput } from '@chakra-ui/react'
+import { Box, VStack, Heading, Text, HStack, Input, Center, Button, Spinner, useBreakpointValue } from '@chakra-ui/react'
 import Header from '../components/Header'
 import { useLocation, useNavigate } from 'react-router-dom'
 
@@ -7,10 +7,13 @@ import { useStudentStore } from '../store/student.js'
 import { useHomeworkStore } from '../store/homework.js'
 import { FaArrowLeft } from 'react-icons/fa';
 
-import { NumberInputField, NumberInputRoot, NumberInputLabel } from '../components/ui/number-input';
+import { NumberInputField, NumberInputRoot } from '../components/ui/number-input';
 import Dialog_Delete from '../components/Dialog_Delete.jsx'
 
 const Homework = () => {
+
+    const disappearOnMin = useBreakpointValue({ "min": "none", "xxs": "flex" })
+
     const location = useLocation();
     const homeworkId = location.state?.homeworkId;
     const selectedClass = location.state?.selectedClass;
@@ -38,7 +41,7 @@ const Homework = () => {
     const [triggerSave, setTriggerSave] = useState(false)
     // maybe use to make "-" on entry possible for grades
     const [pressedSave, setPressedSave] = useState(false)
-    
+
     // launch once on load, get students, homeworks, and settings
     useEffect(() => {
         async function fetchAll() {
@@ -51,30 +54,30 @@ const Homework = () => {
             await fetchHomeworks();
             setTriggerLoad(true);
         }
-    
+
         fetchAll();
     }, []);
-    
+
     // wait for students, homework, and settings then execute
     useEffect(() => {
         if (!homeworkId || !settings.cutoffs || homeworks.length === 0 || students.length === 0) return;
-    
+
         console.log("Processing students and homeworks...");
-    
+
         const homework = homeworks.find(hw => hw._id === homeworkId);
         setCurrentHomework(homework);
-    
+
         const classStudents = students.filter(student => student.class === Number(selectedClass.slice(-1)));
-    
+
         const defaultScores = {};
         const newGrades = {};
-    
+
         // fetch existing saved scores or default to full points
         setTimeout(() => {
             classStudents.forEach(student => {
                 const savedScore = student.homeworkLog?.[homeworkId] ?? homework.points;
                 defaultScores[student._id] = savedScore;
-        
+
                 const percent = (savedScore / homework.points) * 100;
                 let grade = "F";
                 if (percent >= settings.cutoffs.A) grade = "A";
@@ -83,7 +86,7 @@ const Homework = () => {
                 else if (percent >= settings.cutoffs.D) grade = "D";
 
                 console.log(student.homeworkLog[homeworkId] == null)
-        
+
                 newGrades[student._id] = student.homeworkLog[homeworkId] == null ? grade : "-";
             });
 
@@ -94,7 +97,7 @@ const Homework = () => {
         setStudentGrades(newGrades);
         setLocalStudents(classStudents.sort((a, b) => studentScores[b._id] - studentScores[a._id]));
         setTriggerSave(true);
-        
+
     }, [triggerLoad]);
 
     // trigger save to properly load everything
@@ -105,28 +108,28 @@ const Homework = () => {
 
     const handleSaveButton = () => {
         console.log("Saving student scores...");
-    
+
         const updatedGrades = {};
         const updatedStudents = allStudents.map(student => {
             const newScore = studentScores[student._id];
             const percent = (newScore / currentHomework.points) * 100;
-    
+
             let grade = "F";
             if (percent >= settings.cutoffs.A) grade = "A";
             else if (percent >= settings.cutoffs.B) grade = "B";
             else if (percent >= settings.cutoffs.C) grade = "C";
             else if (percent >= settings.cutoffs.D) grade = "D";
-    
+
             updatedGrades[student._id] = grade
-    
+
             return {
                 ...student,
-                homeworkLog: {...student.homeworkLog, [currentHomework._id]: newScore},
+                homeworkLog: { ...student.homeworkLog, [currentHomework._id]: newScore },
             };
         });
-    
+
         updatedStudents.forEach(student => updateStudent(student._id, student));
-    
+
         setStudentGrades(updatedGrades);
         setLocalStudents(updatedStudents.sort((a, b) => studentScores[b._id] - studentScores[a._id]));
 
@@ -139,11 +142,11 @@ const Homework = () => {
         for (let i = 0; i < sortedScores.length; ++i) {
             let [id, score] = sortedScores[i];
             console.log(score)
-            
+
             sum += Number(score);
 
-            if (i > 0 && score === sortedScores[i-1][1]) {
-                newRanks[id] = newRanks[sortedScores[i-1][0]];
+            if (i > 0 && score === sortedScores[i - 1][1]) {
+                newRanks[id] = newRanks[sortedScores[i - 1][0]];
             } else {
                 newRanks[id] = currentRank;
             }
@@ -163,7 +166,7 @@ const Homework = () => {
 
     useEffect(() => {
         setLocalStudents(allStudents.filter(student => student.name.toLowerCase().includes(search.toLowerCase())))
-        
+
     }, [search])
 
 
@@ -176,18 +179,20 @@ const Homework = () => {
         students.forEach(student => {
             const updatedHomeworkLog = { ...student.homeworkLog };
             delete updatedHomeworkLog[homeworkId];
-    
+
             updateStudent(student._id, {
                 ...student,
                 homeworkLog: updatedHomeworkLog
             });
         });
-    
+
         deleteHomework(homeworkId);
     };
 
+    const deleteButtonBreakpoint = useBreakpointValue({ "xxs": "", sm: "Homework" });
 
-    if (!currentHomework || !localStudents ) {
+
+    if (!currentHomework.name || !currentHomework.points || !localStudents) {
         return (
             <Center minH="100vh" bg="gray.100">
                 <Spinner color="green.500" borderWidth="4px" cosize="xl" />
@@ -208,27 +213,24 @@ const Homework = () => {
 
             {dialog && <Dialog_Delete handleBack={handleBack} delete={handleDeleteHomework} id={homeworkId} setDialog={setDialog}></Dialog_Delete>}
 
-            <VStack
-                w="100%">
-                <Box
-                    w="100%"
-                    h={{ sm: "4rem" }}
-                    display="flex"
-                    alignItems={"center"}>
-                    <Heading
-                        marginLeft="1rem"
-                        color="gray.600"
-                        fontSize="2xl"
-                        fontWeight={"400"}
-                    >{currentHomework.name}</Heading>
-                </Box>
-            </VStack>
+            <Box
+                w="100%"
+                h="4rem"
+                display={disappearOnMin}
+                alignItems={"center"}>
+                <Heading
+                    marginLeft="1rem"
+                    color="gray.600"
+                    fontSize="2xl"
+                    fontWeight={"400"}
+                >{currentHomework.name}</Heading>
+            </Box>
 
-            <VStack gap="0" display="flex" flex="1" w="100%">
+
+            <VStack gap="0" display={disappearOnMin} flex="1" w="100%">
 
                 <Box
                     w="80%"
-                    flex="1"
                     maxW="40rem"
                 >
                     <Box
@@ -237,17 +239,17 @@ const Homework = () => {
                         display="flex"
                         flexDir="column"
                         bg="gray.200">
-                        <Text marginTop="1rem">Points: {currentHomework.points}</Text>
-                        <Text marginTop="1rem">Subject: {currentHomework.subject}</Text>
-                        <Text marginTop="1rem">Class Mean Grade: {currentMeanGrade == -1 ? "Not yet scored" : (((currentMeanGrade/currentHomework.points) * 100).toFixed(1) + "%   ,  " + currentMeanGrade.toFixed(2) + " / " + currentHomework.points.toFixed(2))} </Text>
-                        <Text marginY="1rem">Date Created: {String(currentHomework.createdAt).slice(0, 10)} </Text>
+                        <Text lineClamp="1" marginRight="1rem" marginTop="1rem">Points: {currentHomework.points}</Text>
+                        <Text lineClamp="1" marginRight="1rem" marginTop="1rem">Subject: {currentHomework.subject}</Text>
+                        <Text lineClamp="1" marginRight="1rem" marginTop="1rem">Class Mean Grade: {currentMeanGrade == -1 ? "Not yet scored" : (((currentMeanGrade / currentHomework.points) * 100).toFixed(1) + "%   ,  " + currentMeanGrade.toFixed(2) + " / " + currentHomework.points.toFixed(2))} </Text>
+                        <Text lineClamp="1" marginRight="1rem" marginY="1rem">Date Created: {String(currentHomework.createdAt).slice(0, 10)} </Text>
                     </Box>
                 </Box>
 
                 <Box w="80%"
-                    flex="5"
                     //bg="green.100"
                     maxW="40rem"
+                    paddingBottom="1rem"
                 >
 
                     <HStack justifyContent="center" marginTop="2rem">
@@ -273,21 +275,17 @@ const Homework = () => {
                         ></Input>
 
                     </HStack>
-
-
                 </Box>
 
                 <Box
                     w="80%"
-                    flex="3"
-                    //bg="blue.100"
+                    flex="1"
                     maxW="40rem">
                     <VStack
                         w="100%"
                         flex="1"
                         gap="0rem"
                         display="flex"
-                        paddingBottom="2rem"
                     >
                         <HStack
                             flex="1"
@@ -380,16 +378,16 @@ const Homework = () => {
 
                         </VStack>
                     </VStack>
-
-
                 </Box>
 
                 <HStack
                     justifyContent="space-between"
                     maxW="40rem"
                     w="80%"
-                    flex="1"
-                    marginBottom="2rem">
+                    paddingBottom="2rem"
+                    paddingTop="2rem"
+                >
+
                     <Box onClick={handleBack} p="0.5rem" cursor="pointer">
                         <FaArrowLeft size="1.5rem" className='FaArrowLeft' />
                     </Box>
@@ -397,7 +395,7 @@ const Homework = () => {
                     <Box>
                         <Button
                             borderRadius={"4rem"}
-                            w="12rem"
+                            w={{ "xxs": "4.5rem", "xs": "6rem", sm: "12rem" }}
                             borderWidth="2px"
                             borderColor={"green.500"}
                             bg="none"
@@ -406,31 +404,26 @@ const Homework = () => {
                             transition="all 0.3s"
                             onClick={handleDeleteButton}
                             _hover={{ transform: "translateY(-3px)" }}
-                        >Delete Homework</Button>
+                        >Delete {deleteButtonBreakpoint}</Button>
 
                         <Button
                             borderRadius={"4rem"}
-                            w="6rem"
+                            w={{ "xxs": "3.5rem", "xs": "5rem", sm: "6rem" }}
                             bg="green.500"
                             color="gray.100"
                             fontSize={{ sm: "lg", lg: "xl" }}
                             transition="all 0.3s"
                             _hover={{ transform: "translateY(-3px)" }}
-                            marginLeft="1.5rem"
+                            marginLeft={{ "xxs": "0.5rem", "xs": "1rem", sm: "1.5rem" }}
                             onClick={() => {
-                                console.log("clicked")
                                 setPressedSave(true)
                                 handleSaveButton()
                             }}
                         >Save</Button>
                     </Box>
-
-
-
                 </HStack>
 
             </VStack>
-
         </Box>
     )
 }

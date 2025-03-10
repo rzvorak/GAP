@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Box, VStack, Heading, Button, Text } from '@chakra-ui/react';
+import { Box, VStack, Heading, Button, Text, useBreakpointValue } from '@chakra-ui/react';
 import Header from '../components/Header';
 
 import { FaArrowLeft } from 'react-icons/fa';
@@ -10,6 +10,8 @@ import '../styles/Scores_Type.css'
 
 const Scores_Type = () => {
 
+  const disappearOnMin = useBreakpointValue({ "min": "none", "xxs": "flex" })
+  
   const types = ['Homework', 'Monthly', 'Midterm', 'Terminal'];
 
   const location = useLocation();
@@ -37,7 +39,8 @@ const Scores_Type = () => {
 
       <VStack
         w="100%"
-        flex="1">
+        flex="1"
+        display={disappearOnMin}>
         <Box
           w="100%"
           h="4rem"
@@ -84,7 +87,7 @@ const Scores_Type = () => {
           alignItems="center"
         >
           <Box
-            w="15rem"
+            w={{"xxs": "12rem", "xs": "14rem", sm: "15rem"}}
             h="3rem"
             display="flex"
             alignItems={"center"}

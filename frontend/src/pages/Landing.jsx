@@ -18,12 +18,9 @@ const Landing = () => {
         navigate('/' + box.split(" ")[1].toLowerCase());
     }
 
-
     const boxes = ["View Students", "Enter Scores", "Create Reports", "See Statistics"]
-
     const iconSize = useBreakpointValue({ "xxs": "3rem", "xs": "4rem", sm: "5rem", md: "7rem", lg: "9rem" });
-    const gridColumns = useBreakpointValue({"xxs": 1, sm: 2})
-    const disappearOnMin = useBreakpointValue({"min": "none", "xxs": "grid"})
+    const disappearOnMin = useBreakpointValue({ "min": "none", "xxs": "grid" })
 
     return (
 
@@ -37,14 +34,14 @@ const Landing = () => {
 
             <SimpleGrid
                 display={disappearOnMin}
-                columns={gridColumns}
+                columns={useBreakpointValue({ "xxs": 1, sm: 2 })}
                 w={"full"}
                 marginTop={"2rem"}
             >
 
                 {boxes.map((box, index) => (
                     <Center key={index}>
-                        <Box 
+                        <Box
                             h={{ "xxs": "8rem", "xs": "10rem", sm: "14rem", md: "16rem", lg: "17rem", xl: "17rem" }}
                             w={{ "xxs": "12rem", "xs": "18rem", sm: "14rem", md: "23rem", lg: "29rem", xl: "38rem" }}
                             bg="gray.100"
@@ -56,7 +53,7 @@ const Landing = () => {
                             onClick={() => handleForward(box)}
                             transition="all 0.3s"
                             _hover={{ cursor: 'pointer', transform: "translateY(-5px)" }}
-                            >
+                        >
                             <VStack h="100%" >
                                 <Heading
                                     color="gray.600"
@@ -69,7 +66,7 @@ const Landing = () => {
                                     {box === "View Students" ? <FaRegUser size={iconSize} /> : null}
                                     {box === "Enter Scores" ? <GoPencil size={iconSize} /> : null}
                                     {box === "Create Reports" ? <IoDocumentTextOutline size={iconSize} /> : null}
-                                    {box === "See Statistics" ? <SlGraph size={iconSize} /> : null}   
+                                    {box === "See Statistics" ? <SlGraph size={iconSize} /> : null}
                                 </Box>
                             </VStack>
                         </Box>
