@@ -61,25 +61,28 @@ const Scores_Homework = () => {
             maxW={"100vw"}
             bg={"gray.100"}
             color="gray.900"
+            display="flex"
+            flexDir="column"
         >
             {dialog && <Dialog_Homework handleSubmitHomework={handleSubmitHomework} setDialog={setDialog} selectedClass={selectedClass}></Dialog_Homework>}
 
             <Header></Header>
 
-
-            <VStack // all the vertical layout could use adjustment, works fine -> use flex = 1 and flex, column in the very outer box
+            <VStack
                 w="100%"
-                paddingBottom="4rem"
-
+                paddingBottom="0rem"
                 display="flex"
                 gap="0"
+                flexDir="column"
+                flex="1"
             >
-
                 <Box
                     w="100%"
-                    h={{ sm: "4rem" }}
+                    h="4rem" 
                     display="flex"
-                    alignItems={"center"}>
+                    alignItems="center"
+                    marginBottom="1rem"
+                    >
                     <Heading
                         marginLeft="1rem"
                         color="gray.600"
@@ -89,18 +92,15 @@ const Scores_Homework = () => {
                 </Box>
 
 
-                <VStack w="100%" minH="26rem">
+                <VStack w="100%" flex="1">
 
                     <AccordionRoot
-
                         w="80%"
                         variant={"plain"}
                         collapsible
                         multiple
                         borderRadius="0"
                     >
-
-
                         {localHomeworks.map((homework, index) => (
                             <AccordionItem
                                 borderRadius="0"
@@ -131,7 +131,7 @@ const Scores_Homework = () => {
                                         <Box>
                                             <Text fontSize="sm" p="0.4rem">Points:  {homework.points} </Text>
                                             <Text fontSize="sm" p="0.4rem">Subject:  {homework.subject} </Text>
-                                            <Text fontSize="sm" p="0.4rem">Class Mean Grade:  {homework.meanGrade == -1 ? "Not yet scored" : (((homework.meanGrade/homework.points) * 100).toFixed(1) + "%   ,  " + homework.meanGrade.toFixed(2) + " / " + homework.points)} </Text>
+                                            <Text fontSize="sm" p="0.4rem">Class Mean Grade:  {homework.meanGrade == -1 || homework.meanGrade == null ? "Not yet scored" : (((homework.meanGrade/homework.points) * 100).toFixed(1) + "%   ,  " + homework.meanGrade.toFixed(2) + " / " + homework.points)} </Text>
                                             <Text fontSize="sm" p="0.4rem">Date Created: {String(homework.createdAt).slice(0, 10)}</Text>
                                         </Box>
 
@@ -157,24 +157,24 @@ const Scores_Homework = () => {
                         ))}
                     </AccordionRoot>
 
-                    <Box onClick={handleAdd}><AddButton></AddButton></Box>
-
-
+                    <Box  onClick={handleAdd}><AddButton></AddButton></Box>
 
                 </VStack>
 
                 <Box
                     w="100%"
                     display="flex"
-                    paddingTop="3rem"
-                    justifyContent="center">
+                    h="8rem"
+                    paddingTop="2rem" // control how close plus can get
+                    paddingBottom="2rem"
+                    justifyContent="center"
+                    alignItems="center"
+                    >
                     <Box
-                        position="relative"
-                        bottom="0rem" // fix vertical compression issue, stop button from continuing up 
                         w="15rem"
                         h="3rem"
                         display="flex"
-                        alignItems={"center"}
+                        alignItems="center"
                         justifyContent={"space-between"}
                         onClick={handleBack}
                         cursor="pointer"

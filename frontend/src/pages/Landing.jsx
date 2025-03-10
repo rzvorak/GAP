@@ -14,160 +14,73 @@ import { useNavigate } from 'react-router-dom';
 const Landing = () => {
 
     const navigate = useNavigate();
-    const handleViewStudents= () => {
-        navigate('/students')
+    const handleForward = (box) => {
+        navigate('/' + box.split(" ")[1].toLowerCase());
     }
 
-    const handleEnterScores= () => {
-        navigate('/scores')
-    }
 
-    const handleCreateReports= () => {
-        navigate('/reports')
-    }
+    const boxes = ["View Students", "Enter Scores", "Create Reports", "See Statistics"]
 
-    const handleSeeStatistics= () => {
-        navigate('/statistics')
-    }
+    const iconSize = useBreakpointValue({ "xxs": "3rem", "xs": "4rem", sm: "5rem", md: "7rem", lg: "9rem" });
+    const gridColumns = useBreakpointValue({"xxs": 1, sm: 2})
+    const disappearOnMin = useBreakpointValue({"min": "none", "xxs": "grid"})
 
-    const iconSize = useBreakpointValue({sm: "5rem", md: "7rem", lg: "9rem"});
+    return (
 
-
-  return (
-    
-    <Box 
-        minH={"100vh"} 
-        maxW={"100vw"}
-        bg={"gray.100"}
-        color="gray.900" 
-    >
-        <Header></Header>
-
-        <SimpleGrid
-            columns="2"
-            w={"full"}
-            marginTop={"2rem"}
-            rowGap={"2rem"}
+        <Box
+            minH={"100vh"}
+            maxW={"100vw"}
+            bg={"gray.100"}
+            color="gray.900"
         >
-            <Center>
-                <Box 
-                h={{sm: "14rem", md: "16rem", lg: "17rem", xl: "17rem"}}
-                w={{sm: "14rem", md: "23rem", lg: "29rem", xl: "38rem"}}
-                bg="gray.100"
-                borderRadius={"1.25rem"}
-                display="flex"
-                flexDirection={"column"}
-                style={{ boxShadow: 'var(--box-shadow-classic)' }}
-                onClick={handleViewStudents}
-                transition="all 0.3s"
-                _hover={{cursor: 'pointer', transform: "translateY(-5px)"}}>
-                    <VStack h="100%">
-                            <Heading 
-                            color="gray.600" 
-                            fontWeight="400" 
-                            marginTop={{sm: "1.5rem", md: "2rem", lg:"2rem"}}
-                            marginBottom={{sm: "1.5rem", md: "1.5rem", lg: "2rem" }}
-                            fontSize={{sm: "lg", md: "2xl", lg: "3xl"}}>
-                                View Students
-                            </Heading>
-                            <Box color="green.500">
-                                <FaRegUser size={iconSize}/>
-                            </Box>
-                    </VStack>
-                </Box>
-            </Center>
+            <Header></Header>
 
-            <Center>
-                <Box 
-                h={{sm: "14rem", md: "16rem", lg: "17rem", xl: "17rem"}}
-                w={{sm: "14rem", md: "23rem", lg: "29rem", xl: "38rem"}}
-                bg="gray.100"
-                borderRadius={"1.25rem"}
-                display="flex"
-                flexDirection={"column"}
-                style={{ boxShadow: 'var(--box-shadow-classic)' }}
-                onClick={handleEnterScores}
-                transition="all 0.3s"
-                _hover={{cursor: 'pointer', transform: "translateY(-5px)"}}>
-                    <VStack h="100%">
-                            <Heading 
-                            color="gray.600" 
-                            fontWeight="400" 
-                            marginTop={{sm: "1.5rem", md: "2rem", lg:"2rem"}}
-                            marginBottom={{sm: "1.5rem", md: "1.5rem", lg: "2rem" }}
-                            fontSize={{sm: "lg", md: "2xl", lg: "3xl"}}>
-                                Enter Scores
-                            </Heading>
-                            <Box color="green.500">
-                                <GoPencil size={iconSize}/>
-                            </Box>
-                    </VStack>
-                </Box>
-            </Center>
+            <SimpleGrid
+                display={disappearOnMin}
+                columns={gridColumns}
+                w={"full"}
+                marginTop={"2rem"}
+            >
 
-            <Center>
-                <Box 
-                h={{sm: "14rem", md: "16rem", lg: "17rem", xl: "17rem"}}
-                w={{sm: "14rem", md: "23rem", lg: "29rem", xl: "38rem"}}
-                bg="gray.100"
-                borderRadius={"1.25rem"}
-                display="flex"
-                flexDirection={"column"}
-                style={{ boxShadow: 'var(--box-shadow-classic)' }}
-                onClick={handleCreateReports}
-                transition="all 0.3s"
-                _hover={{cursor: 'pointer', transform: "translateY(-5px)"}}>
-                    <VStack h="100%">
-                            <Heading 
-                            color="gray.600" 
-                            fontWeight="400" 
-                            marginTop={{sm: "1.5rem", md: "2rem", lg:"2rem"}}
-                            marginBottom={{sm: "1.5rem", md: "1.5rem", lg: "2rem" }}
-                            fontSize={{sm: "lg", md: "2xl", lg: "3xl"}}>
-                                Create Reports
-                            </Heading>
-                            <Box color="green.500">
-                                <IoDocumentTextOutline size={iconSize}/>
-                            </Box>
-                    </VStack>
-                </Box>
-            </Center>
+                {boxes.map((box, index) => (
+                    <Center key={index}>
+                        <Box 
+                            h={{ "xxs": "8rem", "xs": "10rem", sm: "14rem", md: "16rem", lg: "17rem", xl: "17rem" }}
+                            w={{ "xxs": "12rem", "xs": "18rem", sm: "14rem", md: "23rem", lg: "29rem", xl: "38rem" }}
+                            bg="gray.100"
+                            marginBottom="2rem"
+                            borderRadius={"1.25rem"}
+                            display="flex"
+                            flexDirection={"column"}
+                            style={{ boxShadow: 'var(--box-shadow-classic)' }}
+                            onClick={() => handleForward(box)}
+                            transition="all 0.3s"
+                            _hover={{ cursor: 'pointer', transform: "translateY(-5px)" }}
+                            >
+                            <VStack h="100%" >
+                                <Heading
+                                    color="gray.600"
+                                    fontWeight="400"
+                                    marginTop={{ "xxs": "0.75rem", "xs": "1rem", sm: "1.5rem", md: "2rem", lg: "2rem" }}
+                                    marginBottom={{ "xxs": "0.5rem", "xs": "1rem", sm: "1.5rem", md: "1.5rem", lg: "2rem" }}
+                                    fontSize={{ sm: "lg", md: "2xl", lg: "3xl" }}
+                                >{box}</Heading>
+                                <Box color="green.500">
+                                    {box === "View Students" ? <FaRegUser size={iconSize} /> : null}
+                                    {box === "Enter Scores" ? <GoPencil size={iconSize} /> : null}
+                                    {box === "Create Reports" ? <IoDocumentTextOutline size={iconSize} /> : null}
+                                    {box === "See Statistics" ? <SlGraph size={iconSize} /> : null}   
+                                </Box>
+                            </VStack>
+                        </Box>
+                    </Center>
+                ))}
 
-            <Center>
-                <Box 
-                h={{sm: "14rem", md: "16rem", lg: "17rem", xl: "17rem"}}
-                w={{sm: "14rem", md: "23rem", lg: "29rem", xl: "38rem"}}
-                bg="gray.100"
-                borderRadius={"1.25rem"}
-                display="flex"
-                flexDirection={"column"}
-                style={{ boxShadow: 'var(--box-shadow-classic)' }}
-                onClick={handleSeeStatistics}
-                transition="all 0.3s"
-                _hover={{cursor: 'pointer', transform: "translateY(-5px)"}}>
-                    <VStack h="100%">
-                            <Heading 
-                            color="gray.600" 
-                            fontWeight="400" 
-                            marginTop={{sm: "1.5rem", md: "2rem", lg:"2rem"}}
-                            marginBottom={{sm: "1.5rem", md: "1.5rem", lg: "2rem" }}
-                            fontSize={{sm: "lg", md: "2xl", lg: "3xl"}}>
-                                See Statistics
-                            </Heading>
-                            <Box color="green.500">
-                                <SlGraph size={iconSize}/>
-                            </Box>
-                    </VStack>
-                </Box>
-            </Center>
 
-             
+            </SimpleGrid>
+        </Box>
 
-        </SimpleGrid>
-    
-    </Box>
-    
-  )
+    )
 }
 
 export default Landing

@@ -134,16 +134,16 @@ const Homework = () => {
         const newRanks = {};
         let sum = 0;
 
-        let sorted = Object.entries(studentScores).sort((a, b) => b[1] - a[1])
+        let sortedScores = Object.entries(studentScores).sort((a, b) => b[1] - a[1])
 
-        for (let i = 0; i < sorted.length; ++i) {
-            let [id, score] = sorted[i];
+        for (let i = 0; i < sortedScores.length; ++i) {
+            let [id, score] = sortedScores[i];
             console.log(score)
             
             sum += Number(score);
 
-            if (i > 0 && score === sorted[i-1][1]) {
-                newRanks[id] = newRanks[sorted[i-1][0]];
+            if (i > 0 && score === sortedScores[i-1][1]) {
+                newRanks[id] = newRanks[sortedScores[i-1][0]];
             } else {
                 newRanks[id] = currentRank;
             }
@@ -155,12 +155,10 @@ const Homework = () => {
 
         updateHomework(homeworkId, {
             ...currentHomework,
-            meanGrade: sum / sorted.length
+            meanGrade: sum / sortedScores.length
         })
 
-        console.log("sum:", sum)
-
-        setCurrentMeanGrade(sum / sorted.length);
+        setCurrentMeanGrade(sortedScores.length != 0 ? sum / sortedScores.length : -1);
     };
 
     useEffect(() => {
@@ -241,7 +239,7 @@ const Homework = () => {
                         bg="gray.200">
                         <Text marginTop="1rem">Points: {currentHomework.points}</Text>
                         <Text marginTop="1rem">Subject: {currentHomework.subject}</Text>
-                        <Text marginTop="1rem">Class Mean Grade: {currentMeanGrade == -1 ? "Not yet scored" : (((currentMeanGrade/currentHomework.points) * 100).toFixed(1) + "%   ,  " + currentMeanGrade.toFixed(2) + " / " + currentHomework.points)} </Text>
+                        <Text marginTop="1rem">Class Mean Grade: {currentMeanGrade == -1 ? "Not yet scored" : (((currentMeanGrade/currentHomework.points) * 100).toFixed(1) + "%   ,  " + currentMeanGrade.toFixed(2) + " / " + currentHomework.points.toFixed(2))} </Text>
                         <Text marginY="1rem">Date Created: {String(currentHomework.createdAt).slice(0, 10)} </Text>
                     </Box>
                 </Box>
