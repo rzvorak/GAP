@@ -4,6 +4,7 @@ import { connectDB } from './config/db.js'
 import studentRoutes from './routes/student.route.js';
 import homeworkRoutes from './routes/homework.route.js';
 import settingsRoutes from './routes/settings.route.js';
+import examRoutes from './routes/exam.route.js'
 import Settings from './models/settings.model.js';
 
 dotenv.config();
@@ -15,6 +16,7 @@ app.use(express.json()); // allows JSON data in body
 app.use('/api/students', studentRoutes)
 app.use('/api/homework', homeworkRoutes)
 app.use('/api/settings', settingsRoutes)
+app.use('/api/exams', examRoutes)
 
 const initializeSettings = async () => {
     try {
