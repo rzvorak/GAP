@@ -8,9 +8,7 @@ import Scores from './pages/Scores';
 import Scores_Type from './pages/Scores_Type';
 import Scores_Homework from './pages/Scores_Homework';
 import Homework from './pages/Homework'
-import Scores_Monthly from './pages/Scores_Monthly';
-import Scores_Midterm from './pages/Scores_Midterm';
-import Scores_Terminal from './pages/Scores_Terminal';
+import Scores_Exam from './pages/Scores_Exam';
 
 import Reports from './pages/Reports';
 
@@ -31,9 +29,8 @@ function App() {
 
           <Route path="/scores/type" element={<Scores_Type />} />
           <Route path="/scores/homework" element={<Scores_Homework />} />
-          <Route path="/scores/monthly" element={<Scores_Monthly />} />
-          <Route path="/scores/midterm" element={<Scores_Midterm />} />
-          <Route path="/scores/terminal" element={<Scores_Terminal />} />
+          <Route path="/scores/exam" element={<Scores_Exam />} />
+
 
           <Route path="/scores/homework-view" element={<Homework />} />
         </Routes>

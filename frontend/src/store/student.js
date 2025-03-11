@@ -5,7 +5,7 @@ export const useStudentStore = create((set) => ({
     setStudents: (students) => set({ students }),
 
     createStudent: async (newStudent) => {
-        if (!newStudent.name || !newStudent.class || !newStudent.homeworkLog || !newStudent.monthlyLog || !newStudent.midtermLog || !newStudent.terminalLog) {
+        if (!newStudent.name || !newStudent.class || !newStudent.homeworkLog || !newStudent.examLog) {
             return {success: false, message: "Please fill in all fields."}
         }
         const res = await fetch("/api/students", {
@@ -26,19 +26,19 @@ export const useStudentStore = create((set) => ({
         set({students: data.data});
     },
 
-    deleteStudent: async (pid) => {
-        const res = await fetch(`/api/students/${pid}`, {
+    deleteStudent: async (id) => {
+        const res = await fetch(`/api/students/${id}`, {
             method: "DELETE",
         });
         const data = await res.json();
         if (!data.success) return {success: false, message: data.message};
 
-        set((state) => ({students: state.students.filter(student => student._id !== pid)}));
+        set((state) => ({students: state.students.filter(student => student._id !== id)}));
         return {success: true, message: data.message};
     },
 
-    updateStudent: async (pid, updatedStudent) => {
-        const res = await fetch(`/api/students/${pid}`, {
+    updateStudent: async (id, updatedStudent) => {
+        const res = await fetch(`/api/students/${id}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -49,7 +49,7 @@ export const useStudentStore = create((set) => ({
         if (!data.success) return {success: false, message: data.message};
 
         set(state => ({
-            students: state.students.map(student => student._id === pid ? data.data : student)
+            students: state.students.map(student => student._id === id ? data.data : student)
         }));
         return {success: true, message: data.message};
     },

@@ -13,18 +13,10 @@ const studentSchema = new mongoose.Schema({
         type: Map,
         required: true
     },
-    monthlyLog: {
+    examLog: {
         type: Map,
         required: true
     },
-    midtermLog: {
-        type: Map,
-        required: true
-    },
-    terminalLog: {
-        type: Map,
-        required: true
-    }
 }, {
     timestamps: true
 });

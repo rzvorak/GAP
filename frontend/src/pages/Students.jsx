@@ -80,9 +80,7 @@ const Students = () => {
             name: studentName,
             class: studentClass,
             homeworkLog: {},
-            monthlyLog: {},
-            midtermLog: {},
-            terminalLog: {}
+            examLog: {},
         });
         fetchStudents();
         console.log(success, message);

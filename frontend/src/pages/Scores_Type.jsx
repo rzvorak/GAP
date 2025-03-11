@@ -23,7 +23,7 @@ const Scores_Type = () => {
   }
 
   const handleForward = (type) => {
-    navigate(`/scores/${type.toLowerCase()}`, { state: { selectedType: type.toLowerCase(), selectedClass: selectedClass } })
+    navigate(`/scores/${type === "Homework" ? "homework" : "exam"}`, { state: { selectedType: type.toLowerCase(), selectedClass: selectedClass } })
   }
 
   return (

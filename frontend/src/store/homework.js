@@ -26,19 +26,19 @@ export const useHomeworkStore = create((set) => ({
         set({homeworks: data.data});
     },
 
-    deleteHomework: async (pid) => {
-        const res = await fetch(`/api/homework/${pid}`, {
+    deleteHomework: async (id) => {
+        const res = await fetch(`/api/homework/${id}`, {
             method: "DELETE",
         });
         const data = await res.json();
         if (!data.success) return {success: false, message: data.message};
 
-        set((state) => ({homeworks: state.homeworks.filter(homework => homework._id !== pid)}));
+        set((state) => ({homeworks: state.homeworks.filter(homework => homework._id !== id)}));
         return {success: true, message: data.message};
     },
 
-    updateHomework: async (pid, updatedHomework) => {
-        const res = await fetch(`/api/homework/${pid}`, {
+    updateHomework: async (id, updatedHomework) => {
+        const res = await fetch(`/api/homework/${id}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -49,7 +49,7 @@ export const useHomeworkStore = create((set) => ({
         if (!data.success) return {success: false, message: data.message};
 
         set(state => ({
-            homeworks: state.homeworks.map(homework => homework._id === pid ? data.data : homework)
+            homeworks: state.homeworks.map(homework => homework._id === id ? data.data : homework)
         }));
         return {success: true, message: data.message};
     },

@@ -143,7 +143,7 @@ const Dialog_Homework = (props) => {
             marginBottom="1rem"
             transition="all 0.3s"
             value={currentPoints}
-            onValueChange={(e) => setCurrentPoints(e.value)}
+            onValueChange={(e) => setCurrentPoints(Math.max(0, Math.min(100, e.value)))}
             min={1}
             max={100}
             style={{ boxShadow: 'var(--box-shadow-classic)' }}

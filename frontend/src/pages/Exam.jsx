@@ -4,32 +4,32 @@ import Header from '../components/Header'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import { useStudentStore } from '../store/student.js'
-import { useHomeworkStore } from '../store/homework.js'
+import { useExamStore } from '../store/exam.js'
 import { FaArrowLeft } from 'react-icons/fa';
 
 import { NumberInputField, NumberInputRoot } from '../components/ui/number-input';
 import Dialog_Delete from '../components/Dialog_Delete.jsx'
 
-const Homework = () => {
+const Exam = () => {
 
     const disappearOnMin = useBreakpointValue({ "min": "none", "xxs": "flex" })
 
     const location = useLocation();
-    const homeworkId = location.state?.homeworkId;
+    const examId = location.state?.examId;
     const selectedClass = location.state?.selectedClass;
 
     const navigate = useNavigate();
     const handleBack = () => {
-        navigate('/scores/homework', { state: { selectedClass: selectedClass } })
+        navigate('/scores/exam', { state: { selectedClass: selectedClass } })
     }
 
-    const { fetchHomeworks, deleteHomework, updateHomework, homeworks } = useHomeworkStore()
+    const { fetchExams, deleteExam, updateExam, exams } = useExamStore()
     const { fetchStudents, updateStudent, students } = useStudentStore()
 
     const [localStudents, setLocalStudents] = useState([])
     const [allStudents, setAllStudents] = useState([])
 
-    const [currentHomework, setCurrentHomework] = useState({})
+    const [currentExam, setCurrentExam] = useState({})
     const [currentMeanGrade, setCurrentMeanGrade] = useState(-1)
     const [settings, setSettings] = useState({})
 
@@ -42,28 +42,27 @@ const Homework = () => {
     // maybe use to make "-" on entry possible for grades
     const [pressedSave, setPressedSave] = useState(false)
 
-    // launch once on load, get students, homeworks, and settings
+    // launch once on load, get students, exams, and settings
     useEffect(() => {
         async function fetchAll() {
-            console.log("Fetching settings, homeworks, and students...");
+            console.log("Fetching settings, exams, and students...");
             const res = await fetch("/api/settings");
             const data = await res.json();
             setSettings(data.data);
 
             await fetchStudents();
-            await fetchHomeworks();
+            await fetchExams();
             setTriggerLoad(true);
         }
 
         fetchAll();
     }, []);
 
-    // wait for students, homework, and settings then execute
+    // wait for students, exams, and settings then execute
     useEffect(() => {
-        // TODO: see how this interacts when all students and homeworks are cleared from database
-        if (!homeworkId || !settings.cutoffs || homeworks.length === 0 || students.length === 0) return;
+        if (!examId || !settings.cutoffs || exams.length === 0 || students.length === 0) return;
 
-        console.log("Processing students and homeworks...");
+        console.log("Processing students and exams...");
 
         const homework = homeworks.find(hw => hw._id === homeworkId);
         setCurrentHomework(homework);
@@ -441,4 +440,4 @@ const Homework = () => {
     )
 }
 
-export default Homework
+export default Exam
