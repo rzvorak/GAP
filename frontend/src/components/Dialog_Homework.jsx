@@ -126,6 +126,7 @@ const Dialog_Homework = (props) => {
             placeholder="Title, Description, etc."
             style={{ boxShadow: 'var(--box-shadow-classic)' }}
             border="none"
+            maxLength={50}
             w="80%"
             borderRadius="0.5rem"
             marginBottom="1rem"

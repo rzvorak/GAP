@@ -215,14 +215,23 @@ const Homework = () => {
 
             <Box
                 w="100%"
-                h="4rem"
+                paddingTop="1rem"
+                paddingBottom="1rem"
+                minHeight="4rem"
                 display={disappearOnMin}
-                alignItems={"center"}>
+                flexDirection={"column"}
+                flexWrap="wrap"
+                alignItems={"flex-start"}
+                overflow="visible">
                 <Heading
                     marginLeft="1rem"
+                    marginRight="1rem"
                     color="gray.600"
                     fontSize="2xl"
                     fontWeight={"400"}
+                    whiteSpace={"normal"}
+                    wordBreak="break-word"
+                    
                 >{currentHomework.name}</Heading>
             </Box>
 
@@ -297,13 +306,13 @@ const Homework = () => {
                             <Box flex="3">
                                 <Text ml="1rem" maxW="10rem">Name</Text>
                             </Box>
-                            <Center flex="2">
+                            <Center flex="2" marginRight={{"xxs": "0.4rem", "xs": "0.5rem", sm: "0rem"}}>
                                 <Text>Score</Text>
                             </Center>
                             <Center flex="1">
                                 <Text>Grade</Text>
                             </Center>
-                            <Center flex="1">
+                            <Center flex="1" marginLeft={{"xxs": "0.4rem", "xs": "0.5rem", sm: "0rem"}}>
                                 <Text>Rank</Text>
                             </Center>
                         </HStack>
@@ -334,21 +343,24 @@ const Homework = () => {
                                             <Box flex="3">
                                                 <Text
                                                     ml="1rem"
-                                                    maxW={{ sm: "12rem", md: "20rem" }}
+                                                    maxW={{ "xxs": "3.5rem","xs": "5.5rem", sm: "8rem", md: "14rem" }}
                                                     truncate>{student.name}</Text>
                                             </Box>
                                             <Center flex="2">
                                                 <NumberInputRoot
                                                     defaultValue={currentHomework.points}
-                                                    w="100%"
+                                                    minW="4rem"
+                                                    w={{ "xxs": "70%","xs": "75%", sm: "90%", md: "100%" }}
                                                     h="90%"
                                                     borderRadius="0.25rem"
                                                     step={1}
                                                     value={studentScores[student._id]}
-                                                    onValueChange={(e) => setStudentScores(prevScores => ({
+                                                    onValueChange={(e) => {
+                                                        const newValue = Math.max(0, Math.min(currentHomework.points, e.value))
+                                                        setStudentScores(prevScores => ({
                                                         ...prevScores,
-                                                        [student._id]: e.value
-                                                    }))}
+                                                        [student._id]: newValue
+                                                    }))}}
                                                     min={0}
                                                     max={currentHomework.points}
                                                     style={{ boxShadow: 'var(--box-shadow-classic)' }}

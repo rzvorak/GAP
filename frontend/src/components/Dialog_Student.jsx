@@ -123,7 +123,6 @@ const Dialog = ({ setDialog, handleSubmitStudent }) => {
   };
 
   const handleSubmitButton = async () => {
-    console.log("Button clicked in dialog")
     if (currentName !== "") {
       await handleSubmitStudent(currentName, selectedClass);
       handleExit();
@@ -161,7 +160,7 @@ const Dialog = ({ setDialog, handleSubmitStudent }) => {
             borderRadius="0.5rem"
             marginBottom="2rem"
             transition='all 0.3s'
-            
+            maxLength={30}
             value={currentName}
             onChange={(e) => setCurrentName(e.target.value)}
             _hover={{ transform: "translateY(-3px)" }}></Input>

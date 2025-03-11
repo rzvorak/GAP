@@ -294,7 +294,7 @@ const Students = () => {
                                             <Box flex="4">
                                                 <Text
                                                     ml="1rem"
-                                                    maxW={{ sm: "12rem", md: "20rem" }}
+                                                    maxW={{ "xxs": "5rem", "xs": "8rem", sm: "12rem", md: "20rem" }}
                                                     truncate>{student.name}</Text>
                                             </Box>
                                             <Center flex="1">

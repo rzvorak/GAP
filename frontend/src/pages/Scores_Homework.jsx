@@ -122,10 +122,21 @@ const Scores_Homework = () => {
                                         display="flex"
                                         style={{ boxShadow: 'var(--box-shadow-classic)' }}
                                     >
-                                        <HStack justifyContent="space-between" h="1.5rem" w="100%">
-                                            <Text lineClamp="1" marginRight="1rem" >{homework.name}</Text>
-                                            <Box fontSize="sm" bg="gray.200" p="0.5rem" borderRadius="0.7rem" marginRight="1rem">{homework.subject.slice(0, 2)}</Box>
-                                        </HStack>
+                                            <Text 
+                                            position="absolute"
+                                            lineClamp="1" 
+                                            maxWidth={{"xxs": "30%", "xs": "40%", sm: "50%"}}
+                                            >{homework.name}</Text>
+                                            <Box
+                                                position="absolute"
+                                                right="20%"
+                                                fontSize="sm"
+                                                bg="gray.200"
+                                                p="0.5rem"
+                                                borderRadius="0.7rem"
+                                                marginRight="1rem"
+                                            >{homework.subject.slice(0, 2)}</Box>
+
                                     </AccordionItemTrigger>
                                     <AccordionItemContent
                                         h={{ sm: "9.5rem" }}
