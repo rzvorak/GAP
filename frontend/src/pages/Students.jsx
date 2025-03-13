@@ -2,8 +2,9 @@ import Header from '../components/Header'
 import ClassButton from '../components/ClassButton'
 
 import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import '../styles/App.css'
-import { Box, VStack, Heading, HStack, Input, Button, Text, Center, useBreakpointValue, SimpleGrid, Spinner } from '@chakra-ui/react'
+import { Box, VStack, Heading, HStack, Input, Button, Text, Center, useBreakpointValue, SimpleGrid, Spinner, Link } from '@chakra-ui/react'
 import { IoClose } from "react-icons/io5";
 
 import { useStudentStore } from '../store/student.js';
@@ -93,9 +94,15 @@ const Students = () => {
         setDialogDelete(!dialogDelete);
     }
 
+    const navigate = useNavigate();
+
     // to conform with Dialog_Delete
     const handleBack = () => {
-        console.log("student successfully deleted")
+        console.log("Student successfully deleted")
+    }
+
+    const handleForward = (studentId) => {
+        navigate('/students/student-view', {state: {studentId: studentId}})
     }
 
     return (
@@ -289,11 +296,24 @@ const Students = () => {
                                             display="flex"
                                             w="100%"
                                             gap="0">
-                                            <Box flex="4">
-                                                <Text
-                                                    ml="1rem"
-                                                    maxW={{ "xxs": "5rem", "xs": "8rem", sm: "12rem", md: "20rem" }}
-                                                    truncate>{student.name}</Text>
+                                            <Box flex="4" >
+                                                <Link 
+                                                py="0.5rem"
+                                                pr="0.5rem"
+                                                color="gray.900" 
+                                                ml="1rem" 
+                                                //bg="transparent"
+                                                transition="all 0.1s ease-in-out"
+                                                textDecoration={"none"} 
+                                                _hover={{color: "gray.400" }}
+                                                onClick={() => handleForward(student._id)}
+                                                >
+                                                    <Text
+                                                    
+                                                        maxW={{ "xxs": "5rem", "xs": "8rem", sm: "12rem", md: "20rem" }}
+                                                        truncate
+                                                    >{student.name}</Text>
+                                                </Link>
                                             </Box>
                                             <Center flex="1">
                                                 <Text>{student.class}</Text>

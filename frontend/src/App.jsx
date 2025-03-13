@@ -3,6 +3,7 @@ import Login from './pages/Login';
 import Landing from './pages/Landing';
 
 import Students from './pages/Students';
+import Student from './pages/Student';
 
 import Scores from './pages/Scores';
 import Scores_Type from './pages/Scores_Type';
@@ -34,6 +35,8 @@ function App() {
 
           <Route path="/scores/exam-view" element={<Exam />} />
           <Route path="/scores/homework-view" element={<Homework />} />
+
+          <Route path="/students/student-view" element={<Student />} />
         </Routes>
     </>
   )
