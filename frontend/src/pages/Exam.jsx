@@ -130,13 +130,21 @@ const Exam = () => {
     }, [triggerSave]);
 
     const handleSaveButton = () => {
-        return;
         console.log("Saving student scores...");
 
         const updatedGrades = {};
+        const updatedOverallScores = {};
         const updatedStudents = allStudents.map(student => {
             const newScore = studentScores[student._id];
-            const percent = (newScore / currentExam.points) * 100;
+
+            let overallScore = 0;
+            Object.values(newScore).forEach(subjectScore => {
+                overallScore += subjectScore;
+            })
+
+            updatedOverallScores[student._id] = overallScore;
+
+            const percent = (overallScore / (subjects[currentExam.class] * currentExam.points)) * 100;
 
             let grade = "F";
             if (percent >= settings.cutoffs.A) grade = "A";
@@ -154,14 +162,15 @@ const Exam = () => {
 
         updatedStudents.forEach(student => updateStudent(student._id, student));
 
+        setStudentOverallScores(updatedOverallScores)
         setStudentGrades(updatedGrades);
-        setLocalStudents(updatedStudents.sort((a, b) => studentScores[b._id] - studentScores[a._id]));
+        setLocalStudents(updatedStudents.sort((a, b) => updatedOverallScores[b._id] - updatedOverallScores[a._id]));
 
         let currentRank = 1;
         const newRanks = {};
         let sum = 0;
 
-        let sortedScores = Object.entries(studentScores).sort((a, b) => b[1] - a[1])
+        let sortedScores = Object.entries(updatedOverallScores).sort((a, b) => b[1] - a[1])
 
         for (let i = 0; i < sortedScores.length; ++i) {
             let [id, score] = sortedScores[i];
@@ -273,13 +282,12 @@ const Exam = () => {
                         flexDir="column"
                         bg="gray.200">
                         <Text lineClamp="1" marginRight="1rem" marginTop="1rem">Points: {currentExam.points}</Text>
-                        <Text lineClamp="1" marginRight="1rem" marginTop="1rem">Class Mean Grade: {currentMeanGrade == -1 ? "Not yet scored" : (((currentMeanGrade / currentExam.points) * 100).toFixed(1) + "%   ,  " + currentMeanGrade.toFixed(2) + " / " + currentExam.points.toFixed(2))} </Text>
+                        <Text lineClamp="1" marginRight="1rem" marginTop="1rem">Class Mean Grade: {currentMeanGrade == -1 ? "Not yet scored" : (((currentMeanGrade / (subjects[currentExam.class].length * currentExam.points)) * 100).toFixed(1) + "%")}</Text>
                         <Text lineClamp="1" marginRight="1rem" marginY="1rem">Date Created: {String(currentExam.createdAt).slice(0, 10)} </Text>
                     </Box>
                 </Box>
 
                 <Box w="80%"
-                    //bg="green.100"
                     maxW="40rem"
                     paddingBottom="1rem"
                 >
@@ -363,7 +371,7 @@ const Exam = () => {
                                                     flex="1"
                                                     maxW={{ "xxs": "3.5rem", "xs": "5.5rem", sm: "6rem", md: "14rem" }}
                                                     truncate
-                                                >Overall: </Text>
+                                                >{((studentOverallScores[student._id]) / (subjects[currentExam.class].length * currentExam.points) * 100).toFixed(2)}%</Text>
                                                 <Text
                                                     flex="1"
                                                     maxW={{ "xxs": "3.5rem", "xs": "5.5rem", sm: "6rem", md: "14rem" }}
@@ -377,7 +385,6 @@ const Exam = () => {
                                             >
 
                                                 {subjects[currentExam.class].map((subject, index) => (
-
                                                     <VStack key={index} ml="0.5rem" mr="0.5rem" mb="0.5rem">
                                                         <Text pt="0.5rem" truncate maxW={{"xxs": "3rem", "xs": "6rem", sm: "8rem", }} >{subject}</Text>
                                                         <NumberInputRoot                                                            

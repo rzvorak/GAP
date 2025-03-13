@@ -15,6 +15,16 @@ import { AccordionItem, AccordionItemContent, AccordionItemTrigger, AccordionRoo
 
 const Scores_Exam = () => {
 
+    const subjects = {
+        1: ["Kiswahili", "Writing", "Numeracy", "Health", "Sports and Arts", "Reading"],
+        2: ["Kiswahili", "Writing", "Arithmetic", "Health", "Sports and Arts", "Reading"],
+        3: ["Kiswahili", "English", "Mathematics", "Science", "Geography", "History", "Sports and Arts"],
+        4: ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies"],
+        5: ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"],
+        6: ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"],
+        7: ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"]
+    }
+
     const disappearOnMin = useBreakpointValue({ "min": "none", "xxs": "flex" })
 
     const location = useLocation();
@@ -149,7 +159,7 @@ const Scores_Exam = () => {
                                         <Box display="flex" flexDir="column" position="relative" >
                                             <Box>
                                                 <Text lineClamp="1" fontSize="sm" p="0.4rem">Points:  {exam.points} </Text>
-                                                <Text lineClamp="1" fontSize="sm" p="0.4rem">Class Mean Grade:  {exam.meanGrade == -1 || exam.meanGrade == null ? "Not yet scored" : (((exam.meanGrade / exam.points) * 100).toFixed(1) + "%   ,  " + exam.meanGrade.toFixed(2) + " / " + exam.points)} </Text>
+                                                <Text lineClamp="1" fontSize="sm" p="0.4rem">Class Mean Grade:  {exam.meanGrade == -1 || exam.meanGrade == null ? "Not yet scored" : (((exam.meanGrade / (subjects[exam.class].length * exam.points)) * 100).toFixed(1) + "%")}</Text>
                                                 <Text lineClamp="1" fontSize="sm" p="0.4rem">Date Created: {String(exam.createdAt).slice(0, 10)}</Text>
                                             </Box>
 
