@@ -11,7 +11,6 @@ const Dialog_Exam = (props) => {
     const [fade, setFade] = useState(false);
     // TODO: potentially add settings option for default exam points
     const [currentPoints, setCurrentPoints] = useState(50);
-    const [currentMonth, setCurrentMonth] = useState(-1);
 
     const dialogContainer = {
         position: "fixed",
@@ -145,15 +144,13 @@ const Dialog_Exam = (props) => {
     }
 
     const handleMonthSelect = (month) => {
-        console.log(selectedMonth, month)
         if (selectedMonth !== month) {
             setSelectedMonth(month);
         }
     };
 
     const handleSubmitButton = async () => {
-        await props.handleSubmitExam(currentPoints, currentMonth, -1)
-        console.log(props.capitalizedType)
+        await props.handleSubmitExam(currentPoints, selectedMonth, -1)
         handleExit();
     }
 

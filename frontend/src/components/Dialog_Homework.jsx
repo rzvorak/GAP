@@ -92,7 +92,7 @@ const Dialog_Homework = (props) => {
     setFade(true)
   }, []);
 
-  // make global at some point
+  // TODO: make global at some point
   const subjects = {
     "Class 1": ["Kiswahili", "Writing", "Numeracy", "Health", "Sports and Arts", "Reading"],
     "Class 2": ["Kiswahili", "Writing", "Arithmetic", "Health", "Sports and Arts", "Reading"],

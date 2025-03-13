@@ -9,6 +9,7 @@ import Scores_Type from './pages/Scores_Type';
 import Scores_Homework from './pages/Scores_Homework';
 import Homework from './pages/Homework'
 import Scores_Exam from './pages/Scores_Exam';
+import Exam from './pages/Exam'
 
 import Reports from './pages/Reports';
 
@@ -31,7 +32,7 @@ function App() {
           <Route path="/scores/homework" element={<Scores_Homework />} />
           <Route path="/scores/exam" element={<Scores_Exam />} />
 
-
+          <Route path="/scores/exam-view" element={<Exam />} />
           <Route path="/scores/homework-view" element={<Homework />} />
         </Routes>
     </>

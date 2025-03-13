@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Box, VStack, Heading, Text, HStack, Input, Center, Button, Spinner, useBreakpointValue } from '@chakra-ui/react'
+import { Box, VStack, Heading, Text, HStack, Input, Center, Button, Spinner, useBreakpointValue, SimpleGrid } from '@chakra-ui/react'
 import Header from '../components/Header'
 import { useLocation, useNavigate } from 'react-router-dom'
 
@@ -17,10 +17,11 @@ const Exam = () => {
     const location = useLocation();
     const examId = location.state?.examId;
     const selectedClass = location.state?.selectedClass;
+    const selectedType = location.state?.selectedType;
 
     const navigate = useNavigate();
     const handleBack = () => {
-        navigate('/scores/exam', { state: { selectedClass: selectedClass } })
+        navigate('/scores/exam', { state: { selectedClass: selectedClass, selectedType: selectedType } })
     }
 
     const { fetchExams, deleteExam, updateExam, exams } = useExamStore()
@@ -34,6 +35,7 @@ const Exam = () => {
     const [settings, setSettings] = useState({})
 
     const [studentScores, setStudentScores] = useState({})
+    const [studentOverallScores, setStudentOverallScores] = useState({})
     const [studentGrades, setStudentGrades] = useState({})
     const [studentRanks, setStudentRanks] = useState({})
     const [search, setSearch] = useState("")
@@ -41,6 +43,17 @@ const Exam = () => {
     const [triggerSave, setTriggerSave] = useState(false)
     // maybe use to make "-" on entry possible for grades
     const [pressedSave, setPressedSave] = useState(false)
+
+    // TODO: make global along with homework dialog but pay attention to format
+    const subjects = {
+        1: ["Kiswahili", "Writing", "Numeracy", "Health", "Sports and Arts", "Reading"],
+        2: ["Kiswahili", "Writing", "Arithmetic", "Health", "Sports and Arts", "Reading"],
+        3: ["Kiswahili", "English", "Mathematics", "Science", "Geography", "History", "Sports and Arts"],
+        4: ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies"],
+        5: ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"],
+        6: ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"],
+        7: ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"]
+    }
 
     // launch once on load, get students, exams, and settings
     useEffect(() => {
@@ -64,38 +77,48 @@ const Exam = () => {
 
         console.log("Processing students and exams...");
 
-        const homework = homeworks.find(hw => hw._id === homeworkId);
-        setCurrentHomework(homework);
+        const exam = exams.find(exam => exam._id === examId);
+        setCurrentExam(exam);
 
         const classStudents = students.filter(student => student.class === Number(selectedClass.slice(-1)));
 
         const defaultScores = {};
+        const defaultOverallScores = {};
         const newGrades = {};
 
         // fetch existing saved scores or default to full points
         setTimeout(() => {
             classStudents.forEach(student => {
-                const savedScore = student.homeworkLog?.[homeworkId] ?? homework.points;
+                const savedScore = student.examLog?.[examId] ?? subjects[Number(selectedClass.slice(-1))].reduce((acc, subject) => {
+                    acc[subject] = exam.points;
+                    return acc;
+                }, {});
                 defaultScores[student._id] = savedScore;
 
-                const percent = (savedScore / homework.points) * 100;
+                let overallScore = 0;
+                Object.values(savedScore).forEach(subjectScore => {
+                    overallScore += subjectScore;
+                })
+
+                defaultOverallScores[student._id] = overallScore;
+
+                const percent = (overallScore / (exam.points * subjects[Number(selectedClass.slice(-1))].length)) * 100;
                 let grade = "F";
                 if (percent >= settings.cutoffs.A) grade = "A";
                 else if (percent >= settings.cutoffs.B) grade = "B";
                 else if (percent >= settings.cutoffs.C) grade = "C";
                 else if (percent >= settings.cutoffs.D) grade = "D";
 
-                console.log(student.homeworkLog[homeworkId] == null)
-
-                newGrades[student._id] = student.homeworkLog[homeworkId] == null ? grade : "-";
+                newGrades[student._id] = student.examLog[examId] == null ? grade : "-";
             });
 
         }, 0)
 
         setAllStudents(classStudents);
         setStudentScores(defaultScores);
+        setStudentOverallScores(defaultOverallScores)
         setStudentGrades(newGrades);
-        setLocalStudents(classStudents.sort((a, b) => studentScores[b._id] - studentScores[a._id]));
+        setLocalStudents(classStudents.sort((a, b) => studentOverallScores[b._id] - studentOverallScores[a._id]));
         setTriggerSave(true);
 
     }, [triggerLoad]);
@@ -107,12 +130,13 @@ const Exam = () => {
     }, [triggerSave]);
 
     const handleSaveButton = () => {
+        return;
         console.log("Saving student scores...");
 
         const updatedGrades = {};
         const updatedStudents = allStudents.map(student => {
             const newScore = studentScores[student._id];
-            const percent = (newScore / currentHomework.points) * 100;
+            const percent = (newScore / currentExam.points) * 100;
 
             let grade = "F";
             if (percent >= settings.cutoffs.A) grade = "A";
@@ -124,7 +148,7 @@ const Exam = () => {
 
             return {
                 ...student,
-                homeworkLog: { ...student.homeworkLog, [currentHomework._id]: newScore },
+                examLog: { ...student.examLog, [currentExam._id]: newScore },
             };
         });
 
@@ -156,8 +180,8 @@ const Exam = () => {
 
         setStudentRanks(newRanks);
 
-        updateHomework(homeworkId, {
-            ...currentHomework,
+        updateExam(examId, {
+            ...currentExam,
             meanGrade: sum / sortedScores.length
         })
 
@@ -175,24 +199,24 @@ const Exam = () => {
         setDialog(!dialog);
     }
 
-    const handleDeleteHomework = () => {
+    const handleDeleteExam = () => {
         students.forEach(student => {
-            const updatedHomeworkLog = { ...student.homeworkLog };
-            delete updatedHomeworkLog[homeworkId];
+            const updatedExamLog = { ...student.examLog };
+            delete updatedExamLog[examId];
 
             updateStudent(student._id, {
                 ...student,
-                homeworkLog: updatedHomeworkLog
+                examLog: updatedExamLog
             });
         });
 
-        deleteHomework(homeworkId);
+        deleteExam(examId);
     };
 
-    const deleteButtonBreakpoint = useBreakpointValue({ "xxs": "", sm: "Homework" });
+    const deleteButtonBreakpoint = useBreakpointValue({ "xxs": "", sm: "Exam" });
 
 
-    if (!currentHomework.name || !currentHomework.points || !localStudents) {
+    if (!currentExam.type || !currentExam.points || !localStudents) {
         return (
             <Center minH="100vh" bg="gray.100">
                 <Spinner color="green.500" borderWidth="4px" cosize="xl" />
@@ -211,7 +235,7 @@ const Exam = () => {
         >
             <Header></Header>
 
-            {dialog && <Dialog_Delete handleBack={handleBack} delete={handleDeleteHomework} id={homeworkId} setDialog={setDialog}></Dialog_Delete>}
+            {dialog && <Dialog_Delete handleBack={handleBack} delete={handleDeleteExam} id={examId} setDialog={setDialog}></Dialog_Delete>}
 
             <Box
                 w="100%"
@@ -231,8 +255,8 @@ const Exam = () => {
                     fontWeight={"400"}
                     whiteSpace={"normal"}
                     wordBreak="break-word"
-                    
-                >{currentHomework.name}</Heading>
+
+                >{currentExam.type.charAt(0).toUpperCase()}{currentExam.type.slice(1)} Exam ({currentExam.month})</Heading>
             </Box>
 
 
@@ -248,10 +272,9 @@ const Exam = () => {
                         display="flex"
                         flexDir="column"
                         bg="gray.200">
-                        <Text lineClamp="1" marginRight="1rem" marginTop="1rem">Points: {currentHomework.points}</Text>
-                        <Text lineClamp="1" marginRight="1rem" marginTop="1rem">Subject: {currentHomework.subject}</Text>
-                        <Text lineClamp="1" marginRight="1rem" marginTop="1rem">Class Mean Grade: {currentMeanGrade == -1 ? "Not yet scored" : (((currentMeanGrade / currentHomework.points) * 100).toFixed(1) + "%   ,  " + currentMeanGrade.toFixed(2) + " / " + currentHomework.points.toFixed(2))} </Text>
-                        <Text lineClamp="1" marginRight="1rem" marginY="1rem">Date Created: {String(currentHomework.createdAt).slice(0, 10)} </Text>
+                        <Text lineClamp="1" marginRight="1rem" marginTop="1rem">Points: {currentExam.points}</Text>
+                        <Text lineClamp="1" marginRight="1rem" marginTop="1rem">Class Mean Grade: {currentMeanGrade == -1 ? "Not yet scored" : (((currentMeanGrade / currentExam.points) * 100).toFixed(1) + "%   ,  " + currentMeanGrade.toFixed(2) + " / " + currentExam.points.toFixed(2))} </Text>
+                        <Text lineClamp="1" marginRight="1rem" marginY="1rem">Date Created: {String(currentExam.createdAt).slice(0, 10)} </Text>
                     </Box>
                 </Box>
 
@@ -296,26 +319,6 @@ const Exam = () => {
                         gap="0rem"
                         display="flex"
                     >
-                        <HStack
-                            flex="1"
-                            minH="3rem"
-                            gap="0"
-                            w="100%"
-                            maxW="40rem"
-                        >
-                            <Box flex="3">
-                                <Text ml="1rem" maxW="10rem">Name</Text>
-                            </Box>
-                            <Center flex="2" marginRight={{"xxs": "0.4rem", "xs": "0.5rem", sm: "0rem"}}>
-                                <Text>Score</Text>
-                            </Center>
-                            <Center flex="1">
-                                <Text>Grade</Text>
-                            </Center>
-                            <Center flex="1" marginLeft={{"xxs": "0.4rem", "xs": "0.5rem", sm: "0rem"}}>
-                                <Text>Rank</Text>
-                            </Center>
-                        </HStack>
 
                         <VStack
                             flex="10"
@@ -332,50 +335,84 @@ const Exam = () => {
                                     <Box
                                         key={index}
                                         w="100%"
-                                        h="3rem"
+                                        h={subjects[currentExam.class].length > 6 ? "22rem" : "15rem"}
                                         bg={index % 2 === 0 ? "gray.200" : "gray.300"}
                                         display="flex"
                                         alignItems="center">
-                                        <HStack
+
+                                        <VStack
                                             display="flex"
                                             w="100%"
+                                            h="100%"
                                             gap="0">
-                                            <Box flex="3">
+
+                                            <Box
+                                                flex="1"
+                                                w="100%"
+                                                display="flex"
+                                                alignItems="center">
                                                 <Text
+                                                    flex="2"
                                                     ml="1rem"
-                                                    maxW={{ "xxs": "3.5rem","xs": "5.5rem", sm: "8rem", md: "14rem" }}
-                                                    truncate>{student.name}</Text>
+                                                    pr="1rem"
+                                                    fontWeight="500"
+                                                    //maxW={{ "xxs": "3.5rem", "xs": "5.5rem", sm: "10rem", md: "14rem" }}
+                                                    truncate
+                                                >{student.name}</Text>
+                                                <Text
+                                                    flex="1"
+                                                    maxW={{ "xxs": "3.5rem", "xs": "5.5rem", sm: "6rem", md: "14rem" }}
+                                                    truncate
+                                                >Overall: </Text>
+                                                <Text
+                                                    flex="1"
+                                                    maxW={{ "xxs": "3.5rem", "xs": "5.5rem", sm: "6rem", md: "14rem" }}
+                                                    truncate
+                                                >Rank: {studentRanks[student._id] || "-"}</Text>
                                             </Box>
-                                            <Center flex="2">
-                                                <NumberInputRoot
-                                                    defaultValue={currentHomework.points}
-                                                    minW="4rem"
-                                                    w={{ "xxs": "70%","xs": "75%", sm: "90%", md: "100%" }}
-                                                    h="90%"
-                                                    borderRadius="0.25rem"
-                                                    step={1}
-                                                    value={studentScores[student._id]}
-                                                    onValueChange={(e) => {
-                                                        const newValue = Math.max(0, Math.min(currentHomework.points, e.value))
-                                                        setStudentScores(prevScores => ({
-                                                        ...prevScores,
-                                                        [student._id]: newValue
-                                                    }))}}
-                                                    min={0}
-                                                    max={currentHomework.points}
-                                                    style={{ boxShadow: 'var(--box-shadow-classic)' }}
-                                                >
-                                                    <NumberInputField borderWidth={"0"} />
-                                                </NumberInputRoot>
-                                            </Center>
-                                            <Center flex="1">
-                                                <Text>{studentGrades[student._id] || "-"}</Text>
-                                            </Center>
-                                            <Center flex="1">
-                                                <Text>{studentRanks[student._id] || "-"}</Text>
-                                            </Center>
-                                        </HStack>
+
+                                            <SimpleGrid 
+                                            columns={3} 
+                                            pb="1rem"
+                                            >
+
+                                                {subjects[currentExam.class].map((subject, index) => (
+
+                                                    <VStack key={index} ml="0.5rem" mr="0.5rem" mb="0.5rem">
+                                                        <Text pt="0.5rem" truncate maxW={{"xxs": "3rem", "xs": "6rem", sm: "8rem", }} >{subject}</Text>
+                                                        <NumberInputRoot                                                            
+                                                            minW="4rem"
+                                                            w={{ "xxs": "70%", "xs": "75%", sm: "90%", md: "100%" }}
+                                                            h="50%"
+                                                            borderRadius="0.25rem"
+                                                            step={1}
+                                                            value={studentScores[student._id][subject]}
+                                                            onValueChange={(e) => {
+                                                                const newValue = Math.max(0, Math.min(currentExam.points, e.value))
+                                                                setStudentScores(prevScores => ({
+                                                                    ...prevScores,
+                                                                    [student._id]: {
+                                                                        ...prevScores[student._id],
+                                                                        [subject]: newValue
+                                                                    }
+                                                                }))
+                                                            }}
+                                                            min={0}
+                                                            max={currentExam.points}
+                                                            style={{ boxShadow: 'var(--box-shadow-classic)' }}
+                                                        >
+                                                            <NumberInputField borderWidth={"0"} />
+                                                        </NumberInputRoot>
+                                                    </VStack>
+
+                                                ))}
+
+                                            </SimpleGrid>
+
+                                        </VStack>
+
                                     </Box>
+
                                 )) :
                                 <Box
                                     w="100%"

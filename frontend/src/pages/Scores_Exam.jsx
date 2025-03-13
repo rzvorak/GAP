@@ -40,20 +40,20 @@ const Scores_Exam = () => {
     }
 
     const handleForward = (examId) => {
-        navigate('/scores/exam-view', { state: { examId: examId, selectedClass: selectedClass } })
+        navigate('/scores/exam-view', { state: { examId: examId, selectedClass: selectedClass, selectedType: selectedType } })
     }
 
     const [dialog, setDialog] = useState(false);
     const handleAdd = () => {
         setDialog(!dialog);
     }
-
-    // TODO: 
+ 
     const handleSubmitExam = async (examPoints, examMonth, examMeanGrade) => {
+        console.log(selectedType, examPoints, examMonth, Number(selectedClass.slice(-1)), examMeanGrade)
         const { success, message } = await createExam({
             type: selectedType,
             points: examPoints,
-            monthly: examMonth,
+            month: examMonth,
             // account here for the fact that class was a string "Class X"
             class: Number(selectedClass.slice(-1)),
             meanGrade: examMeanGrade
@@ -129,7 +129,7 @@ const Scores_Exam = () => {
                                             position="absolute"
                                             lineClamp="1" 
                                             maxWidth={{"xxs": "30%", "xs": "40%", sm: "50%"}}
-                                            >{exam.type}</Text>
+                                            >{exam.type.charAt(0).toUpperCase()}{exam.type.slice(1)} Exam</Text>
                                             <Box
                                                 position="absolute"
                                                 right="20%"
@@ -142,7 +142,7 @@ const Scores_Exam = () => {
 
                                     </AccordionItemTrigger>
                                     <AccordionItemContent
-                                        h={{ sm: "9.5rem" }}
+                                        h={{ sm: "7.5rem" }}
                                         bg="gray.200"
                                         p="0.5rem"
                                     >
@@ -155,7 +155,7 @@ const Scores_Exam = () => {
 
                                             <Box
                                                 position={{ "xxs": "relative", sm: "absolute" }}
-                                                bottom={{ "xxs": "0rem", sm: "0.7rem" }}
+                                                bottom="0rem"
                                                 right={{ "xxs": "0rem", sm: "1.5rem" }}
                                                 w="3rem"
                                                 h="3rem"

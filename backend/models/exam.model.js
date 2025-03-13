@@ -10,7 +10,7 @@ const examSchema = new mongoose.Schema({
         required: true
     },
     month: {
-        type: Number,
+        type: String,
         required: true
     },
     class: {
