@@ -5,7 +5,7 @@ export const useStudentStore = create((set) => ({
     setStudents: (students) => set({ students }),
 
     createStudent: async (newStudent) => {
-        if (!newStudent.name || !newStudent.class || !newStudent.homeworkLog || !newStudent.examLog || !newStudent.comments) {
+        if (!newStudent.name || !newStudent.class || !newStudent.homeworkLog || !newStudent.examLog || !newStudent.comments || !newStudent.profile) {
             return {success: false, message: "Please fill in all fields."}
         }
         const res = await fetch("/api/students", {

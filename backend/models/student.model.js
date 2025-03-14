@@ -20,6 +20,10 @@ const studentSchema = new mongoose.Schema({
     comments: {
         type: Map,
         required: true
+    },
+    profile: {
+        type: Map,
+        required: true
     }
 }, {
     timestamps: true

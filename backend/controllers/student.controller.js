@@ -4,7 +4,7 @@ import Student from '../models/student.model.js';
 export const createStudent = async (req, res) => {
     const student = req.body;
 
-    if (!student.name || !student.class || !student.homeworkLog || !student.examLog || !student.comments) {
+    if (!student.name || !student.class || !student.homeworkLog || !student.examLog || !student.comments || !student.profile) {
         return res.status(400).json({success:false, message: "Please provide all fields"});
     }
 

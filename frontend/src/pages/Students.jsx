@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom'
 import '../styles/App.css'
 import { Box, VStack, Heading, HStack, Input, Button, Text, Center, useBreakpointValue, SimpleGrid, Spinner, Link } from '@chakra-ui/react'
 import { IoClose } from "react-icons/io5";
+import { FaArrowLeft } from 'react-icons/fa';
+
 
 import { useStudentStore } from '../store/student.js';
 import Dialog_Student from '../components/Dialog_Student.jsx'
@@ -83,6 +85,7 @@ const Students = () => {
             homeworkLog: {},
             examLog: {},
             comments: {},
+            profile: {"First Name": "Testing..."},
         });
         fetchStudents();
         console.log(success, message);
@@ -98,12 +101,16 @@ const Students = () => {
     const navigate = useNavigate();
 
     // to conform with Dialog_Delete
-    const handleBack = () => {
+    const handleDeleteBack = () => {
         console.log("Student successfully deleted")
     }
 
     const handleForward = (studentId) => {
-        navigate('/students/student-view', {state: {studentId: studentId}})
+        navigate('/students/student-view', { state: { studentId: studentId } })
+    }
+
+    const handleBack = () => {
+        navigate('/landing')
     }
 
     return (
@@ -115,7 +122,7 @@ const Students = () => {
             display="flex"
             flexDir={"column"}
         >
-            {dialogDelete && <Dialog_Delete handleBack={handleBack} delete={deleteStudent} id={deleteStudentId} setDialog={setDialogDelete}></Dialog_Delete>}
+            {dialogDelete && <Dialog_Delete handleBack={handleDeleteBack} delete={deleteStudent} id={deleteStudentId} setDialog={setDialogDelete}></Dialog_Delete>}
             {dialogStudent && <Dialog_Student handleSubmitStudent={handleSubmitStudent} setDialog={setDialogStudent}></Dialog_Student>}
 
             <Header></Header>
@@ -248,10 +255,9 @@ const Students = () => {
                     flex="1"
                     gap="0rem"
                     display="flex"
-                    paddingBottom="2rem"
+                    paddingBottom="0rem"
                 >
                     <HStack
-                        flex="1"
                         minH="4rem"
                         gap="0"
                         w="80%"
@@ -272,11 +278,8 @@ const Students = () => {
                     </HStack>
 
                     <VStack
-                        flex="10"
-                        bg="gray.100"
                         w="80%"
                         maxW="40rem"
-                        minH="12rem"
                         gap="0rem"
                         alignItems={"center"} >
 
@@ -298,19 +301,19 @@ const Students = () => {
                                             w="100%"
                                             gap="0">
                                             <Box flex="4" >
-                                                <Link 
-                                                py="0.5rem"
-                                                pr="0.5rem"
-                                                color="gray.900" 
-                                                ml="1rem" 
-                                                //bg="transparent"
-                                                transition="all 0.1s ease-in-out"
-                                                textDecoration={"none"} 
-                                                _hover={{color: "gray.400" }}
-                                                onClick={() => handleForward(student._id)}
+                                                <Link
+                                                    py="0.5rem"
+                                                    pr="0.5rem"
+                                                    color="gray.900"
+                                                    ml="1rem"
+                                                    //bg="transparent"
+                                                    transition="all 0.1s ease-in-out"
+                                                    textDecoration={"none"}
+                                                    _hover={{ color: "gray.400" }}
+                                                    onClick={() => handleForward(student._id)}
                                                 >
                                                     <Text
-                                                    
+
                                                         maxW={{ "xxs": "5rem", "xs": "8rem", sm: "12rem", md: "20rem" }}
                                                         truncate
                                                     >{student.name}</Text>
@@ -345,6 +348,22 @@ const Students = () => {
                     </VStack>
                 </VStack>
             </VStack>
+
+            <Box
+                w="100%"
+                display={disappearOnMin}
+                h="8rem"
+                paddingTop="2rem" // control how close plus can get
+                paddingBottom="2rem"
+                justifyContent="center"
+                alignItems="center"
+            >
+                <Box
+                    cursor={"pointer"}
+                    onClick={handleBack}>
+                    <FaArrowLeft size="1.5rem" className='FaArrowLeft' />
+                </Box>
+            </Box>
 
         </Box>
     )
