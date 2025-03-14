@@ -4,6 +4,9 @@ import Landing from './pages/Landing';
 
 import Students from './pages/Students';
 import Student from './pages/Student';
+import Student_Comments from './pages/Student_Comments';
+import Student_Profile from './pages/Student_Profile';
+import Student_Scores from './pages/Student_Scores';
 
 import Scores from './pages/Scores';
 import Scores_Type from './pages/Scores_Type';
@@ -37,6 +40,9 @@ function App() {
           <Route path="/scores/homework-view" element={<Homework />} />
 
           <Route path="/students/student-view" element={<Student />} />
+          <Route path="/students/student-view/scores" element={<Student_Scores />} />
+          <Route path="/students/student-view/comments" element={<Student_Comments />} />
+          <Route path="/students/student-view/profile" element={<Student_Profile />} />
         </Routes>
     </>
   )

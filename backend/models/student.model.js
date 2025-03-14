@@ -17,6 +17,10 @@ const studentSchema = new mongoose.Schema({
         type: Map,
         required: true
     },
+    comments: {
+        type: Map,
+        required: true
+    }
 }, {
     timestamps: true
 });

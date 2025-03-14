@@ -82,6 +82,7 @@ const Students = () => {
             class: studentClass,
             homeworkLog: {},
             examLog: {},
+            comments: {},
         });
         fetchStudents();
         console.log(success, message);
