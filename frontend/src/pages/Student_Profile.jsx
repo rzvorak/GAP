@@ -55,13 +55,10 @@ const Student_Profile = () => {
     }
 
     const handleSubmit = async (updatedProfile) => {
-
-        console.log(updatedProfile)
-
-        // const { success } = await updateStudent(studentId, {
-        //     ...currentStudent,
-        //     profile: updatedProfile
-        // })
+        const { success } = await updateStudent(studentId, {
+            ...currentStudent,
+            profile: updatedProfile
+        })
         console.log(success)
     }
 
@@ -72,7 +69,7 @@ const Student_Profile = () => {
         "Pupil's Medical Information": ["Doctor's Full Name", "Hospital", "Hospital Location", "Mobile", "Health Concerns", "Regular Medication (if any)"],
         "Emergency Contact and Safety": ["Emergency Contact Name", "Emergency Contact Relation", "Emergency Contact Mobile", "Allowed to pick up child", "Not allowed to pick up child"],
         "Confirmation": ["Pupil is registed in", "Headmaster Full Name", "Signature", "Date"]
-    }
+    } 
 
     return (
         <Box
@@ -83,12 +80,14 @@ const Student_Profile = () => {
             display="flex"
             flexDir="column"
         >
+
             {dialog && <Dialog_Profile categories={categories} editCategory={editCategory} currentProfile={currentStudent.profile} handleSubmit={handleSubmit} setDialog={setDialog}></Dialog_Profile>}
+            
 
 
-            <Header></Header>
+            {!dialog && <Header></Header>}
 
-            {currentStudent.profile && currentStudent.name ? (
+            {!dialog && currentStudent.profile && currentStudent.name ? (
 
                 <VStack
                     w="100%"
@@ -197,9 +196,12 @@ const Student_Profile = () => {
                     </Box>
 
                 </VStack>) : (
+                
+                !dialog &&
                 <Box w="100%" display="flex" justifyContent="center" pt="17rem">
                     <Spinner marginTop="2rem" color="green.500" borderWidth="4px" cosize="xl" />
                 </Box>
+                    
             )}
         </Box >
     )

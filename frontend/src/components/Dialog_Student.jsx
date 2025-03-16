@@ -187,10 +187,11 @@ const Dialog = ({ setDialog, handleSubmitStudent }) => {
             h="2.5rem"
             borderRadius={"4rem"}
             borderWidth="2px"
-            bg={currentName === "" ? "gray.300" : "green.500"}
             color="gray.100" 
             fontSize="lg"
             transition="all 0.3s"
+            disabled={currentName === ""}
+            bg={currentName === "" ? "gray.300" : "green.500"}
             cursor={currentName === "" ? "auto" : "pointer"}
             _hover={{bg: currentName === "" ? "gray.300" : "green.600"}}
             onClick={handleSubmitButton}

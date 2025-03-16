@@ -2,14 +2,18 @@ import React, { useState, useEffect } from 'react'
 import { Input, Button, Textarea } from '@chakra-ui/react'
 import { IoClose } from "react-icons/io5";
 import '../styles/Dialog.css'
+import { TbObjectScan } from 'react-icons/tb';
 
 const Dialog_Profile = (props) => {
     const [fade, setFade] = useState(false);
     const [localProfile, setLocalProfile] = useState(props.currentProfile)
 
     const dialogContainer = {
-        position: "fixed",
+        position: "relative",
         width: "100%",
+        minHeight: "100vh",
+        height: `${(6.4 * props.categories[props.editCategory].length) + 5 + 6 + 2}rem`,
+
 
         display: "flex",
         alignItems: "center",
@@ -23,7 +27,8 @@ const Dialog_Profile = (props) => {
     }
 
     const dialog = {
-        height: "60rem",
+
+        height: `${(6.4 * props.categories[props.editCategory].length) + 9}rem`,
         width: "20rem",
         backgroundColor: "#f4f4f5",
         borderRadius: "1rem",
@@ -35,7 +40,7 @@ const Dialog_Profile = (props) => {
 
     const dialogHeader = {
         width: "100%",
-        flex: "1",
+        minHeight: "5rem",
         paddingLeft: "2.3rem",
         paddingTop: "1rem",
         display: "flex",
@@ -47,7 +52,8 @@ const Dialog_Profile = (props) => {
 
     const dialogBody = {
         width: "100%",
-        flex: "9",
+
+        height: `${(6.4 * props.categories[props.editCategory].length)}rem`,
         display: "flex",
         flexDirection: "column",
         paddingTop: "1rem",
@@ -65,10 +71,12 @@ const Dialog_Profile = (props) => {
 
     const dialogFooter = {
         width: "100%",
-        flex: "1",
+        marginTop: "0rem",
+
+        minHeight: "4rem",
         display: "flex",
         justifyContent: 'center',
-        alignItems: "center",
+
     }
 
     const handleSubmitButton = async () => {
@@ -101,46 +109,46 @@ const Dialog_Profile = (props) => {
 
                     {props.categories[props.editCategory].map((field, index) => (
 
-                        <>
+                        <React.Fragment key={index}>
                             <div style={dialogBodyText}><p>{field}</p></div>
 
                             <Input
                                 style={{ boxShadow: 'var(--box-shadow-classic)' }}
                                 border="none"
                                 w="80%"
+                                minH="2.5rem"
                                 borderRadius="0.5rem"
                                 marginBottom="1.5rem"
                                 transition='all 0.3s'
                                 maxLength={30}
-                                //TODO: generate profile fields at student create or something
-                                value={localProfile[field]}
-                                onChange={(e) => setLocalProfile({
-                                    ...localProfile,
-                                    [field]: e.target.value
-                                })}
+                                value={localProfile[field] || ""}
+                                onChange={(e) => setLocalProfile((prev) => ({ ...prev, [field]: e.target.value }))}
                                 _hover={{ transform: "translateY(-3px)" }}></Input>
-                        </>
+                        </React.Fragment>
                     ))}
 
-
-
-                    <div style={dialogFooter}>
-                        <Button
-                            w="55%"
-                            h="2.5rem"
-                            borderRadius={"4rem"}
-                            borderWidth="2px"
-                            bg={(true) ? "gray.300" : "green.500"}
-                            color="gray.100"
-                            fontSize="lg"
-                            transition="all 0.3s"
-                            cursor={(true) ? "auto" : "pointer"}
-                            _hover={{ bg: (true) ? "gray.300" : "green.600" }}
-                            onClick={handleSubmitButton}
-                        >Post Comment</Button>
-
-                    </div>
                 </div>
+
+
+
+                <div style={dialogFooter}>
+                    <Button
+                        w="55%"
+                        h="2.5rem"
+                        borderRadius={"4rem"}
+                        borderWidth="2px"
+                        bg={(Object.keys(localProfile).length != props.categories[props.editCategory].length) ? "gray.300" : "green.500"}
+                        color="gray.100"
+                        fontSize="lg"
+                        transition="all 0.3s"
+                        disabled={(Object.keys(localProfile).length != props.categories[props.editCategory].length)}
+                        cursor={(Object.keys(localProfile).length != props.categories[props.editCategory].length) ? "auto" : "pointer"}
+                        _hover={{ bg: (Object.keys(localProfile).length != props.categories[props.editCategory].length) ? "gray.300" : "green.600" }}
+                        onClick={handleSubmitButton}
+                    >Save Information</Button>
+
+                </div>
+
             </div>
         </div>
     )

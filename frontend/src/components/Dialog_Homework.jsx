@@ -197,6 +197,7 @@ const Dialog_Homework = (props) => {
             h="2.5rem"
             borderRadius={"4rem"}
             borderWidth="2px"
+            disabled={currentName === "" || currentSubject === ""}
             bg={currentName === "" || currentSubject === "" ? "gray.300" : "green.500"}
             color="gray.100"
             fontSize="lg"

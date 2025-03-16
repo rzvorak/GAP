@@ -151,6 +151,7 @@ const Dialog_Comments = (props) => {
                             h="2.5rem"
                             borderRadius={"4rem"}
                             borderWidth="2px"
+                            disabled={(currentName === "" || currentRole === "" || currentComment === "")}
                             bg={(currentName === "" || currentRole === "" || currentComment === "") ? "gray.300" : "green.500"}
                             color="gray.100"
                             fontSize="lg"
