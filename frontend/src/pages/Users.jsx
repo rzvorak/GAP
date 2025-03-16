@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { FaArrowLeft } from 'react-icons/fa';
 
 
-const Statistics = () => {
+const Users = () => {
   const disappearOnMin = useBreakpointValue({ "min": "none", "xxs": "flex" })
 
   const navigate = useNavigate();
@@ -37,7 +37,7 @@ const Statistics = () => {
             color="gray.600"
             fontSize="2xl"
             fontWeight={"400"}
-          >School Statistics</Heading>
+          >Users</Heading>
         </Box>
       </VStack>
 
@@ -62,4 +62,4 @@ const Statistics = () => {
   )
 }
 
-export default Statistics
+export default Users

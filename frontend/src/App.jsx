@@ -19,6 +19,10 @@ import Reports from './pages/Reports';
 
 import Statistics from './pages/Statistics';
 
+import Settings from './pages/Settings';
+
+import Users from './pages/Users';
+
 
 function App() {
   return (
@@ -31,6 +35,8 @@ function App() {
           <Route path="/scores" element={<Scores />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/statistics" element={<Statistics />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/users" element={<Users />} />
 
           <Route path="/scores/type" element={<Scores_Type />} />
           <Route path="/scores/homework" element={<Scores_Homework />} />
