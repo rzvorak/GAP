@@ -85,7 +85,7 @@ const Students = () => {
             homeworkLog: {},
             examLog: {},
             comments: {},
-            profile: {"First Name": "Testing..."},
+            profile: {},
         });
         fetchStudents();
         console.log(success, message);

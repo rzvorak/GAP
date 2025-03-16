@@ -137,13 +137,12 @@ const Dialog_Profile = (props) => {
                         h="2.5rem"
                         borderRadius={"4rem"}
                         borderWidth="2px"
-                        bg={(Object.keys(localProfile).length != props.categories[props.editCategory].length) ? "gray.300" : "green.500"}
+                        bg= "green.500"
                         color="gray.100"
                         fontSize="lg"
                         transition="all 0.3s"
-                        disabled={(Object.keys(localProfile).length != props.categories[props.editCategory].length)}
-                        cursor={(Object.keys(localProfile).length != props.categories[props.editCategory].length) ? "auto" : "pointer"}
-                        _hover={{ bg: (Object.keys(localProfile).length != props.categories[props.editCategory].length) ? "gray.300" : "green.600" }}
+                        cursor="pointer"
+                        _hover={{ bg: "green.600" }}
                         onClick={handleSubmitButton}
                     >Save Information</Button>
 

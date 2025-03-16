@@ -62,10 +62,10 @@ const Student_Profile = () => {
         console.log(success)
     }
 
-    // TODO: potentially make global
+    // TODO: potentially make global, ensure can't have duplicate
     const categories = {
         "Pupil's Information": ["First Name", "Middle Name", "Surname", "Date of Birth", "Place of Birth", "Birth Certificate Number", "Sex", "Nationality", "Region"],
-        "Parent's / Guardian's Information": ["Father's Full Name", "Occupation", "Place of Work", "Physical Address", "Street", "House Number", "Telephone", "Mobile", "Mother's Full Name", "Occupation", "Place of Work", "Physical Address", "Street", "House Number", "Telephone", "Mobile",],
+        "Parent's / Guardian's Information": ["Father's Full Name", "Father's Occupation", "Father's Place of Work", "Father's Physical Address", "Father's Street", "Father's House Number", "Father's Telephone", "Father's Mobile", "Mother's Full Name", "Mother's Occupation", "Mother's Place of Work", "Mother's Physical Address", "Mother's Street", "Mother's House Number", "Mother's Telephone", "Mother's Mobile",],
         "Pupil's Medical Information": ["Doctor's Full Name", "Hospital", "Hospital Location", "Mobile", "Health Concerns", "Regular Medication (if any)"],
         "Emergency Contact and Safety": ["Emergency Contact Name", "Emergency Contact Relation", "Emergency Contact Mobile", "Allowed to pick up child", "Not allowed to pick up child"],
         "Confirmation": ["Pupil is registed in", "Headmaster Full Name", "Signature", "Date"]
@@ -82,8 +82,6 @@ const Student_Profile = () => {
         >
 
             {dialog && <Dialog_Profile categories={categories} editCategory={editCategory} currentProfile={currentStudent.profile} handleSubmit={handleSubmit} setDialog={setDialog}></Dialog_Profile>}
-            
-
 
             {!dialog && <Header></Header>}
 
@@ -152,8 +150,11 @@ const Student_Profile = () => {
                                     >
                                         <Box display="flex" flexDir="column" position="relative" >
                                             <Box>
-                                                {categories[category].map((field, findex) => (
-                                                    <Text key={findex} lineClamp="1" fontSize="sm" p="0.4rem">{field}: {currentStudent.profile[field]} </Text>
+                                                {categories[category].map((field) => (
+                                                    <VStack key={field} alignItems={"flex-start"} gap="0rem">
+                                                        <Text lineClamp="1" fontWeight="bold" fontSize="sm" p="0.4rem">{field}:</Text>
+                                                        <Text lineClamp="1" fontSize="sm" p="0.4rem">{currentStudent.profile[field]}</Text>
+                                                    </VStack>
                                                 ))}
                                             </Box>
 
