@@ -10,6 +10,7 @@ import { FaArrowLeft } from 'react-icons/fa';
 import { NumberInputField, NumberInputRoot } from '../components/ui/number-input';
 import Dialog_Delete from '../components/Dialog_Delete.jsx'
 
+// TODO: fix bug in which a new assignment is added to a student if the homework is entered but not saved
 const Homework = () => {
 
     const disappearOnMin = useBreakpointValue({ "min": "none", "xxs": "flex" })
