@@ -45,6 +45,7 @@ const Settings = () => {
     "D": "green.400",
     "F": "green.300"
   }
+  const cutoffColumns = useBreakpointValue({ "xxs": 1, "xs": 2, sm: 2, md: 4 })
 
 
   const navigate = useNavigate();
@@ -69,10 +70,12 @@ const Settings = () => {
 
         <VStack
           flex="1"
+          display={disappearOnMin}
+          flexDir="column"
           w="100%">
           <Box
             w="100%"
-            h={{ sm: "4rem" }}
+            h="4rem"
             display="flex"
             alignItems={"center"}>
             <Heading
@@ -96,8 +99,14 @@ const Settings = () => {
           </Box>
 
           {Object.keys(localDistribution).map((type, index) => (
-            <Box w="80%" display="flex" justifyContent="center">
-              <VStack w="60%">
+            <Box w="80%"
+              display="flex"
+              key={index}>
+
+              <VStack
+                w={{ "xxs": "25rem", "xs": "25rem", sm: "20rem" }}
+              //bg="red"
+              >
                 <Box
                   display="flex"
                   flexDir="row"
@@ -106,10 +115,10 @@ const Settings = () => {
                   pr="1rem"
                   w="100%"
                 >
-                  <Text w="50%">{type.charAt(0).toUpperCase() + type.slice(1)}:</Text>
+                  <Text w={{ "xxs": "60%", "xs": "60%", sm: "45%" }}>{type.charAt(0).toUpperCase() + type.slice(1)}:</Text>
                   <NumberInputRoot
                     defaultValue="10"
-                    w="50%"
+                    w={{ "xxs": "40%", "xs": "40%", sm: "55%" }}
                     h="fill"
                     borderRadius="0.5rem"
                     transition="all 0.3s"
@@ -128,10 +137,14 @@ const Settings = () => {
                 </Box>
               </VStack>
 
-              <HStack w="40%" gap="0rem">
+              <HStack
+                w={{ "xxs": "50%", "xs": "60%", sm: "70%" }}
+                gap="0rem"
+              //bg="blue"
+              >
                 <Box h="100%" borderRadius="0.1rem" w="0.25rem" bg="gray.700"></Box>
 
-                <Box h="80%" bg="green.500" borderRightRadius="0.5rem" w={(localDistribution[type] / 100) * 20 + "rem"}></Box>
+                <Box h="80%" bg="green.500" borderRightRadius="0.5rem" w={localDistribution[type] + "%"}></Box>
 
               </HStack>
             </Box>))}
@@ -150,65 +163,73 @@ const Settings = () => {
 
           <VStack w="80%" justifyContent="center">
 
-            <Box h="1.5rem" w="100%" display="flex" justifyContent="flex-start">
-              <Box
-                bg={cutoffBackground["A"]}
-                w={(100 - localCutoffs["A"]) + "%"}
-              ></Box>
+            {localCutoffs["A"] > localCutoffs["B"] && localCutoffs["B"] > localCutoffs["C"] && localCutoffs["C"] > localCutoffs["D"] ? (
 
-              <Box
-                bg={cutoffBackground["B"]}
-                w={(localCutoffs["A"] - localCutoffs["B"]) + "%"}
-              ></Box>
-
-              <Box
-                bg={cutoffBackground["C"]}
-                w={(localCutoffs["B"] - localCutoffs["C"]) + "%"}
-              ></Box>
-
-              <Box
-                bg={cutoffBackground["D"]}
-                w={(localCutoffs["C"] - localCutoffs["D"]) + "%"}
-              ></Box>
-
-              <Box
-                bg={cutoffBackground["F"]}
-                w={(localCutoffs["D"] - localCutoffs["F"]) + "%"}
-              ></Box>
-            </Box>
-
-            <SimpleGrid 
-            columns={3}
-            w="100%">
-              {Object.keys(localCutoffs).map((grade, index) => (
+              <Box h="1.5rem" w="100%" display="flex" justifyContent="flex-start">
+                <Box
+                  bg={cutoffBackground["A"]}
+                  w={(100 - localCutoffs["A"]) + "%"}
+                ></Box>
 
                 <Box
-                  display="flex"
-                  flexDir="row"
-                  alignItems="center"
-                  p="1rem"
-                >
-                  <Text>{grade}:</Text>
-                  <NumberInputRoot
-                    defaultValue="10"
-                    w="90%"
-                    h="fill"
-                    borderRadius="0.5rem"
-                    transition="all 0.3s"
-                    value={localCutoffs[grade]}
-                    onValueChange={(e) => setLocalCutoffs({
-                      ...localCutoffs,
-                      [grade]: Math.max(0, Math.min(100, e.value))
-                    })}
-                    min={0}
-                    max={100}
-                    style={{ boxShadow: 'var(--box-shadow-classic)' }}
-                    _hover={{ transform: "translateY(-3px)" }}
+                  bg={cutoffBackground["B"]}
+                  w={(localCutoffs["A"] - localCutoffs["B"]) + "%"}
+                ></Box>
+
+                <Box
+                  bg={cutoffBackground["C"]}
+                  w={(localCutoffs["B"] - localCutoffs["C"]) + "%"}
+                ></Box>
+
+                <Box
+                  bg={cutoffBackground["D"]}
+                  w={(localCutoffs["C"] - localCutoffs["D"]) + "%"}
+                ></Box>
+
+                <Box
+                  bg={cutoffBackground["F"]}
+                  w={(localCutoffs["D"] - localCutoffs["F"]) + "%"}
+                ></Box>
+              </Box>
+
+            ) : (
+              <Box h="1.5rem" w="100%" display="flex" justifyContent="center" bg="gray.200"></Box>
+            )}
+
+
+            <SimpleGrid
+              columns={cutoffColumns}
+              w="100%">
+              {Object.keys(localCutoffs).map((grade, index) => (
+                grade !== "F" ?
+                  <Box
+                    display="flex"
+                    flexDir="row"
+                    alignItems="center"
+                    p="1rem"
+                    key={index}
                   >
-                    <NumberInputField borderWidth={"0"} />
-                  </NumberInputRoot>
-                </Box>
-              ))}
+                    <Text mr="1rem">{grade}:</Text>
+                    <NumberInputRoot
+                      defaultValue="10"
+                      w="90%"
+                      h="fill"
+                      borderRadius="0.5rem"
+                      transition="all 0.3s"
+                      value={localCutoffs[grade]}
+                      onValueChange={(e) => setLocalCutoffs({
+                        ...localCutoffs,
+                        [grade]: Math.max(0, Math.min(100, e.value))
+                      })}
+                      min={0}
+                      max={100}
+                      style={{ boxShadow: 'var(--box-shadow-classic)' }}
+                      _hover={{ transform: "translateY(-3px)" }}
+                    >
+                      <NumberInputField borderWidth={"0"} />
+                    </NumberInputRoot>
+                  </Box>
+                  : (null)))}
             </SimpleGrid>
 
           </VStack>
