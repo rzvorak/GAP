@@ -25,7 +25,7 @@ const initializeSettings = async () => {
         if (!existingSettings) {
             await Settings.create({
                 _id: "global",
-                distribution: { "Homework": 10, "Monthly": 20, "Midterm": 20, "Terminal": 50 },
+                distribution: { "homework": 10, "monthly": 20, "midterm": 20, "terminal": 50 },
                 cuttoffs: {"A": 81, "B": 61, "C": 41, "D": 21, "F": 0}
             });
         }

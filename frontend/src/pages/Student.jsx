@@ -1,6 +1,6 @@
 import Header from '../components/Header'
 import { React, useState, useEffect } from 'react'
-import { Box, SimpleGrid, useBreakpointValue, Center, VStack, Heading, Spinner, Text } from '@chakra-ui/react'
+import { Box, SimpleGrid, useBreakpointValue, Center, VStack, Heading, Spinner, Text, HStack } from '@chakra-ui/react'
 import '../styles/App.css'
 
 // icon imports
@@ -20,6 +20,8 @@ import { useHomeworkStore } from '../store/homework.js';
 import { useExamStore } from '../store/exam.js'
 
 const Landing = () => {
+
+
 
     const location = useLocation();
     const studentId = location.state?.studentId;
@@ -74,8 +76,10 @@ const Landing = () => {
 
     const boxes = ["See Scores", "Create Report", "Student Profile", "Add Comments"]
     const iconSize = useBreakpointValue({ "xxs": "3rem", "xs": "4rem", sm: "5rem", md: "7rem", lg: "9rem" });
-    const disappearOnMin = useBreakpointValue({ "min": "none", "xxs": "grid" })
+    const disappearOnMin = useBreakpointValue({ "min": "none", "xxs": "flex" })
+    const disappearOnMinGrid = useBreakpointValue({ "min": "none", "xxs": "grid" })
     const columns = useBreakpointValue({ "xxs": 1, sm: 2 });
+    const classPosition = useBreakpointValue({"xxs": "space-between", sm: "flex-start"})
 
     if (!currentStudent.name) {
         return (
@@ -97,48 +101,42 @@ const Landing = () => {
         >
             <Header></Header>
 
-            <Box
+            <HStack
                 w="100%"
                 paddingTop="1rem"
                 paddingBottom="1rem"
-                minHeight="4rem"
+                height="4rem"
+                alignItems={"center"}
                 display={disappearOnMin}
-                flexDirection={"column"}
-                flexWrap="wrap"
-                alignItems={"flex-start"}
-                overflow="visible">
+                flexDir={"row"}
+                justifyContent={classPosition}
+            >
+
                 <Heading
                     marginLeft="1rem"
-                    marginRight="1rem"
                     color="gray.600"
                     fontSize="2xl"
                     fontWeight={"400"}
-                    whiteSpace={"normal"}
-                    wordBreak="break-word"
                 >{currentStudent.name}</Heading>
-            </Box>
+
+                <Box
+                    mr="10%"
+                    ml="1rem"
+                    mt="0.4rem"
+                    bg="gray.200"
+                    borderRadius="0.7rem" 
+                    p="0.5rem"
+                    >
+                    Class {currentStudent.class}
+                </Box>
+            </HStack>
 
 
             <VStack flex="1">
-                <Box
-                    w="80%"
-                    maxW="40rem"
-                >
-                    <Box
-                        borderRadius="1.2rem"
-                        paddingLeft="1rem"
-                        display={disappearOnMin}
-                        flexDir="column"
-                        bg="gray.200">
-                        <Text lineClamp="1" marginRight="1rem" marginTop="1rem">Class: {currentStudent.class}</Text>
-                        <Text lineClamp="1" marginRight="1rem" marginTop="1rem">Class: {currentStudent.class}</Text>
-                        <Text lineClamp="1" marginRight="1rem" marginTop="1rem">Class: {currentStudent.class}</Text>
-                        <Text lineClamp="1" marginRight="1rem" marginY="1rem">Class: {currentStudent.class}</Text>
-                    </Box>
-                </Box>
+
 
                 <SimpleGrid
-                    display={disappearOnMin}
+                    display={disappearOnMinGrid}
                     columns={columns}
                     w={"full"}
                     marginTop={"1rem"}

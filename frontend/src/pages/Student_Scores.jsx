@@ -14,6 +14,7 @@ import { useExamStore } from '../store/exam.js'
 import { AccordionItem, AccordionItemContent, AccordionItemTrigger, AccordionRoot } from '../components/ui/accordion'
 
 
+// TODO: fix weird load issue 
 const Student_Scores = () => {
   const disappearOnMin = useBreakpointValue({ "min": "none", "xxs": "flex" })
 
@@ -65,8 +66,6 @@ const Student_Scores = () => {
   useEffect(() => {
     if (!studentId || students.length === 0 || Object.keys(settings).length === 0) return;
 
-    console.log(settings)
-
     const student = students.find(student => student._id === studentId);
 
     setCurrentStudent(student);
@@ -84,11 +83,30 @@ const Student_Scores = () => {
     setIsHomeworkLoading(false)
   }, [homeworks]);
 
-  useEffect(() => {
-    if (isHomeworkLoading || isExamLoading) return;
+  const typeToPercent = { "homework": homeworkPercent, "monthly": monthlyPercent, "midterm": midtermPercent, "terminal": terminalPercent }
 
-    setHomeworkPercent(localHomeworks.reduce((sum, homework) => sum += currentStudent.homeworkLog[homework._id], 0) / localHomeworks.reduce((sum, homework) => sum += homework.points, 0)) * 100
-    //setExamGrade(localHomeworks.reduce((sum, homework) => sum += currentStudent.homeworkLog[homework._id], 0) / localHomeworks.reduce((sum, homework) => sum += homework.points, 0)) * 100
+  useEffect(() => {
+    if (isHomeworkLoading || isExamLoading || !settings) return;
+
+    setHomeworkPercent(localHomeworks.length !== 0 ? (localHomeworks.reduce((sum, homework) => sum += currentStudent.homeworkLog[homework._id], 0) / localHomeworks.reduce((sum, homework) => sum += homework.points, 0) * 100) : -2)
+
+    const monthlyExams = localExams.filter((exam) => { return exam.type === "monthly" })
+    const midtermExams = localExams.filter((exam) => { return exam.type === "midterm" })
+    const terminalExams = localExams.filter((exam) => { return exam.type === "terminal" })
+
+    setMonthlyPercent(monthlyExams.length !== 0 ? ((monthlyExams.reduce((sum, exam) => sum += Object.values(currentStudent.examLog[exam._id]).reduce((sum, score) => sum + score, 0), 0) / monthlyExams.reduce((sum, exam) => sum += exam.points * subjects[currentStudent.class].length, 0)) * 100) : -2)
+    setMidtermPercent(midtermExams.length !== 0 ? ((midtermExams.reduce((sum, exam) => sum += Object.values(currentStudent.examLog[exam._id]).reduce((sum, score) => sum + score, 0), 0) / midtermExams.reduce((sum, exam) => sum += exam.points * subjects[currentStudent.class].length, 0)) * 100) : -2)
+    setTerminalPercent(terminalExams.length !== 0 ? ((terminalExams.reduce((sum, exam) => sum += Object.values(currentStudent.examLog[exam._id]).reduce((sum, score) => sum + score, 0), 0) / terminalExams.reduce((sum, exam) => sum += exam.points * subjects[currentStudent.class].length, 0)) * 100) : -2)
+
+    // get new total weight based on types that have existing scores to consider
+    let totalWeight = Object.keys(settings.distribution).reduce((sum, type) => sum += typeToPercent[type] !== -2 ? settings.distribution[type] : 0, 0)
+
+
+    if (totalWeight === 0) {
+      setOverallPercent(-2)
+    } else {
+      setOverallPercent(Object.keys(settings.distribution).reduce((sum, type) => sum += typeToPercent[type] !== -2 ? (settings.distribution[type] / totalWeight) * typeToPercent[type] : 0, 0))
+    }
 
   })
 
@@ -106,6 +124,7 @@ const Student_Scores = () => {
   const examGridColumns = useBreakpointValue({ "xxs": 2, sm: 3, md: 4, lg: 6, xl: 7 })
 
   const calculateGrade = (percent) => {
+    if (percent < 0) return "-"
     let grade = "F";
     if (percent >= settings.cutoffs.A) grade = "A";
     else if (percent >= settings.cutoffs.B) grade = "B";
@@ -136,7 +155,6 @@ const Student_Scores = () => {
         display={disappearOnMin}
         w="100%">
 
-
         <Box
           w="100%"
           h="4rem"
@@ -150,7 +168,7 @@ const Student_Scores = () => {
           >Student Scores</Heading>
         </Box>
 
-        {(overallPercent === -1) ? (
+        {(overallPercent !== -1) ? (
           <Box
             w="80%"
             maxW="40rem"
@@ -161,11 +179,18 @@ const Student_Scores = () => {
               display={disappearOnMin}
               flexDir="column"
               bg="gray.200">
-              <Text fontWeight="bold" lineClamp="1" marginRight="1rem" marginTop="1rem">Overall Grade: </Text>
-              <Text lineClamp="1" marginRight="1rem" marginTop="1rem">Homework Grade: </Text>
-              <Text lineClamp="1" marginRight="1rem" marginTop="1rem">Monthly Exam Grade:</Text>
-              <Text lineClamp="1" marginRight="1rem" marginTop="1rem">Midterm Exam Grade:</Text>
-              <Text lineClamp="1" marginRight="1rem" marginY="1rem">Terminal Exam Grade:</Text>
+              <Box display="flex" flexDir="row" justifyContent="space-between">
+                <Text lineClamp="1" marginRight="1rem" marginTop="1rem">Overall Grade: {overallPercent !== -2 ? overallPercent.toFixed(1) + "%" : "-"}</Text>
+                <Text fontWeight="bold" lineClamp="1" marginRight="2rem" marginTop="1rem">{calculateGrade(overallPercent)}</Text>
+              </Box>
+              {Object.keys(typeToPercent).map((type, index) => (
+                <Box key={index} display="flex" flexDir="row" justifyContent="space-between">
+                  <Text lineClamp="1" marginRight="1rem" marginTop="1rem">{type.charAt(0).toUpperCase() + type.slice(1)} Grade: {typeToPercent[type] !== -2 ? typeToPercent[type].toFixed(1) + "%" : "-"}</Text>
+                  <Text mb={type === "terminal" ? "1rem" : "0rem"} fontWeight="bold" lineClamp="1" marginRight="2rem" marginTop="1rem">{calculateGrade(typeToPercent[type])}</Text>
+                </Box>
+              ))}
+
+
             </Box>
           </Box>
         ) : (

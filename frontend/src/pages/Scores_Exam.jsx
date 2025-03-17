@@ -125,7 +125,7 @@ const Scores_Exam = () => {
                                     bg="gray.200"
                                     marginBottom="1rem"
                                     key={index}
-                                    value={exam.type}>
+                                    value={exam.createdAt}>
                                     <AccordionItemTrigger
                                         p="0.75rem"
                                         cursor="pointer"
