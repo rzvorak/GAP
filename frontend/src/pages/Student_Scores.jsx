@@ -34,6 +34,7 @@ const Student_Scores = () => {
   const [isExamLoading, setIsExamLoading] = useState(true)
 
   const [settings, setSettings] = useState({})
+  const [subjects, setSubjects] = useState({})
 
   const [overallPercent, setOverallPercent] = useState(-1);
   const [homeworkPercent, setHomeworkPercent] = useState(-1);
@@ -59,6 +60,7 @@ const Student_Scores = () => {
       const res = await fetch('/api/settings')
       const data = await res.json()
       setSettings(data.data)
+      setSubjects(data.data.subjects)
     }
     fetchSettings();
   }, [])
@@ -86,7 +88,7 @@ const Student_Scores = () => {
   const typeToPercent = { "homework": homeworkPercent, "monthly": monthlyPercent, "midterm": midtermPercent, "terminal": terminalPercent }
 
   useEffect(() => {
-    if (isHomeworkLoading || isExamLoading || !settings) return;
+    if (isHomeworkLoading || isExamLoading || !settings.subjects) return;
 
     setHomeworkPercent(localHomeworks.length !== 0 ? (localHomeworks.reduce((sum, homework) => sum += currentStudent.homeworkLog[homework._id], 0) / localHomeworks.reduce((sum, homework) => sum += homework.points, 0) * 100) : -2)
 
@@ -109,17 +111,6 @@ const Student_Scores = () => {
     }
 
   })
-
-
-  const subjects = {
-    1: ["Kiswahili", "Writing", "Numeracy", "Health", "Sports and Arts", "Reading"],
-    2: ["Kiswahili", "Writing", "Arithmetic", "Health", "Sports and Arts", "Reading"],
-    3: ["Kiswahili", "English", "Mathematics", "Science", "Geography", "History", "Sports and Arts"],
-    4: ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies"],
-    5: ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"],
-    6: ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"],
-    7: ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"]
-  }
 
   const examGridColumns = useBreakpointValue({ "xxs": 2, sm: 3, md: 4, lg: 6, xl: 7 })
 

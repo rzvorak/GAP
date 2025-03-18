@@ -26,7 +26,16 @@ const initializeSettings = async () => {
             await Settings.create({
                 _id: "global",
                 distribution: { "homework": 10, "monthly": 20, "midterm": 20, "terminal": 50 },
-                cuttoffs: {"A": 81, "B": 61, "C": 41, "D": 21, "F": 0}
+                cuttoffs: {"A": 81, "B": 61, "C": 41, "D": 21, "F": 0},
+                subjects: {
+                    1: ["Kiswahili", "Writing", "Numeracy", "Health", "Sports and Arts", "Reading"],
+                    2: ["Kiswahili", "Writing", "Arithmetic", "Health", "Sports and Arts", "Reading"],
+                    3: ["Kiswahili", "English", "Mathematics", "Science", "Geography", "History", "Sports and Arts"],
+                    4: ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies"],
+                    5: ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"],
+                    6: ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"],
+                    7: ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"]
+                },
             });
         }
     } catch (error) {

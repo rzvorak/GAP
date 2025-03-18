@@ -33,6 +33,7 @@ const Exam = () => {
     const [currentExam, setCurrentExam] = useState({})
     const [currentMeanGrade, setCurrentMeanGrade] = useState(-1)
     const [settings, setSettings] = useState({})
+    const [subjects, setSubjects] = useState({})
 
     const [studentScores, setStudentScores] = useState({})
     const [studentOverallScores, setStudentOverallScores] = useState({})
@@ -44,17 +45,6 @@ const Exam = () => {
     // maybe use to make "-" on entry possible for grades
     const [pressedSave, setPressedSave] = useState(false)
 
-    // TODO: make global along with homework dialog but pay attention to format
-    const subjects = {
-        1: ["Kiswahili", "Writing", "Numeracy", "Health", "Sports and Arts", "Reading"],
-        2: ["Kiswahili", "Writing", "Arithmetic", "Health", "Sports and Arts", "Reading"],
-        3: ["Kiswahili", "English", "Mathematics", "Science", "Geography", "History", "Sports and Arts"],
-        4: ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies"],
-        5: ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"],
-        6: ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"],
-        7: ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"]
-    }
-
     // launch once on load, get students, exams, and settings
     useEffect(() => {
         async function fetchAll() {
@@ -62,6 +52,7 @@ const Exam = () => {
             const res = await fetch("/api/settings");
             const data = await res.json();
             setSettings(data.data);
+            setSubjects(data.data.subjects)
 
             await fetchStudents();
             await fetchExams();
@@ -73,7 +64,7 @@ const Exam = () => {
 
     // wait for students, exams, and settings then execute
     useEffect(() => {
-        if (!examId || !settings.cutoffs || exams.length === 0 || students.length === 0) return;
+        if (!examId || !settings.cutoffs || !settings.subjects ||  exams.length === 0 || students.length === 0) return;
 
         console.log("Processing students and exams...");
 

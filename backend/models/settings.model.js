@@ -12,6 +12,10 @@ const settingsSchema = new mongoose.Schema({
         required: true,
         default: {"A": 81, "B": 61, "C": 41, "D": 21, "F": 0}
     },
+    subjects: {
+        type: Map,
+        required: true,
+    }
 
 }, {timestamps: true, _id: false})
 

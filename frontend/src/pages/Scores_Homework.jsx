@@ -24,8 +24,15 @@ const Scores_Homework = () => {
     const [localHomeworks, setLocalHomeworks] = useState([])
     const [isHomeworkLoading, setIsHomeworkLoading] = useState(true)
 
+    const [subjects, setSubjects] = useState({})
+
     useEffect(() => {
-        fetchHomeworks().then(() => setIsHomeworkLoading(false));
+        const fetchSettings = async () => {
+            const res = await fetch('/api/settings')
+            const data = await res.json()
+            setSubjects(data.data.subjects)
+        }
+        fetchHomeworks().then(() => fetchSettings()).then(() => setIsHomeworkLoading(false));
     }, [fetchHomeworks]);
 
     useEffect(() => {
@@ -43,6 +50,11 @@ const Scores_Homework = () => {
 
     const [dialog, setDialog] = useState(false);
     const handleAdd = () => {
+        // prevent entry before load
+        if (Object.keys(subjects).length === 0) {
+            return;
+
+        }
         setDialog(!dialog);
     }
 
@@ -68,7 +80,7 @@ const Scores_Homework = () => {
             display="flex"
             flexDir="column"
         >
-            {dialog && <Dialog_Homework handleSubmitHomework={handleSubmitHomework} setDialog={setDialog} selectedClass={selectedClass}></Dialog_Homework>}
+            {dialog && <Dialog_Homework subjects={subjects} handleSubmitHomework={handleSubmitHomework} setDialog={setDialog} selectedClass={selectedClass}></Dialog_Homework>}
 
             <Header></Header>
 

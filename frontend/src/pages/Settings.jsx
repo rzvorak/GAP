@@ -9,6 +9,7 @@ import { FaPlus } from "react-icons/fa6";
 
 
 import Dialog_Delete from '../components/Dialog_Delete';
+import Dialog_Subjects from '../components/Dialog_Subjects';
 
 import { NumberInputField, NumberInputRoot } from '../components/ui/number-input';
 
@@ -20,15 +21,7 @@ const Settings = () => {
   const [settings, setSettings] = useState({})
   const [localDistribution, setLocalDistribution] = useState({})
   const [localCutoffs, setLocalCutoffs] = useState({})
-  const [localSubjects, setLocalSubjects] = useState({
-    "Class 1": ["Kiswahili", "Writing", "Numeracy", "Health", "Sports and Arts", "Reading"],
-    "Class 2": ["Kiswahili", "Writing", "Arithmetic", "Health", "Sports and Arts", "Reading"],
-    "Class 3": ["Kiswahili", "English", "Mathematics", "Science", "Geography", "History", "Sports and Arts"],
-    "Class 4": ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies"],
-    "Class 5": ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"],
-    "Class 6": ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"],
-    "Class 7": ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"]
-  })
+  const [localSubjects, setLocalSubjects] = useState({})
 
 
   const [isSettingsLoading, setIsSettingsLoading] = useState(true)
@@ -40,6 +33,7 @@ const Settings = () => {
       setSettings(data.data)
       setLocalDistribution(data.data.distribution)
       setLocalCutoffs(data.data.cutoffs)
+      setLocalSubjects(data.data.subjects)
       setIsSettingsLoading(false)
     }
     fetchSettings()
@@ -69,11 +63,30 @@ const Settings = () => {
     setLocalSubjects(updatedSubjects)
   }
 
-  const handleAddButton = (currentClass) => {
-    
+  const handleDeleteBack = () => {
+    console.log("Subject successfully deleted")
   }
 
+  const [dialog, setDialog] = useState(false);
+  const [currentClass, setCurrentClass] = useState("")
+  const handleAddButton = (currentClass) => {
+    setCurrentClass(currentClass)
+    setDialog(!dialog);
+  }
 
+  const handleSubmitSubject = (newSubject) => {
+
+    const updatedSubjects = {
+      ...localSubjects,
+      [currentClass]: [
+        ...localSubjects[currentClass],
+        newSubject
+      ]
+    }
+
+    setLocalSubjects(updatedSubjects)
+
+  }
 
   const cutoffBackground = {
     "A": "green.700",
@@ -84,9 +97,7 @@ const Settings = () => {
   }
   const cutoffColumns = useBreakpointValue({ "xxs": 1, "xs": 2, sm: 2, md: 4 })
 
-  const handleDeleteBack = () => {
-    console.log("Subject successfully deleted")
-  }
+
 
   const navigate = useNavigate();
   const handleBack = () => {
@@ -105,6 +116,7 @@ const Settings = () => {
       <Header></Header>
 
       {dialogDelete && <Dialog_Delete handleBack={handleDeleteBack} delete={deleteSubject} id={deleteId} setDialog={setDialogDelete}></Dialog_Delete>}
+      {dialog && <Dialog_Subjects handleSubmitSubject={handleSubmitSubject} currentClass={currentClass} setDialog={setDialog}></Dialog_Subjects>}
 
 
 
@@ -148,7 +160,6 @@ const Settings = () => {
 
               <VStack
                 w={{ "xxs": "25rem", "xs": "25rem", sm: "20rem" }}
-              //bg="red"
               >
                 <Box
                   display="flex"
@@ -302,7 +313,7 @@ const Settings = () => {
                   display="flex"
                   flexDir="row"
                   flexWrap="wrap">
-                  <Text display="flex" mr="0.5rem" alignItems="center">{currentClass}:</Text>
+                  <Text display="flex" mr="0.5rem" alignItems="center">Class {currentClass}:</Text>
 
                   {localSubjects[currentClass].map((subject, sindex) => (
                     <Box
@@ -346,8 +357,8 @@ const Settings = () => {
                     mx="0.4rem"
                     onClick={() => handleAddButton(currentClass)}
                     transition="all 0.3s ease-in-out"
-                    _hover={{transform: "translateY(-3px)"}}
-                    >
+                    _hover={{ transform: "translateY(-3px)" }}
+                  >
                     <FaPlus color="gray" size="1rem" className="FaPlus" />
                   </Box>
 

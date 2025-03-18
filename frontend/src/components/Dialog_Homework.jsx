@@ -92,20 +92,9 @@ const Dialog_Homework = (props) => {
     setFade(true)
   }, []);
 
-  // TODO: make global at some point
-  const subjects = {
-    "Class 1": ["Kiswahili", "Writing", "Numeracy", "Health", "Sports and Arts", "Reading"],
-    "Class 2": ["Kiswahili", "Writing", "Arithmetic", "Health", "Sports and Arts", "Reading"],
-    "Class 3": ["Kiswahili", "English", "Mathematics", "Science", "Geography", "History", "Sports and Arts"],
-    "Class 4": ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies"],
-    "Class 5": ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"],
-    "Class 6": ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"],
-    "Class 7": ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"]
-  }
-
   // specifically for functionality with chakra select
   const frameworks = createListCollection({
-    items: subjects[props.selectedClass].map((subject) => {
+    items: props.subjects[Number(props.selectedClass.slice(-1))].map((subject) => {
       return ({ label: subject, value: subject });
     })
   })

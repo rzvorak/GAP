@@ -15,16 +15,6 @@ import { AccordionItem, AccordionItemContent, AccordionItemTrigger, AccordionRoo
 
 const Scores_Exam = () => {
 
-    const subjects = {
-        1: ["Kiswahili", "Writing", "Numeracy", "Health", "Sports and Arts", "Reading"],
-        2: ["Kiswahili", "Writing", "Arithmetic", "Health", "Sports and Arts", "Reading"],
-        3: ["Kiswahili", "English", "Mathematics", "Science", "Geography", "History", "Sports and Arts"],
-        4: ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies"],
-        5: ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"],
-        6: ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"],
-        7: ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"]
-    }
-
     const disappearOnMin = useBreakpointValue({ "min": "none", "xxs": "flex" })
 
     const location = useLocation();
@@ -35,9 +25,17 @@ const Scores_Exam = () => {
     const { fetchExams, createExam, exams } = useExamStore();
     const [localExams, setLocalExams] = useState([])
     const [isExamLoading, setIsExamLoading] = useState(true)
+    const [subjects, setSubjects] = useState({})
 
     useEffect(() => {
-        fetchExams().then(() => setIsExamLoading(false));
+        const fetchSettings = async () => {
+            const res = await fetch('/api/settings');
+            const data = await res.json();
+            
+            setSubjects(data.data.subjects)
+          }
+          
+        fetchExams().then(() => fetchSettings()).then(() => setIsExamLoading(false))
     }, [fetchExams]);
 
     useEffect(() => {
