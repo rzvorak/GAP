@@ -2,7 +2,13 @@ import React, { useState, useEffect } from 'react'
 import { Box, VStack, Heading, useBreakpointValue, Spinner, Text, HStack, SimpleGrid } from '@chakra-ui/react'
 import Header from '../components/Header'
 import { useNavigate } from 'react-router-dom'
+
 import { FaArrowLeft } from 'react-icons/fa';
+import { IoClose } from "react-icons/io5";
+import { FaPlus } from "react-icons/fa6";
+
+
+import Dialog_Delete from '../components/Dialog_Delete';
 
 import { NumberInputField, NumberInputRoot } from '../components/ui/number-input';
 
@@ -14,6 +20,15 @@ const Settings = () => {
   const [settings, setSettings] = useState({})
   const [localDistribution, setLocalDistribution] = useState({})
   const [localCutoffs, setLocalCutoffs] = useState({})
+  const [localSubjects, setLocalSubjects] = useState({
+    "Class 1": ["Kiswahili", "Writing", "Numeracy", "Health", "Sports and Arts", "Reading"],
+    "Class 2": ["Kiswahili", "Writing", "Arithmetic", "Health", "Sports and Arts", "Reading"],
+    "Class 3": ["Kiswahili", "English", "Mathematics", "Science", "Geography", "History", "Sports and Arts"],
+    "Class 4": ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies"],
+    "Class 5": ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"],
+    "Class 6": ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"],
+    "Class 7": ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"]
+  })
 
 
   const [isSettingsLoading, setIsSettingsLoading] = useState(true)
@@ -38,6 +53,28 @@ const Settings = () => {
 
   }
 
+  // for subjets logic
+  const [dialogDelete, setDialogDelete] = useState(false)
+  const [deleteId, setDeleteId] = useState({})
+  const handleDeleteButton = (currentClass, subject) => {
+    setDeleteId({ class: currentClass, subject: subject })
+    setDialogDelete(!dialogDelete);
+  }
+
+  const deleteSubject = (deleteId) => {
+    const updatedSubjects = { ...localSubjects }
+    updatedSubjects[deleteId.class] = updatedSubjects[deleteId.class].filter(
+      (subject) => subject !== deleteId.subject
+    );
+    setLocalSubjects(updatedSubjects)
+  }
+
+  const handleAddButton = (currentClass) => {
+    
+  }
+
+
+
   const cutoffBackground = {
     "A": "green.700",
     "B": "green.600",
@@ -47,6 +84,9 @@ const Settings = () => {
   }
   const cutoffColumns = useBreakpointValue({ "xxs": 1, "xs": 2, sm: 2, md: 4 })
 
+  const handleDeleteBack = () => {
+    console.log("Subject successfully deleted")
+  }
 
   const navigate = useNavigate();
   const handleBack = () => {
@@ -63,6 +103,9 @@ const Settings = () => {
       flexDir={"column"}
     >
       <Header></Header>
+
+      {dialogDelete && <Dialog_Delete handleBack={handleDeleteBack} delete={deleteSubject} id={deleteId} setDialog={setDialogDelete}></Dialog_Delete>}
+
 
 
 
@@ -231,7 +274,6 @@ const Settings = () => {
                   </Box>
                   : (null)))}
             </SimpleGrid>
-
           </VStack>
 
 
@@ -247,6 +289,79 @@ const Settings = () => {
               fontWeight={"400"}
             >Class Subjects:</Heading>
           </Box>
+
+          <SimpleGrid columns={1} w="80%">
+            {Object.keys(localSubjects).map((currentClass, index) => (
+              <HStack key={index} w="100%" mb="1rem"  >
+                <Box h="100%" borderRadius="0.1rem" minW="0.2rem" bg="gray.700" >
+
+                </Box>
+
+                <Box
+                  h="fit-content"
+                  display="flex"
+                  flexDir="row"
+                  flexWrap="wrap">
+                  <Text display="flex" mr="0.5rem" alignItems="center">{currentClass}:</Text>
+
+                  {localSubjects[currentClass].map((subject, sindex) => (
+                    <Box
+                      key={sindex}
+                      bg="gray.200"
+                      w="fit-content"
+                      display="flex"
+                      borderRadius="0.75rem"
+                      justifyContent="center"
+                      alignItems="center"
+                      p="0.75rem"
+                      pr="0.5rem"
+                      mx="0.2rem"
+                      my="0.4rem"
+                      h="2rem">
+
+                      <Text
+                        whiteSpace="nowrap"
+                        color="gray.500"
+                        mr="0.2rem"
+
+                      >{subject}</Text>
+
+                      <Box mt="0.1rem" onClick={() => handleDeleteButton(currentClass, subject)}>
+                        <IoClose size="1.5rem" className="IoClose" />
+                      </Box>
+
+                    </Box>
+                  ))}
+
+                  <Box
+                    border="2px solid gray"
+                    borderRadius="0.4rem"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    h="1.5rem"
+                    w="1.5rem"
+                    cursor="pointer"
+                    my="0.6rem"
+                    mx="0.4rem"
+                    onClick={() => handleAddButton(currentClass)}
+                    transition="all 0.3s ease-in-out"
+                    _hover={{transform: "translateY(-3px)"}}
+                    >
+                    <FaPlus color="gray" size="1rem" className="FaPlus" />
+                  </Box>
+
+                </Box>
+
+              </HStack>
+
+            ))}
+          </SimpleGrid>
+
+
+
+
+
 
           <Box
             w="80%"
