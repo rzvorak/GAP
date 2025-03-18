@@ -26,7 +26,7 @@ const initializeSettings = async () => {
             await Settings.create({
                 _id: "global",
                 distribution: { "homework": 10, "monthly": 20, "midterm": 20, "terminal": 50 },
-                cuttoffs: {"A": 81, "B": 61, "C": 41, "D": 21, "F": 0},
+                cutoffs: {"A": 81, "B": 61, "C": 41, "D": 21, "F": 0},
                 subjects: {
                     1: ["Kiswahili", "Writing", "Numeracy", "Health", "Sports and Arts", "Reading"],
                     2: ["Kiswahili", "Writing", "Arithmetic", "Health", "Sports and Arts", "Reading"],

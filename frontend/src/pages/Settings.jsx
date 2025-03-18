@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Box, VStack, Heading, useBreakpointValue, Spinner, Text, HStack, SimpleGrid } from '@chakra-ui/react'
+import { Box, VStack, Heading, useBreakpointValue, Spinner, Text, HStack, SimpleGrid, Button } from '@chakra-ui/react'
 import Header from '../components/Header'
 import { useNavigate } from 'react-router-dom'
 
@@ -13,8 +13,7 @@ import Dialog_Subjects from '../components/Dialog_Subjects';
 
 import { NumberInputField, NumberInputRoot } from '../components/ui/number-input';
 
-
-
+// TODO: handle change in subject affecting existing exams, possibly delete all exams when change and notify
 const Settings = () => {
   const disappearOnMin = useBreakpointValue({ "min": "none", "xxs": "flex" })
 
@@ -43,11 +42,52 @@ const Settings = () => {
 
   })
 
-  const updateSettings = async () => {
+
+
+  const handleSaveButton = async () => {
+
+    const updatedSettings = {
+      distribution: localDistribution,
+      cutoffs: localCutoffs,
+      subjects: localSubjects,
+
+    }
+
+    const res = await fetch(`/api/settings`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedSettings),
+    });
+    const data = await res.json();
+    console.log("success:", data.success)
 
   }
 
-  // for subjets logic
+
+  const defaultSettings = {
+    distribution: { "homework": 10, "monthly": 20, "midterm": 20, "terminal": 50 },
+    cutoffs: { "A": 81, "B": 61, "C": 41, "D": 21, "F": 0 },
+    subjects: {
+      1: ["Kiswahili", "Writing", "Numeracy", "Health", "Sports and Arts", "Reading"],
+      2: ["Kiswahili", "Writing", "Arithmetic", "Health", "Sports and Arts", "Reading"],
+      3: ["Kiswahili", "English", "Mathematics", "Science", "Geography", "History", "Sports and Arts"],
+      4: ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies"],
+      5: ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"],
+      6: ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"],
+      7: ["Kiswahili", "English", "Mathematics", "Science", "Civics", "Social Studies", "Vocational Skills"]
+    }
+  }
+
+  const restoreButtonBreakpoint = useBreakpointValue({ "xxs": "", sm: "Settings" });
+  const handleRestoreButton = () => {
+    setLocalDistribution(defaultSettings.distribution)
+    setLocalCutoffs(defaultSettings.cutoffs)
+    setLocalSubjects(defaultSettings.subjects)
+  }
+
+  // for subjects logic
   const [dialogDelete, setDialogDelete] = useState(false)
   const [deleteId, setDeleteId] = useState({})
   const handleDeleteButton = (currentClass, subject) => {
@@ -75,7 +115,6 @@ const Settings = () => {
   }
 
   const handleSubmitSubject = (newSubject) => {
-
     const updatedSubjects = {
       ...localSubjects,
       [currentClass]: [
@@ -83,10 +122,10 @@ const Settings = () => {
         newSubject
       ]
     }
-
     setLocalSubjects(updatedSubjects)
-
   }
+
+
 
   const cutoffBackground = {
     "A": "green.700",
@@ -397,21 +436,51 @@ const Settings = () => {
 
 
 
-      <Box
-        w="100%"
-        display={disappearOnMin}
-        h="8rem"
-        paddingTop="2rem"
-        paddingBottom="2rem"
-        justifyContent="center"
-        alignItems="center"
-      >
-        <Box
-          cursor={"pointer"}
-          onClick={handleBack}>
-          <FaArrowLeft size="1.5rem" className='FaArrowLeft' />
-        </Box>
+
+      <Box w="100%" display="flex" justifyContent="center">
+        <HStack
+          justifyContent="space-between"
+          w="80%"
+          h="8rem"
+          display={disappearOnMin}
+          paddingBottom="2rem"
+          paddingTop="2rem"
+        >
+
+          <Box onClick={handleBack} p="0.5rem" cursor="pointer">
+            <FaArrowLeft size="1.5rem" className='FaArrowLeft' />
+          </Box>
+
+          <Box>
+            <Button
+              borderRadius={"4rem"}
+              w={{ "xxs": "4.5rem", "xs": "6rem", sm: "12rem" }}
+              borderWidth="2px"
+              borderColor={"green.500"}
+              bg="none"
+              color="green.500"
+              fontSize={{ sm: "lg", lg: "xl" }}
+              transition="all 0.3s"
+              onClick={handleRestoreButton}
+              _hover={{ transform: "translateY(-3px)" }}
+            >Restore {restoreButtonBreakpoint}</Button>
+
+            <Button
+              borderRadius={"4rem"}
+              w={{ "xxs": "3.5rem", "xs": "5rem", sm: "6rem" }}
+              bg="green.500"
+              color="gray.100"
+              fontSize={{ sm: "lg", lg: "xl" }}
+              transition="all 0.3s"
+              _hover={{ transform: "translateY(-3px)" }}
+              marginLeft={{ "xxs": "0.5rem", "xs": "1rem", sm: "1.5rem" }}
+              onClick={() => handleSaveButton()}
+            >Save</Button>
+          </Box>
+        </HStack>
+
       </Box>
+
 
     </Box>
   )
