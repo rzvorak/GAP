@@ -69,7 +69,7 @@ const Reports = () => {
     const pdfDoc = await PDFDocument.create();
     const page = pdfDoc.addPage([600, 400]);
 
-    page.drawText(currentExam.name, {
+    page.drawText(currentExam.type, {
       x: 50,
       y: 350,
       size: 20,
