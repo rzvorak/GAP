@@ -6,16 +6,25 @@ import { useNavigate } from 'react-router-dom'
 import { FaArrowLeft } from 'react-icons/fa';
 import { IoClose } from "react-icons/io5";
 import { FaPlus } from "react-icons/fa6";
+import { IoWarningOutline } from "react-icons/io5";
 
+import { useStudentStore } from '../store/student.js';
+import { useHomeworkStore } from '../store/homework.js';
+import { useExamStore } from '../store/exam.js'
 
 import Dialog_Delete from '../components/Dialog_Delete';
 import Dialog_Subjects from '../components/Dialog_Subjects';
 
+import { AccordionItem, AccordionItemContent, AccordionItemTrigger, AccordionRoot } from '../components/ui/accordion'
 import { NumberInputField, NumberInputRoot } from '../components/ui/number-input';
 
 // TODO: handle change in subject affecting existing exams, possibly delete all exams when change and notify
 const Settings = () => {
   const disappearOnMin = useBreakpointValue({ "min": "none", "xxs": "flex" })
+
+  const { fetchStudents, deleteStudent, students } = useStudentStore();
+  const { fetchHomeworks, deleteHomework, homeworks } = useHomeworkStore();
+  const { fetchExams, deleteExam, exams } = useExamStore();
 
   const [settings, setSettings] = useState({})
   const [localDistribution, setLocalDistribution] = useState({})
@@ -36,13 +45,14 @@ const Settings = () => {
       setIsSettingsLoading(false)
     }
     fetchSettings()
+    fetchStudents()
+    fetchHomeworks()
+    fetchExams()
   }, [])
 
   useEffect(() => {
 
   })
-
-
 
   const handleSaveButton = async () => {
 
@@ -88,11 +98,11 @@ const Settings = () => {
   }
 
   // for subjects logic
-  const [dialogDelete, setDialogDelete] = useState(false)
+  const [dialogDeleteSubject, setDialogDeleteSubject] = useState(false)
   const [deleteId, setDeleteId] = useState({})
-  const handleDeleteButton = (currentClass, subject) => {
+  const handleDeleteSubjectButton = (currentClass, subject) => {
     setDeleteId({ class: currentClass, subject: subject })
-    setDialogDelete(!dialogDelete);
+    setDialogDeleteSubject(!dialogDeleteSubject);
   }
 
   const deleteSubject = (deleteId) => {
@@ -104,7 +114,7 @@ const Settings = () => {
   }
 
   const handleDeleteBack = () => {
-    console.log("Subject successfully deleted")
+    console.log("Successfully deleted")
   }
 
   const [dialog, setDialog] = useState(false);
@@ -125,6 +135,40 @@ const Settings = () => {
     setLocalSubjects(updatedSubjects)
   }
 
+  const [dialogDeleteStudents, setDialogDeleteStudents] = useState(false)
+  const handleDeleteStudentsButton = () => {
+    setDialogDeleteStudents(!dialogDeleteStudents);
+  }
+
+  const [dialogDeleteHomework, setDialogDeleteHomework] = useState(false)
+  const handleDeleteHomeworkButton = () => {
+    setDialogDeleteHomework(!dialogDeleteHomework);
+  }
+
+  const [dialogDeleteExams, setDialogDeleteExams] = useState(false)
+  const handleDeleteExamsButton = () => {
+    setDialogDeleteExams(!dialogDeleteExams);
+  }
+
+  const deleteAllExams = async (ignore) => {
+    exams.forEach(exam => {
+      deleteExam(exam._id)
+    })
+
+  }
+
+  const deleteAllHomework = async (ignore) => {
+    homeworks.forEach(homework => {
+       deleteHomework(homework._id)
+    })
+
+  }
+
+  const deleteAllStudents = async (ignore) => {
+    students.forEach(student => {
+      deleteStudent(student._id)
+    })
+  }
 
 
   const cutoffBackground = {
@@ -154,7 +198,10 @@ const Settings = () => {
     >
       <Header></Header>
 
-      {dialogDelete && <Dialog_Delete handleBack={handleDeleteBack} delete={deleteSubject} id={deleteId} setDialog={setDialogDelete}></Dialog_Delete>}
+      {dialogDeleteExams && <Dialog_Delete handleBack={handleDeleteBack} delete={deleteAllExams} id={"critical"} setDialog={setDialogDeleteExams}></Dialog_Delete>}
+      {dialogDeleteHomework && <Dialog_Delete handleBack={handleDeleteBack} delete={deleteAllHomework} id={"critical"} setDialog={setDialogDeleteHomework}></Dialog_Delete>}
+      {dialogDeleteStudents && <Dialog_Delete handleBack={handleDeleteBack} delete={deleteAllStudents} id={"critical"} setDialog={setDialogDeleteStudents}></Dialog_Delete>}
+      {dialogDeleteSubject && <Dialog_Delete handleBack={handleDeleteBack} delete={deleteSubject} id={deleteId} setDialog={setDialogDeleteSubject}></Dialog_Delete>}
       {dialog && <Dialog_Subjects handleSubmitSubject={handleSubmitSubject} currentClass={currentClass} setDialog={setDialog}></Dialog_Subjects>}
 
 
@@ -376,7 +423,7 @@ const Settings = () => {
 
                       >{subject}</Text>
 
-                      <Box mt="0.1rem" onClick={() => handleDeleteButton(currentClass, subject)}>
+                      <Box mt="0.1rem" onClick={() => handleDeleteSubjectButton(currentClass, subject)}>
                         <IoClose size="1.5rem" className="IoClose" />
                       </Box>
 
@@ -424,6 +471,112 @@ const Settings = () => {
               fontWeight={"400"}
             >Student Information:</Heading>
           </Box>
+
+
+
+
+          <AccordionRoot
+            w="80%"
+            variant={"plain"}
+            collapsible
+            multiple
+            borderRadius="0"
+          >
+            <AccordionItem
+              borderRadius="0"
+              marginBottom="1rem"
+              value={"danger"}>
+              <AccordionItemTrigger
+                p="0.75rem"
+                cursor="pointer"
+                h="3.5rem"
+                bg="gray.100"
+                fontWeight="400"
+                display="flex"
+                style={{ boxShadow: 'var(--box-shadow-classic)' }}
+              >
+
+                <Box w="100%" display="flex" justifyContent="center">
+                  <Box mt="0.25rem" mr="0.5rem">
+                    <IoWarningOutline size="1rem" color="orange" />
+                  </Box>
+
+                  System Reset
+
+                  <Box mt="0.25rem" ml="0.5rem">
+                    <IoWarningOutline size="1rem" color="orange" />
+                  </Box>
+                </Box>
+
+
+              </AccordionItemTrigger>
+              <AccordionItemContent
+
+                //bg="gray.200"
+                p="1rem"
+              >
+                <VStack w="100%">
+                  <Button
+
+                    w="100%"
+                    maxW="60rem"
+                    h={{ sm: "2.5rem", md: "3rem", lg: "4rem" }}
+                    borderRadius={"4rem"}
+                    borderWidth="2px"
+                    borderColor={"red.500"}
+                    bg="none"
+                    color="red.500"
+                    fontSize={{ sm: "lg", lg: "xl" }}
+                    transition="all 0.3s"
+                    marginTop="0.3rem"
+                    _hover={{ transform: "translateY(-3px)" }}
+                    onClick={() => handleDeleteStudentsButton()}
+                  >
+                    Delete ALL Students
+                  </Button>
+
+                  <Button
+
+                    w="100%"
+                    maxW="60rem"
+                    h={{ sm: "2.5rem", md: "3rem", lg: "4rem" }}
+                    borderRadius={"4rem"}
+                    borderWidth="2px"
+                    borderColor={"red.500"}
+                    bg="none"
+                    color="red.500"
+                    fontSize={{ sm: "lg", lg: "xl" }}
+                    transition="all 0.3s"
+                    marginTop="0.3rem"
+                    _hover={{ transform: "translateY(-3px)" }}
+                    onClick={() => handleDeleteHomeworkButton()}
+                  >
+                    Delete ALL Homework
+                  </Button>
+
+                  <Button
+
+                    w="100%"
+                    maxW="60rem"
+                    h={{ sm: "2.5rem", md: "3rem", lg: "4rem" }}
+                    borderRadius={"4rem"}
+                    borderWidth="2px"
+                    borderColor={"red.500"}
+                    bg="none"
+                    color="red.500"
+                    fontSize={{ sm: "lg", lg: "xl" }}
+                    transition="all 0.3s"
+                    marginTop="0.3rem"
+                    _hover={{ transform: "translateY(-3px)" }}
+                    onClick={() => handleDeleteExamsButton()}
+                  >
+                    Delete ALL Exams
+                  </Button>
+                </VStack>
+
+              </AccordionItemContent>
+            </AccordionItem>
+          </AccordionRoot>
 
         </VStack>
 

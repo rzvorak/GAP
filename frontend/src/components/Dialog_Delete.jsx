@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Input, Button, createListCollection } from '@chakra-ui/react'
 import { IoClose } from "react-icons/io5";
-import { SelectContent, SelectItem, SelectRoot, SelectTrigger, SelectValueText } from '../components/ui/select';
-import { NumberInputField, NumberInputRoot, NumberInputLabel } from '../components/ui/number-input';
 import '../styles/Dialog.css'
 import '../styles/Dialog_Homework.css'
 
@@ -71,12 +69,12 @@ const Dialog_Delete = (props) => {
             h="2.5rem"
             borderRadius={"4rem"}
             borderWidth="2px"
-            bg="green.500"
+            bg={(props.id !== "critical" ? "green.500" : "red.500" )}
             color="gray.100"
             fontSize="lg"
             transition="all 0.3s"
             cursor="pointer"
-            _hover={{bg: "green.600" }}
+            _hover={{bg: (props.id !== "critical" ? "green.600" : "red.600" ) }}
             onClick={handleConfirmButton}
           >Confirm Deletion</Button>
           <div onClick={() => handleExit()}>
