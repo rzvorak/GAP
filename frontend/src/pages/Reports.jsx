@@ -49,13 +49,7 @@ const Reports = () => {
   const createHomeworkPDF = async (id) => {
 
     const currentHomework = homeworks.find((homework) => homework._id === id)
-
-    const currentStudents = students.filter((student) => { return Object.keys(student.homeworkLog).includes(currentHomework._id) }).sort((a, b) => {
-      if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
-      if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
-      return 0;
-    })
-
+    let currentStudents = students.filter((student) => { return Object.keys(student.homeworkLog).includes(currentHomework._id) })
 
     const pdfDoc = await PDFDocument.create();
     let page = pdfDoc.addPage([595, 842]);
@@ -96,7 +90,7 @@ const Reports = () => {
       String(currentHomework.class),
       currentHomework.subject,
       String(currentHomework.points),
-      currentHomework.updatedAt.slice(0, 10),
+      (currentHomework.meanGrade != -1 ? currentHomework.updatedAt.slice(0, 10) : "-"),
       currentHomework.createdAt.slice(0, 10)
     ]
     varY = 842 - 100
@@ -123,6 +117,26 @@ const Reports = () => {
       varX += category === "Name" ? 250 : 85
     })
 
+    // lines by homework analysis
+    page.drawLine({
+      start: { x: 285, y: 842 - 85 },
+      end: { x: 595 - 30, y: 842 - 85 },
+      thickness: 2,
+      color: rgb(0, 0, 0)
+    })
+    page.drawLine({
+      start: { x: 285, y: 842 - 130 },
+      end: { x: 595 - 30, y: 842 - 130 },
+      thickness: 2,
+      color: rgb(0, 0, 0)
+    })
+    page.drawLine({
+      start: { x: 285, y: 842 - 225 },
+      end: { x: 595 - 30, y: 842 - 225 },
+      thickness: 2,
+      color: rgb(0, 0, 0)
+    })
+
     const calculateGrade = (percent) => {
       if (percent < 0) return "-"
       let grade = "F";
@@ -133,21 +147,112 @@ const Reports = () => {
       return grade;
     }
 
-    varY = 842-305
-    let lineY = 842-280
+    // student ranking logic
+    let currentRank = 1;
+    const ranks = {};
+    const studentScores = currentStudents.map((student) => [student._id, student.homeworkLog[currentHomework._id]])
+    let gradeCounts = {
+      "A": 0,
+      "B": 0,
+      "C": 0,
+      "D": 0,
+      "F": 0,
+      "Total": 0
+    }
+
+    let sortedScores = studentScores.sort((a, b) => b[1] - a[1])
+
+    for (let i = 0; i < sortedScores.length; ++i) {
+        let [id, score] = sortedScores[i];
+
+        ++gradeCounts[calculateGrade((score / currentHomework.points) * 100)]
+        ++gradeCounts["Total"]
+
+        if (i > 0 && score === sortedScores[i - 1][1]) {
+            ranks[id] = ranks[sortedScores[i - 1][0]];
+        } else {
+            ranks[id] = currentRank;
+        }
+
+        currentRank++;
+    }
+
+    // sort by rank then sort alphabetically
+    currentStudents = currentStudents.sort((a, b) => {
+      if (ranks[a._id] !== ranks[b._id]) {
+        return ranks[a._id] - ranks[b._id]; 
+      }
+      if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+      if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+      return 0;
+    })
+
+
+    // homework analysis
+    varX = 290
+    const meanPercent = ((currentHomework.meanGrade / currentHomework.points) * 100).toFixed(1)
+    const analysisCategories = [
+      "Class Mean:", 
+      (currentHomework.meanGrade != -1 ? currentHomework.meanGrade.toFixed(1) + "/" + currentHomework.points : "-"),
+      (currentHomework.meanGrade != -1 ? meanPercent + "%" : "-"),
+      calculateGrade(meanPercent)
+    ];
+    analysisCategories.forEach(category => {
+      page.drawText(category, {
+        x: varX,
+        y: 842 - 112,
+        size: 15,
+        color: rgb(0, 0, 0),
+      })
+      varX += category === "Class Mean:" ? 140 : 60
+    })
+
+
+    // grade distribution
+    varX = 290
+    let varXAnalysis = 290
+    Object.keys(gradeCounts).forEach((grade, index) => {
+      page.drawText(grade, {
+        x: varX,
+        y: 842 - 160,
+        size: 15,
+        color: rgb(0, 0, 0),
+      })
+      page.drawText(String(gradeCounts[grade]), {
+        x: varXAnalysis,
+        y: 842 - 200,
+        size: 15,
+        color: rgb(0, 0, 0),
+      })
+      varX += 45
+      varXAnalysis += index == 4 ? 52 : 45
+    })
+
+    if (currentStudents.length == 0) {
+      page.drawText("Not Yet Scored", {
+        x: 250,
+        y: 842 - 320,
+        size: 15,
+        color: rgb(0, 0, 0),
+      })
+    }
+
+    // student table
+    varY = 842 - 305
+    let lineY = 842 - 280
     currentStudents.forEach((student, index) => {
-      let percent = ((student.homeworkLog[currentHomework._id] / currentHomework.points ) * 100).toFixed(1)
+      let percent = ((student.homeworkLog[currentHomework._id] / currentHomework.points) * 100).toFixed(1)
       let studentStats = [
-        student.name, 
+        student.name,
         student.homeworkLog[currentHomework._id] + "/" + currentHomework.points,
         percent + "%",
         calculateGrade(percent),
-        "-1"
+        String(ranks[student._id])
       ]
 
       page.drawLine({
         start: { x: 30, y: lineY },
-        end: { x: 595-30, y: lineY },
+        end: { x: 595 - 30, y: lineY },
         thickness: 2,
         color: rgb(0, 0, 0)
       })
