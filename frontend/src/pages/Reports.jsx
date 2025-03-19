@@ -4,7 +4,7 @@ import Header from '../components/Header'
 import { useNavigate } from 'react-router-dom'
 import { FaArrowLeft } from 'react-icons/fa';
 
-import { PDFDocument, rgb } from 'pdf-lib';
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 import { saveAs } from 'file-saver';
 
 import { useStudentStore } from '../store/student.js';
@@ -24,9 +24,15 @@ const Reports = () => {
   const { fetchExams, exams } = useExamStore();
 
   const [isLoading, setIsLoading] = useState(true);
+  const [settings, setSettings] = useState({})
 
   useEffect(() => {
-    fetchStudents().then(() => fetchHomeworks().then(() => fetchExams().then(setIsLoading(false))))
+    const fetchSettings = async () => {
+      const res = await fetch('/api/settings')
+      const data = await res.json();
+      setSettings(data.data)
+    }
+    fetchStudents().then(() => fetchHomeworks().then(() => fetchExams().then(() => fetchSettings().then(setIsLoading(false)))))
   }, [])
 
   const navigate = useNavigate();
@@ -44,16 +50,130 @@ const Reports = () => {
 
     const currentHomework = homeworks.find((homework) => homework._id === id)
 
-    console.log("beginning pdf")
-    const pdfDoc = await PDFDocument.create();
-    const page = pdfDoc.addPage([600, 400]);
+    const currentStudents = students.filter((student) => { return Object.keys(student.homeworkLog).includes(currentHomework._id) }).sort((a, b) => {
+      if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+      if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+      return 0;
+    })
 
-    page.drawText(currentHomework.name, {
-      x: 50,
-      y: 350,
-      size: 20,
+
+    const pdfDoc = await PDFDocument.create();
+    let page = pdfDoc.addPage([595, 842]);
+
+    const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+    // title
+    page.drawText(currentHomework.name.length > 30 ? currentHomework.name.slice(0, 30) + "..." : currentHomework.name, {
+      x: 25,
+      y: 842 - 60,
+      size: 30,
       color: rgb(0, 0, 0),
     });
+
+    // homework metadata
+    const homeworkCategories = ["Class:", "Subject:", "Points:", "Date Scored:", "Date Created:"]
+    let varY = 842 - 100
+    homeworkCategories.forEach((category) => {
+      page.drawText(category, {
+        x: 60,
+        y: varY,
+        size: 15,
+        color: rgb(0, 0, 0),
+      })
+      varY -= 30
+    })
+
+    // line by homework metadata
+    page.drawLine({
+      start: { x: 30, y: 842 - 85 },
+      end: { x: 30, y: 842 - 225 },
+      thickness: 2,
+      color: rgb(0, 0, 0)
+    })
+
+    // homework metadata values
+    const homeworkCategoryValues = [
+      String(currentHomework.class),
+      currentHomework.subject,
+      String(currentHomework.points),
+      currentHomework.updatedAt.slice(0, 10),
+      currentHomework.createdAt.slice(0, 10)
+    ]
+    varY = 842 - 100
+    homeworkCategoryValues.forEach((categoryValue) => {
+      page.drawText(categoryValue, {
+        x: 180,
+        y: varY,
+        size: 15,
+        color: rgb(0, 0, 0),
+      })
+      varY -= 30
+    })
+
+    let varX = 30
+    const studentCategories = ["Name", "Score", "Percent", "Grade", "Rank"];
+    studentCategories.forEach(category => {
+      page.drawText(category, {
+        x: varX,
+        y: 842 - 260,
+        size: 15,
+        font: boldFont,
+        color: rgb(0, 0, 0),
+      })
+      varX += category === "Name" ? 250 : 85
+    })
+
+    const calculateGrade = (percent) => {
+      if (percent < 0) return "-"
+      let grade = "F";
+      if (percent >= settings.cutoffs.A) grade = "A";
+      else if (percent >= settings.cutoffs.B) grade = "B";
+      else if (percent >= settings.cutoffs.C) grade = "C";
+      else if (percent >= settings.cutoffs.D) grade = "D";
+      return grade;
+    }
+
+    varY = 842-305
+    let lineY = 842-280
+    currentStudents.forEach((student, index) => {
+      let percent = ((student.homeworkLog[currentHomework._id] / currentHomework.points ) * 100).toFixed(1)
+      let studentStats = [
+        student.name, 
+        student.homeworkLog[currentHomework._id] + "/" + currentHomework.points,
+        percent + "%",
+        calculateGrade(percent),
+        "-1"
+      ]
+
+      page.drawLine({
+        start: { x: 30, y: lineY },
+        end: { x: 595-30, y: lineY },
+        thickness: 2,
+        color: rgb(0, 0, 0)
+      })
+      lineY -= 40
+
+      varX = 30
+      studentStats.forEach((stat, index) => {
+        page.drawText(stat, {
+          x: varX,
+          y: varY,
+          size: 15,
+          color: rgb(0, 0, 0),
+        })
+        varX += index === 0 ? 255 : 85
+      })
+      varY -= 40
+
+      // account for page wrap
+      if ((index - 12) % 19 == 0) {
+        page = pdfDoc.addPage([595, 842]);
+        varY = 842 - 65;
+        lineY = 842 - 40;
+      }
+    })
+
+
 
     const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes], { type: 'application/pdf' });
@@ -61,6 +181,13 @@ const Reports = () => {
     saveAs(blob, 'document.pdf');  // Triggers the file download
 
   }
+
+
+
+
+
+
+
 
   const createExamPDF = async (id) => {
     const currentExam = exams.find((exam) => exam._id === id)
