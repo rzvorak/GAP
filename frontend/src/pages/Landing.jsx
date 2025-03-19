@@ -1,7 +1,6 @@
 import Header from '../components/Header'
 import React from 'react'
 import { Box, SimpleGrid, useBreakpointValue, Center, VStack, Heading } from '@chakra-ui/react'
-import '../styles/App.css'
 
 // icon imports
 import { FaRegUser } from "react-icons/fa6";

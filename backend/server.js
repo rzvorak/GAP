@@ -7,16 +7,27 @@ import settingsRoutes from './routes/settings.route.js';
 import examRoutes from './routes/exam.route.js'
 import Settings from './models/settings.model.js';
 
+import path from "path"
+
 dotenv.config();
 
 const app = express();
 
+const __dirname = path.resolve()
 app.use(express.json()); // allows JSON data in body
 
 app.use('/api/students', studentRoutes)
 app.use('/api/homework', homeworkRoutes)
 app.use('/api/settings', settingsRoutes)
 app.use('/api/exams', examRoutes)
+
+if (process.env.NODE_ENV === "production") {
+    app.use(express.static(path.join(__dirname, "/frontend/dist")));
+
+    app.get("*", (req, res) => {
+        res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"))
+    })
+}
 
 const initializeSettings = async () => {
     try {
