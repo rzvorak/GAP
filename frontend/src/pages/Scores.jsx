@@ -76,20 +76,20 @@ const Scores = () => {
       </VStack>
 
       <Box
-          w="100%"
-          display={disappearOnMin}
-          h="8rem"
-          paddingTop="2rem" // control how close plus can get
-          paddingBottom="2rem"
-          justifyContent="center"
-          alignItems="center"
-        >
-          <Box
-            cursor={"pointer"}
-            onClick={handleBack}>
-            <FaArrowLeft size="1.5rem" className='FaArrowLeft' />
-          </Box>
+        w="100%"
+        display={disappearOnMin}
+        h="8rem"
+        paddingTop="2rem" // control how close plus can get
+        paddingBottom="2rem"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <Box
+          cursor={"pointer"}
+          onClick={handleBack}>
+          <FaArrowLeft size="1.5rem" className='FaArrowLeft' />
         </Box>
+      </Box>
 
     </Box>
   )

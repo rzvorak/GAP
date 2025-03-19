@@ -1,11 +1,10 @@
 import React, {useState, useEffect} from 'react'
-import { Input, Button } from '@chakra-ui/react'
+import { Button } from '@chakra-ui/react'
 import { IoClose } from "react-icons/io5";
-import '../styles/Dialog.css'
 
-const Dialog_Report_Class = ({ setDialog, handleSubmitStudent }) => {
+
+const Dialog_Report_Class = (props) => {
   const [fade, setFade] = useState(false);
-  const [currentName, setCurrentName] = useState("");
 
   const dialogContainer = {
     position: "fixed",
@@ -22,7 +21,7 @@ const Dialog_Report_Class = ({ setDialog, handleSubmitStudent }) => {
   }
 
   const dialog = {
-    height: "25rem",
+    height: "18rem",
     width: "20rem",
     backgroundColor: "#f4f4f5",
     borderRadius: "1rem",
@@ -34,7 +33,7 @@ const Dialog_Report_Class = ({ setDialog, handleSubmitStudent }) => {
 
   const dialogHeader = {
     width: "100%",
-    flex: "1",
+    height: "5rem",
     paddingLeft: "2.5rem",
     paddingTop: "1rem",
     display: "flex",
@@ -46,10 +45,10 @@ const Dialog_Report_Class = ({ setDialog, handleSubmitStudent }) => {
 
   const dialogBody = {
     width: "100%",
-    flex: "4",
+    paddingTop: "0.5rem",
+    height: "7rem",
     display: "flex",
     flexDirection: "column",
-    paddingTop: "1rem",
     alignItems: "center",
   }
 
@@ -64,7 +63,7 @@ const Dialog_Report_Class = ({ setDialog, handleSubmitStudent }) => {
 
   const dialogFooter = {
     width: "100%",
-    flex: "2",
+    height: "6rem",
     display: "flex",
     justifyContent: 'center',
     alignItems: "center",
@@ -123,16 +122,14 @@ const Dialog_Report_Class = ({ setDialog, handleSubmitStudent }) => {
   };
 
   const handleSubmitButton = async () => {
-    if (currentName !== "") {
-      await handleSubmitStudent(currentName, selectedClass);
-      handleExit();
-    } 
+    await props.createClassPDF(selectedClass);
+    handleExit();
   }
 
   const handleExit = () => {
     setFade(false);
     setTimeout(() => {
-      setDialog(false);
+      props.setDialog(false);
     }, 100)
   };
 
@@ -144,26 +141,13 @@ const Dialog_Report_Class = ({ setDialog, handleSubmitStudent }) => {
     <div style={dialogContainer}>
       <div style={dialog}>
         <div style={dialogHeader}>
-          <h1>Add a Student</h1>
+          <h1>Create Report</h1>
           <div onClick={() => handleExit()}>
             <IoClose size="2rem" className="IoClose" />
           </div>
         </div>
 
         <div style={dialogBody}>
-          <div style={dialogBodyText}><p>Name: </p></div>
-          <Input
-            placeholder="Name (First Middle Sur)"
-            style={{ boxShadow: 'var(--box-shadow-classic)' }}
-            border="none"
-            w="80%"
-            borderRadius="0.5rem"
-            marginBottom="2rem"
-            transition='all 0.3s'
-            maxLength={30}
-            value={currentName}
-            onChange={(e) => setCurrentName(e.target.value)}
-            _hover={{ transform: "translateY(-3px)" }}></Input>
 
           <div style={dialogBodyText}><p>Class: </p></div>
           <div style={dialogClassSelect}>
@@ -183,19 +167,18 @@ const Dialog_Report_Class = ({ setDialog, handleSubmitStudent }) => {
 
         <div style={dialogFooter}>
           <Button
-            w="50%"
+            w="60%"
             h="2.5rem"
             borderRadius={"4rem"}
             borderWidth="2px"
             color="gray.100" 
             fontSize="lg"
             transition="all 0.3s"
-            disabled={currentName === ""}
-            bg={currentName === "" ? "gray.300" : "green.500"}
-            cursor={currentName === "" ? "auto" : "pointer"}
-            _hover={{bg: currentName === "" ? "gray.300" : "green.600"}}
+            bg="green.500"
+            cursor="pointer"
+            _hover={{bg: "green.600"}}
             onClick={handleSubmitButton}
-          >Add Student</Button>
+          >Download PDF</Button>
 
         </div>
       </div>

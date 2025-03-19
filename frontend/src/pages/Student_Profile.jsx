@@ -5,14 +5,10 @@ import { useNavigate, useLocation } from 'react-router-dom'
 
 import { FaArrowLeft } from 'react-icons/fa';
 import { GoPencil } from "react-icons/go";
-import { IoClose } from "react-icons/io5";
 
 import Dialog_Profile from '../components/Dialog_Profile';
 
 import { AccordionItem, AccordionItemContent, AccordionItemTrigger, AccordionRoot } from '../components/ui/accordion'
-
-import Dialog_Comments from '../components/Dialog_Comments'
-import Dialog_Delete from '../components/Dialog_Delete';
 
 import { useStudentStore } from '../store/student.js';
 

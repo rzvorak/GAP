@@ -29,7 +29,7 @@ const Statistics = () => {
         w="100%">
         <Box
           w="100%"
-          h={{ sm: "4rem" }}
+          h="4rem"
           display="flex"
           alignItems={"center"}>
           <Heading

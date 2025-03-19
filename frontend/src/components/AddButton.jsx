@@ -1,8 +1,6 @@
 import React, {useState} from 'react'
 import { FaPlus } from "react-icons/fa6";
 
-import '../styles/AddButton.css'
-
 const AddButton = () => {
     const [isHovered, setIsHovered] = useState(false);
 
@@ -25,7 +23,7 @@ const AddButton = () => {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             >
-            <FaPlus size="1.5rem" className="FaPlus"/>
+            <FaPlus color="#22c55e" size="1.5rem" className="FaPlus"/>
         </div>
     )
 }

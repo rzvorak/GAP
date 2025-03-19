@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { Input, Button, createListCollection } from '@chakra-ui/react'
+import { Button } from '@chakra-ui/react'
 import { IoClose } from "react-icons/io5";
-import '../styles/Dialog.css'
-import '../styles/Dialog_Homework.css'
 
 const Dialog_Delete = (props) => {
   const [fade, setFade] = useState(false);

@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { Input, Button, createListCollection } from '@chakra-ui/react'
+import { Button, createListCollection } from '@chakra-ui/react'
 import { IoClose } from "react-icons/io5";
 import { SelectContent, SelectItem, SelectRoot, SelectTrigger, SelectValueText } from '../components/ui/select';
-import { NumberInputField, NumberInputRoot } from '../components/ui/number-input';
-import '../styles/Dialog.css'
-import '../styles/Dialog_Homework.css'
 
 
 const Dialog_Report_Exam = (props) => {

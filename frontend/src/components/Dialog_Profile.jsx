@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { Input, Button, Textarea } from '@chakra-ui/react'
+import { Input, Button } from '@chakra-ui/react'
 import { IoClose } from "react-icons/io5";
-import '../styles/Dialog.css'
-import { TbObjectScan } from 'react-icons/tb';
 
 const Dialog_Profile = (props) => {
     const [fade, setFade] = useState(false);

@@ -278,8 +278,6 @@ const Reports = () => {
       }
     })
 
-
-
     const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes], { type: 'application/pdf' });
 
@@ -302,6 +300,24 @@ const Reports = () => {
     const page = pdfDoc.addPage([600, 400]);
 
     page.drawText(currentExam.type, {
+      x: 50,
+      y: 350,
+      size: 20,
+      color: rgb(0, 0, 0),
+    });
+
+    const pdfBytes = await pdfDoc.save();
+    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+
+    saveAs(blob, 'document.pdf');  // Triggers the file download
+  }
+
+  const createClassPDF = async (selectedClass) => {
+
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([600, 400]);
+
+    page.drawText("Class PDF", {
       x: 50,
       y: 350,
       size: 20,
@@ -350,7 +366,7 @@ const Reports = () => {
       <Header></Header>
 
       {homeworkDialog && <Dialog_Report_Homework createHomeworkPDF={createHomeworkPDF} homeworks={homeworks} setDialog={handleHomework}></Dialog_Report_Homework>}
-      {classDialog && <Dialog_Report_Class setDialog={handleClass}></Dialog_Report_Class>}
+      {classDialog && <Dialog_Report_Class setDialog={handleClass} createClassPDF={createClassPDF}></Dialog_Report_Class>}
       {examDialog && <Dialog_Report_Exam createExamPDF={createExamPDF} exams={exams} setDialog={handleExam}></Dialog_Report_Exam>}
 
       <VStack

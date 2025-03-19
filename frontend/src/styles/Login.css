@@ -1,8 +1,0 @@
-.FaArrowLeft:hover {
-    color: gray
-}
-
-.FaArrowLeft{
-    color: lightgray;
-    transition: all 0.1s ease-in-out;
-}

@@ -3,7 +3,6 @@ import ClassButton from '../components/ClassButton'
 
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import '../styles/App.css'
 import { Box, VStack, Heading, HStack, Input, Button, Text, Center, useBreakpointValue, SimpleGrid, Spinner, Link } from '@chakra-ui/react'
 import { IoClose } from "react-icons/io5";
 import { FaArrowLeft } from 'react-icons/fa';

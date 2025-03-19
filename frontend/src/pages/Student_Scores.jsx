@@ -3,13 +3,10 @@ import { Box, VStack, Heading, useBreakpointValue, Spinner, Center, Text, Simple
 import Header from '../components/Header'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { FaArrowLeft } from 'react-icons/fa';
-import { GoPencil } from "react-icons/go";
-
 
 import { useStudentStore } from '../store/student.js';
 import { useHomeworkStore } from '../store/homework.js';
 import { useExamStore } from '../store/exam.js'
-
 
 import { AccordionItem, AccordionItemContent, AccordionItemTrigger, AccordionRoot } from '../components/ui/accordion'
 

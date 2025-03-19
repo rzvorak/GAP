@@ -1,7 +1,6 @@
 import { Box, Center } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { Squash as Hamburger } from 'hamburger-react'
-import '../styles/header.css'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 const Header = () => {

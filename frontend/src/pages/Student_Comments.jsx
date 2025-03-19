@@ -4,9 +4,7 @@ import Header from '../components/Header'
 import { useNavigate, useLocation } from 'react-router-dom'
 
 import { FaArrowLeft } from 'react-icons/fa';
-import { GoPencil } from "react-icons/go";
 import { IoClose } from "react-icons/io5";
-
 
 import AddButton from '../components/AddButton'
 import Dialog_Comments from '../components/Dialog_Comments'

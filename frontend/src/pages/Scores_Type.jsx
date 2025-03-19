@@ -6,8 +6,6 @@ import Header from '../components/Header';
 import { FaArrowLeft } from 'react-icons/fa';
 import { GoPencil } from "react-icons/go";
 
-import '../styles/Scores_Type.css'
-
 const Scores_Type = () => {
 
   const disappearOnMin = useBreakpointValue({ "min": "none", "xxs": "flex" })

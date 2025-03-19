@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { Input, Button, createListCollection } from '@chakra-ui/react'
+import { Button } from '@chakra-ui/react'
 import { IoClose } from "react-icons/io5";
-import { SelectContent, SelectItem, SelectRoot, SelectTrigger, SelectValueText } from '../components/ui/select';
-import { NumberInputField, NumberInputRoot, NumberInputLabel } from '../components/ui/number-input';
-import '../styles/Dialog.css'
-// TODO: check this import
-import '../styles/Dialog_Homework.css'
+import { NumberInputField, NumberInputRoot } from '../components/ui/number-input';
 
 const Dialog_Exam = (props) => {
     const [fade, setFade] = useState(false);

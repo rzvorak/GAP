@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Input, Button, Textarea } from '@chakra-ui/react'
 import { IoClose } from "react-icons/io5";
-import '../styles/Dialog.css'
 
 const Dialog_Comments = (props) => {
     const [fade, setFade] = useState(false);

@@ -1,5 +1,0 @@
-/* specifically to address black border on chakra select input */
-.chakra-select__trigger {
-    border: none !important;
-    outline: none !important; 
-  }

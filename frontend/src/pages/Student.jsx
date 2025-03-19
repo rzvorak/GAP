@@ -1,18 +1,13 @@
 import Header from '../components/Header'
 import { React, useState, useEffect } from 'react'
 import { Box, SimpleGrid, useBreakpointValue, Center, VStack, Heading, Spinner, Text, HStack } from '@chakra-ui/react'
-import '../styles/App.css'
 
 // icon imports
 import { FaRegUser } from "react-icons/fa6";
-import { GoPencil } from "react-icons/go";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
-import { SlGraph } from "react-icons/sl";
 import { MdOutlinePercent } from "react-icons/md";
 import { FaArrowLeft } from 'react-icons/fa';
-
-
 
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useStudentStore } from '../store/student.js';

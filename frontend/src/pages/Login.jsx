@@ -1,5 +1,4 @@
 import React, {useState} from 'react'
-import '../styles/Login.css'
 import { Box, Button, Input, VStack, IconButton } from '@chakra-ui/react'
 import { motion } from 'framer-motion';
 import { FaArrowLeft } from 'react-icons/fa'
