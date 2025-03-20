@@ -5,6 +5,7 @@ import studentRoutes from './routes/student.route.js';
 import homeworkRoutes from './routes/homework.route.js';
 import settingsRoutes from './routes/settings.route.js';
 import examRoutes from './routes/exam.route.js'
+import userRoutes from './routes/user.route.js'
 import Settings from './models/settings.model.js';
 
 import path from "path"
@@ -20,6 +21,7 @@ app.use('/api/students', studentRoutes)
 app.use('/api/homework', homeworkRoutes)
 app.use('/api/settings', settingsRoutes)
 app.use('/api/exams', examRoutes)
+app.use('/api/users', userRoutes)
 
 if (process.env.NODE_ENV === "production") {
     app.use(express.static(path.join(__dirname, "/frontend/dist")));
