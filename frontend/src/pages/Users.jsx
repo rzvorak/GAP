@@ -38,9 +38,8 @@ const Users = () => {
   const [localUsers, setLocalUsers] = useState([])
   const [allUsers, setAllUsers] = useState([])
   useEffect(() => {
-    setLocalUsers(users);
-    setAllUsers(users);
-
+    setLocalUsers(users.filter(user => user.role !== "admin"));
+    setAllUsers(users.filter(user => user.role !== "admin"));
   }, [users]);
 
   const [search, setSearch] = useState("")
@@ -51,6 +50,9 @@ const Users = () => {
   const [dialogUser, setDialogUser] = useState(false);
   const [currentMode, setCurrentMode] = useState("")
   const handleStudentButton = () => {
+
+    //createStudentAccount("67dc1c1f656558c276451f4c", "password")
+
     setCurrentMode("student")
     setDialogUser(!dialogUser);
   }
@@ -64,8 +66,25 @@ const Users = () => {
 
     const currentStudent = students.find(student => student._id === studentId)
 
+    const splitName = currentStudent.name.toLowerCase().split(" ")
+    let newUsername = currentStudent.name.toLowerCase().charAt(0) + splitName[splitName.length - 1]
+    const existing = users.filter(user => user.username.startsWith(newUsername)).map(user => user.username.slice(newUsername.length, user.username.length))
+    
+    // duplicate assignment logic
+    if (existing.length !== 0) {
+      let max = 0
+      for (let i = 0; i < existing.length; ++i) {
+        if (existing[i] !== '') {
+          if (Number(existing[i] > max)) max = Number(existing[i])
+        }
+      }
+      newUsername += (max + 1)
+    }
+
+    console.log(newUsername)
+
     const { success, message } = await createUser({
-      username: currentStudent.name,
+      username: newUsername,
       password: password,
       role: "student",
       requestingNewPassword: false,
@@ -269,7 +288,7 @@ const Users = () => {
                           ml="1rem"
                           maxW={{ "xxs": "5rem", "xs": "8rem", sm: "12rem", md: "20rem" }}
                           truncate
-                        >{user.username}</Text>
+                        >{user.role === "student" ? students.find(student => student._id === user.identity).name : user.identity}</Text>
                       </Box>
                       <Box flex="4" >
                         <Text
@@ -278,7 +297,7 @@ const Users = () => {
                           ml="1rem"
                           maxW={{ "xxs": "5rem", "xs": "8rem", sm: "12rem", md: "20rem" }}
                           truncate
-                        >{user.role === "student" ? students.find(student => student._id === user.identity).name : user.identity}</Text>
+                        >{user.username}</Text>
                       </Box>
                       <Center flex="1">
                         <Box
