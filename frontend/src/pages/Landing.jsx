@@ -19,8 +19,7 @@ const Landing = () => {
         navigate('/' + box.split(" ")[1].toLowerCase());
     }
 
-    // TODO: implement
-    const loginCondition = true;
+    const loginCondition = localStorage.getItem("role") === "admin"
 
     const teacherBoxes = ["View Students", "Enter Scores", "Create Reports", "See Statistics"]
     const adminBoxes = ["View Students", "Enter Scores", "Create Reports", "See Statistics", "School Settings", "Manage Users"]

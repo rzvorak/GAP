@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Box, Button, Input, VStack, IconButton } from '@chakra-ui/react'
 import { motion, useAnimationFrame } from 'framer-motion';
 import { FaArrowLeft } from 'react-icons/fa'
@@ -12,13 +12,11 @@ const Login = () => {
   const [alertMessage, setAlertMessage] = useState("")
   const [isForgotPassword, setIsForgotPassword] = useState(false);
 
-  const handleForgotPasswordButton = () => {
-    setIsForgotPassword(true);
-  }
-
-  const handleReturn = () => {
-    setIsForgotPassword(false);
-  }
+  // sign out any time this page is visited
+  useEffect(() => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+  }, [])
 
   const handleLogin = async () => {
     const res = await fetch("/api/users/login", {
@@ -31,7 +29,7 @@ const Login = () => {
     if (data.token) {
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.role);
-      navigate("/landing");
+      data.role !== "student" ? navigate("/landing") : navigate('/students/student-view', { state: { studentId: data.studentId } })
     } else {
       setAlertMessage(data.message);
     }
@@ -96,13 +94,13 @@ const Login = () => {
           bg="green.500"
           borderRadius="0.5rem"
           _hover={{ bg: "green.600" }}
-          onClick={handleSignInButton}>Sign In</Button>
+          onClick={(handleSignInButton)}>Sign In</Button>
         <Button bg="none"
           color="gray.400"
           fontWeight="400"
           textDecoration="underline"
           _hover={{ color: "gray.500" }}
-          onClick={handleForgotPasswordButton}>
+          onClick={() => setIsForgotPassword(true)}>
           Forgot Password?
         </Button>
         {alertMessage !== "" ? (<Box>{alertMessage}</Box>) : (null)}
@@ -137,7 +135,7 @@ const Login = () => {
           marginBottom="1rem"
           _hover={{ bg: "green.600" }}
         >Request New Password</Button>
-        <Button bg="none" onClick={handleReturn}>
+        <Button bg="none" onClick={() => setIsForgotPassword(false)}>
           <FaArrowLeft size="1.5rem" className='FaArrowLeft' />
         </Button>
       </MotionVStack>

@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom'
+import { Route, Routes, Outlet, Navigate } from 'react-router-dom'
 import Login from './pages/Login';
 import Landing from './pages/Landing';
 
@@ -25,31 +25,62 @@ import Users from './pages/Users';
 
 
 function App() {
+
+
+
+  const ProtectedRoute = () => {
+    const token = localStorage.getItem("token");
+    return token ? <Outlet /> : <Navigate to="/" />;
+  };
+
+  const AdminRoute = () => {
+    const role = localStorage.getItem("role");
+    return role === "admin" ? <Outlet /> : <Navigate to="/" />
+  }
+
+  const TeacherRoute = () => {
+    const role = localStorage.getItem("role")
+    return role === "admin" || role === "teacher" ? <Outlet /> : <Navigate to="/" />
+  }
+
+
   return (
     <>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/landing" element={<Landing />} />
+      <Routes>
+        <Route path="/" element={<Login />} />
 
-          <Route path="/students" element={<Students />} />
-          <Route path="/scores" element={<Scores />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/statistics" element={<Statistics />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/users" element={<Users />} />
+        <Route element={<ProtectedRoute />}>
 
-          <Route path="/scores/type" element={<Scores_Type />} />
-          <Route path="/scores/homework" element={<Scores_Homework />} />
-          <Route path="/scores/exam" element={<Scores_Exam />} />
+          <Route element={<TeacherRoute />}>
+            <Route path="/landing" element={<Landing />} />
 
-          <Route path="/scores/exam-view" element={<Exam />} />
-          <Route path="/scores/homework-view" element={<Homework />} />
+            <Route path="/students" element={<Students />} />
+            <Route path="/scores" element={<Scores />} />
+            <Route path="/reports" element={<Reports />} />
+            <Route path="/statistics" element={<Statistics />} />
+
+            <Route element={<AdminRoute />}>
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/users" element={<Users />} />
+            </Route>
+
+            <Route path="/scores/type" element={<Scores_Type />} />
+            <Route path="/scores/homework" element={<Scores_Homework />} />
+            <Route path="/scores/exam" element={<Scores_Exam />} />
+
+            <Route path="/scores/exam-view" element={<Exam />} />
+            <Route path="/scores/homework-view" element={<Homework />} />
+
+          </Route>
 
           <Route path="/students/student-view" element={<Student />} />
           <Route path="/students/student-view/scores" element={<Student_Scores />} />
           <Route path="/students/student-view/comments" element={<Student_Comments />} />
           <Route path="/students/student-view/profile" element={<Student_Profile />} />
-        </Routes>
+          
+        </Route>
+
+      </Routes>
     </>
   )
 }

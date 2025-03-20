@@ -106,6 +106,9 @@ const Header = () => {
   }
 
   const handleSignOut = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+
     navigate('/');
   }
 
@@ -128,10 +131,10 @@ const Header = () => {
       <Center
         color="gray.100"
         p={"1rem"}>
-          <div style={hamburger}>
-            <Hamburger toggled={isOpen} toggle={setOpen} />
-          </div>
-      </Center>  
+        <div style={hamburger}>
+          <Hamburger toggled={isOpen} toggle={setOpen} />
+        </div>
+      </Center>
 
       <div onClick={handleMenuBackground} style={menuBackground}></div>
 
@@ -140,7 +143,7 @@ const Header = () => {
           <button style={homeButton} onClick={handleHome}>Home</button>
         </div>
 
-        <div style={menuButtonContainer} onMouseEnter={() => setSettingsHover(true)} onMouseLeave={() => setSettingsHover(false)}> 
+        <div style={menuButtonContainer} onMouseEnter={() => setSettingsHover(true)} onMouseLeave={() => setSettingsHover(false)}>
           <button style={settingsButton} onClick={handleSettings}>Settings</button>
         </div>
 

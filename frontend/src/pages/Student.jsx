@@ -14,9 +14,9 @@ import { useStudentStore } from '../store/student.js';
 import { useHomeworkStore } from '../store/homework.js';
 import { useExamStore } from '../store/exam.js'
 
-const Landing = () => {
+const Student = () => {
 
-
+    const role = localStorage.getItem("role")
 
     const location = useLocation();
     const studentId = location.state?.studentId;
@@ -69,12 +69,12 @@ const Landing = () => {
 
     }, [triggerLoad]);
 
-    const boxes = ["See Scores", "Create Report", "Student Profile", "Add Comments"]
+    const boxes = ["See Scores", "Create Report", "Student Profile", role !== "student" ? "Add Comments" : "View Comments"]
     const iconSize = useBreakpointValue({ "xxs": "3rem", "xs": "4rem", sm: "5rem", md: "7rem", lg: "9rem" });
     const disappearOnMin = useBreakpointValue({ "min": "none", "xxs": "flex" })
     const disappearOnMinGrid = useBreakpointValue({ "min": "none", "xxs": "grid" })
     const columns = useBreakpointValue({ "xxs": 1, sm: 2 });
-    const classPosition = useBreakpointValue({"xxs": "space-between", sm: "flex-start"})
+    const classPosition = useBreakpointValue({ "xxs": "space-between", sm: "flex-start" })
 
     if (!currentStudent.name) {
         return (
@@ -119,9 +119,9 @@ const Landing = () => {
                     ml="1rem"
                     mt="0.4rem"
                     bg="gray.200"
-                    borderRadius="0.7rem" 
+                    borderRadius="0.7rem"
                     p="0.5rem"
-                    >
+                >
                     Class {currentStudent.class}
                 </Box>
             </HStack>
@@ -162,7 +162,7 @@ const Landing = () => {
                                     >{box}</Heading>
                                     <Box color="green.500">
                                         {box === "Student Profile" ? <FaRegUser size={iconSize} /> : null}
-                                        {box === "Add Comments" ? <IoChatbubbleEllipsesOutline size={iconSize} /> : null}
+                                        {box.split(" ")[1] === "Comments" ? <IoChatbubbleEllipsesOutline size={iconSize} /> : null}
                                         {box === "Create Report" ? <IoDocumentTextOutline size={iconSize} /> : null}
                                         {box === "See Scores" ? <MdOutlinePercent size={iconSize} /> : null}
                                     </Box>
@@ -178,24 +178,27 @@ const Landing = () => {
 
             </VStack>
 
-            <Box
-                w="100%"
-                display={disappearOnMin}
-                h="6rem"
-                paddingTop="1rem" // control how close plus can get
-                paddingBottom="2rem"
-                justifyContent="center"
-                alignItems="center"
-            >
+            {role !== "student" ? (
                 <Box
-                    cursor={"pointer"}
-                    onClick={handleBack}>
-                    <FaArrowLeft size="1.5rem" className='FaArrowLeft' />
+                    w="100%"
+                    display={disappearOnMin}
+                    h="6rem"
+                    paddingTop="1rem" // control how close plus can get
+                    paddingBottom="2rem"
+                    justifyContent="center"
+                    alignItems="center"
+                >
+                    <Box
+                        cursor={"pointer"}
+                        onClick={handleBack}>
+                        <FaArrowLeft size="1.5rem" className='FaArrowLeft' />
+                    </Box>
                 </Box>
-            </Box>
+            ) : (null)}
+
         </Box>
 
     )
 }
 
-export default Landing
+export default Student

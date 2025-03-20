@@ -4,15 +4,15 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
 export const createUser = async (req, res) => {
-    const {username, password, role} = req.body;
+    const {username, password, role, studentId} = req.body;
 
-    if (!username || !password || !role) {
+    if (!username || !password || !role || !studentId) {
         return res.status(400).json({success:false, message: "Please provide all fields"});
     }
 
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    const newUser = new User({username, password: hashedPassword, role});
+    const newUser = new User({username, password: hashedPassword, role, studentId});
 
     try {
         await newUser.save();
@@ -26,13 +26,11 @@ export const createUser = async (req, res) => {
 export const loginUser = async (req, res) => {
     try {
         const { username, password } = req.body;
-        console.log("in loginUser: ", username, password)
         const user = await User.findOne({ username });
 
         if (!user) return res.status(400).json({ message: "User not found" });
 
         const isMatch = await bcrypt.compare(password, user.password);
-        console.log("isMatch: ", isMatch)
         if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
         const token = jwt.sign(
@@ -41,7 +39,7 @@ export const loginUser = async (req, res) => {
             { expiresIn: "1h" }
         );
 
-        res.status(200).json({ token, role: user.role });
+        res.status(200).json({ token, role: user.role, studentId: user.studentId });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -60,7 +58,7 @@ export const getUsers = async (req, res) => {
 export const updateUser = async (req, res) => {
     const {id} = req.params;
 
-    const {username, password, role} = req.body;
+    const {username, password, role, studentId} = req.body;
 
     const hashedPassword = await bcrypt.hash(password, 10)
 
@@ -69,7 +67,7 @@ export const updateUser = async (req, res) => {
     }
 
     try {
-        const updatedUser = await User.findByIdAndUpdate(id, {username, password: hashedPassword, role}, {new:true});
+        const updatedUser = await User.findByIdAndUpdate(id, {username, password: hashedPassword, role, studentId}, {new:true});
         res.status(200).json({ success: true, data: updatedUser});
     } catch (error) {
         res.status(500).json({ success: false, message: "Server Error"});

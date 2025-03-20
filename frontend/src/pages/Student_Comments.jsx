@@ -15,6 +15,8 @@ import { useStudentStore } from '../store/student.js';
 
 const Student_Comments = () => {
 
+    const role = localStorage.getItem("role")
+
     const disappearOnMin = useBreakpointValue({ "min": "none", "xxs": "flex" })
 
     const location = useLocation();
@@ -78,8 +80,8 @@ const Student_Comments = () => {
     }
 
     const deleteComment = async (id) => {
-        
-        const updatedComments = {...currentStudent.comments}
+
+        const updatedComments = { ...currentStudent.comments }
         delete updatedComments[id];
 
         const { success } = await updateStudent(studentId, {
@@ -131,7 +133,12 @@ const Student_Comments = () => {
                 <VStack w="100%" flex="1">
 
 
+
                     {currentStudent.comments ? (
+
+                        Object.keys(localComments).length == 0 && role === "student" ? (
+                            <Box bg="gray.200" h="4rem" w="80%" display="flex" justifyContent="center" alignItems="center">No Comments Yet</Box>
+                        ) :
 
                         Object.keys(localComments).map((id, index) => (
                             <VStack
@@ -164,11 +171,14 @@ const Student_Comments = () => {
                                     w="100%"
                                     justifyContent="space-between"
                                 >
-                                    <Box onClick={() => handleDeleteButton(id)}>
-                                        <IoClose size="2rem" className="IoClose" />
-                                    </Box>
+                                    {role !== "student" ? (
+                                        <Box onClick={() => handleDeleteButton(id)}>
+                                            <IoClose size="2rem" className="IoClose" />
+                                        </Box>
+                                    ) : (<Box></Box>)}
 
-                                    <Text maxW={{"xxs": "8rem", "xs": "12rem", sm: "19rem", md: "30rem"}}>
+
+                                    <Text maxW={{ "xxs": "8rem", "xs": "12rem", sm: "19rem", md: "30rem" }}>
                                         -{localComments[id][0]}, {localComments[id][1]}
                                     </Text>
                                 </Box>
@@ -181,7 +191,10 @@ const Student_Comments = () => {
                         </Box>
                     }
 
-                    <Box onClick={handleAdd}><AddButton></AddButton></Box>
+                    {role !== "student" ? (
+                        <Box onClick={handleAdd}><AddButton></AddButton></Box>
+                    ) : (null)}
+
 
                 </VStack>
 
