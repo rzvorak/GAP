@@ -29,7 +29,7 @@ const Login = () => {
     if (data.token) {
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.role);
-      data.role !== "student" ? navigate("/landing") : navigate('/students/student-view', { state: { studentId: data.studentId } })
+      data.role !== "student" ? navigate("/landing") : navigate('/students/student-view', { state: { studentId: data.identity } })
     } else {
       setAlertMessage(data.message);
     }

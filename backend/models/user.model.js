@@ -3,7 +3,6 @@ import mongoose from 'mongoose';
 const userSchema = new mongoose.Schema({
     username: {
         type: String,
-        unique: true,
         required: true
     },
     password: {
@@ -14,7 +13,12 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    studentId: {
+    requestingNewPassword: {
+        type: Boolean,
+        required: true
+    },
+    // stores either a student ID or teacher name
+    identity: {
         type: String,
         required: true
     }

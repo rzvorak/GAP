@@ -4,15 +4,15 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
 export const createUser = async (req, res) => {
-    const {username, password, role, studentId} = req.body;
+    const {username, password, role, identity, requestingNewPassword} = req.body;
 
-    if (!username || !password || !role || !studentId) {
+    if (!username || !password || !role || !identity || requestingNewPassword === undefined) {
         return res.status(400).json({success:false, message: "Please provide all fields"});
     }
 
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    const newUser = new User({username, password: hashedPassword, role, studentId});
+    const newUser = new User({username, password: hashedPassword, role, identity, requestingNewPassword});
 
     try {
         await newUser.save();
@@ -58,7 +58,7 @@ export const getUsers = async (req, res) => {
 export const updateUser = async (req, res) => {
     const {id} = req.params;
 
-    const {username, password, role, studentId} = req.body;
+    const {username, password, role, requestingNewPassword, identity} = req.body;
 
     const hashedPassword = await bcrypt.hash(password, 10)
 
@@ -67,7 +67,7 @@ export const updateUser = async (req, res) => {
     }
 
     try {
-        const updatedUser = await User.findByIdAndUpdate(id, {username, password: hashedPassword, role, studentId}, {new:true});
+        const updatedUser = await User.findByIdAndUpdate(id, {username, password: hashedPassword, role, requestingNewPassword, identity}, {new:true});
         res.status(200).json({ success: true, data: updatedUser});
     } catch (error) {
         res.status(500).json({ success: false, message: "Server Error"});

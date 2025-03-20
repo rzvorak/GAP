@@ -5,7 +5,7 @@ export const useUserStore = create((set) => ({
     setusers: (users) => set({ users }),
 
     createUser: async (newUser) => {
-        if (!newUser.username || !newUser.password || !newUser.role) {
+        if (!newUser.username || !newUser.password || !newUser.role || newUser.requestingNewPassword === undefined || !newUser.identity) {
             return {success: false, message: "Please fill in all fields."}
         }
         const res = await fetch("/api/users", {
@@ -33,7 +33,7 @@ export const useUserStore = create((set) => ({
         const data = await res.json();
         if (!data.success) return {success: false, message: data.message};
 
-        set((state) => ({users: state.users.filter(student => student._id !== id)}));
+        set((state) => ({users: state.users.filter(user => user._id !== id)}));
         return {success: true, message: data.message};
     },
 
@@ -49,7 +49,7 @@ export const useUserStore = create((set) => ({
         if (!data.success) return {success: false, message: data.message};
 
         set(state => ({
-            users: state.users.map(student => student._id === id ? data.data : student)
+            users: state.users.map(user => user._id === id ? data.data : user)
         }));
         return {success: true, message: data.message};
     },

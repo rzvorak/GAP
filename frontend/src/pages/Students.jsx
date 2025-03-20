@@ -132,6 +132,7 @@ const Students = () => {
                 display={disappearOnMin}
                 flexDir={"column"}
                 flex="1"
+                justifyContent="center"
             >
 
                 <Box
@@ -177,38 +178,35 @@ const Students = () => {
                     </HStack>
                 </Box>
 
-                <Box
-                    w="100%"
-                    h={{ "xxs": "4rem" }}
-                    display="flex"
-                    alignItems={"center"}
-                    justifyContent={"center"}
-                >
-                    <HStack
-                        alignItems={"center"}
-                    >
-                        <Heading
-                            marginRight="0.5rem"
-                            marginBottom="0.3rem"
-                            color="gray.600"
-                            fontWeight={"400"}
-                            fontSize={{ "xxs": "lg", sm: "xl" }}
-                        >Search: </Heading>
 
-                        <Input
-                            placeholder="Student Name (Optional)"
-                            style={{ boxShadow: 'var(--box-shadow-classic)' }}
-                            border="none"
-                            borderRadius="0.5rem"
-                            marginBottom="0.3rem"
-                            transition='all 0.3s'
-                            w={{ "xxs": "10rem", "xs": "15rem", sm: "22rem" }}
-                            _hover={{ transform: "translateY(-3px)" }}
-                            value={search}
-                            onChange={(e) => { setSearch(e.target.value) }}
-                        ></Input>
-                    </HStack>
-                </Box>
+                <HStack
+                    display="flex"
+                    flexDir="row"
+                    justifyContent="center"
+                    w="80%"
+                    alignItems={"center"}
+                >
+                    <Heading
+                        marginRight="0.5rem"
+                        marginBottom="0.3rem"
+                        color="gray.600"
+                        fontWeight={"400"}
+                        fontSize={{ "xxs": "lg", sm: "xl" }}
+                    >Search: </Heading>
+
+                    <Input
+                        placeholder="Student Name (Optional)"
+                        style={{ boxShadow: 'var(--box-shadow-classic)' }}
+                        border="none"
+                        borderRadius="0.5rem"
+                        marginBottom="0.3rem"
+                        transition='all 0.3s'
+                        w={{ "xxs": "10rem", "xs": "15rem", sm: "22rem" }}
+                        _hover={{ transform: "translateY(-3px)" }}
+                        value={search}
+                        onChange={(e) => { setSearch(e.target.value) }}
+                    ></Input>
+                </HStack>
 
                 <Box
                     w="100%"
@@ -219,6 +217,7 @@ const Students = () => {
                 >
                     <HStack
                         alignItems={"center"}
+                        gap="0rem"
                     >
 
                         <Button
