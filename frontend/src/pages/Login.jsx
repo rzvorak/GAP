@@ -4,16 +4,22 @@ import { motion, useAnimationFrame } from 'framer-motion';
 import { FaArrowLeft } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom';
 
+import { useUserStore } from '../store/user';
+
 const MotionVStack = motion.create(VStack);
 
+// TODO: request password stuff, alerts for wrong password / no find username
 const Login = () => {
   const [currentUsername, setCurrentUsername] = useState("")
   const [currentPassword, setCurrentPassword] = useState("")
   const [alertMessage, setAlertMessage] = useState("")
   const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [forgotPasswordUsername, setForgotPasswordUsername] = useState("")
 
+  const { fetchUsers, updateUser, users} = useUserStore();
   // sign out any time this page is visited
   useEffect(() => {
+    fetchUsers()
     localStorage.removeItem("token");
     localStorage.removeItem("role");
   }, [])
@@ -34,6 +40,22 @@ const Login = () => {
       setAlertMessage(data.message);
     }
   };
+
+  const handleRequestPassword = async () => {
+    const user = users.find((user) => user.username === forgotPasswordUsername)
+    if (!user) {
+      console.log("user not found")
+      return;
+    }
+
+    // 'false' argument to avoid updating password
+    const {success} = await updateUser(user._id, false, {
+      ...user,
+      requestingNewPassword: true
+    })
+    console.log("success: ", success)
+
+  }
 
   const navigate = useNavigate();
   const handleSignInButton = async () => {
@@ -126,6 +148,8 @@ const Login = () => {
           borderRadius="0.5rem"
           marginBottom="0.3rem"
           transition='all 0.3s'
+          value={forgotPasswordUsername}
+          onChange={(e) => setForgotPasswordUsername(e.target.value)}
           _hover={{ transform: "translateY(-3px)" }}></Input>
         <Button
           w="100%"
@@ -133,6 +157,7 @@ const Login = () => {
           bg="green.500"
           borderRadius="0.5rem"
           marginBottom="1rem"
+          onClick={() => handleRequestPassword()}
           _hover={{ bg: "green.600" }}
         >Request New Password</Button>
         <Button bg="none" onClick={() => setIsForgotPassword(false)}>

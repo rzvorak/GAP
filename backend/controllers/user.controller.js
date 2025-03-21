@@ -39,7 +39,7 @@ export const loginUser = async (req, res) => {
             { expiresIn: "1h" }
         );
 
-        res.status(200).json({ token, role: user.role, studentId: user.studentId });
+        res.status(200).json({ token, role: user.role, identity: user.identity });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -59,7 +59,24 @@ export const updateUser = async (req, res) => {
     const {id} = req.params;
 
     const {username, password, role, requestingNewPassword, identity} = req.body;
+    
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(404).json({success: false, message: "Invalid Id"})
+    }
 
+    try {
+        const updatedUser = await User.findByIdAndUpdate(id, {username, password, role, requestingNewPassword, identity}, {new:true});
+        res.status(200).json({ success: true, data: updatedUser});
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server Error"});
+    }
+}
+
+export const updateUserPassword = async (req, res) => {
+    const {id} = req.params;
+
+    const {username, password, role, requestingNewPassword, identity} = req.body;
+    
     const hashedPassword = await bcrypt.hash(password, 10)
 
     if (!mongoose.Types.ObjectId.isValid(id)) {

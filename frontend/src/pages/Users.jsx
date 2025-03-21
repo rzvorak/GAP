@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Box, VStack, Heading, useBreakpointValue, HStack, Input, Button, Spinner, Center, Text, Link } from '@chakra-ui/react'
+import { Box, VStack, Heading, useBreakpointValue, HStack, Input, Button, Spinner, Center, Text, Checkbox } from '@chakra-ui/react'
 import Header from '../components/Header'
 import { useNavigate } from 'react-router-dom'
 
@@ -12,6 +12,7 @@ import { useStudentStore } from '../store/student'
 
 import Dialog_User from '../components/Dialog_User';
 import Dialog_Delete from '../components/Dialog_Delete';
+import Dialog_Password from '../components/Dialog_Password'
 
 
 const Users = () => {
@@ -42,17 +43,18 @@ const Users = () => {
     setAllUsers(users.filter(user => user.role !== "admin"));
   }, [users]);
 
+  // search logic
   const [search, setSearch] = useState("")
+  const [checkedStudents, setCheckedStudents] = useState(true)
+  const [checkedTeachers, setCheckedTeachers] = useState(true)
   useEffect(() => {
-    setLocalUsers(allUsers.filter(user => user.username.toLowerCase().includes(search.toLowerCase())))
-  }, [search])
+    setLocalUsers(allUsers.filter(user => user.username.toLowerCase().includes(search.toLowerCase()) && (checkedTeachers || user.role !== "teacher"  ) && (checkedStudents || user.role !== "student")))
+  }, [search, checkedStudents, checkedTeachers])
+
 
   const [dialogUser, setDialogUser] = useState(false);
   const [currentMode, setCurrentMode] = useState("")
   const handleStudentButton = () => {
-
-    //createStudentAccount("67dc1c1f656558c276451f4c", "password")
-
     setCurrentMode("student")
     setDialogUser(!dialogUser);
   }
@@ -62,6 +64,23 @@ const Users = () => {
     setDialogUser(!dialogUser)
   }
 
+  const [dialogPassword, setDialogPassword] = useState(false)
+  const [editUser, setEditUser] = useState({})
+  const handleEditButton = (user) => {
+    setEditUser(user)
+    setDialogPassword(!dialogPassword)
+  }
+
+  const handleSubmitPassword = async (newPassword) => {
+      const {success} = await updateUser(editUser._id, true, {
+        ...editUser,
+        password: newPassword,
+        requestingNewPassword: false
+      })
+      console.log("success: " , success)
+
+  }
+
   const createStudentAccount = async (studentId, password) => {
 
     const currentStudent = students.find(student => student._id === studentId)
@@ -69,7 +88,7 @@ const Users = () => {
     const splitName = currentStudent.name.toLowerCase().split(" ")
     let newUsername = currentStudent.name.toLowerCase().charAt(0) + splitName[splitName.length - 1]
     const existing = users.filter(user => user.username.startsWith(newUsername)).map(user => user.username.slice(newUsername.length, user.username.length))
-    
+
     // duplicate assignment logic
     if (existing.length !== 0) {
       let max = 0
@@ -80,8 +99,6 @@ const Users = () => {
       }
       newUsername += (max + 1)
     }
-
-    console.log(newUsername)
 
     const { success, message } = await createUser({
       username: newUsername,
@@ -95,16 +112,32 @@ const Users = () => {
     console.log(success, message);
   }
 
-  const createTeacherAccount = async (teacher, password) => {
+  const createTeacherAccount = async (teacherName, password) => {
+
+    const splitName = teacherName.toLowerCase().split(" ")
+    let newUsername = teacherName.toLowerCase().charAt(0) + splitName[splitName.length - 1]
+    const existing = users.filter(user => user.username.startsWith(newUsername)).map(user => user.username.slice(newUsername.length, user.username.length))
+
+    // duplicate assignment logic
+    if (existing.length !== 0) {
+      let max = 0
+      for (let i = 0; i < existing.length; ++i) {
+        if (existing[i] !== '') {
+          if (Number(existing[i] > max)) max = Number(existing[i])
+        }
+      }
+      newUsername += (max + 1)
+    }
+
     const { success, message } = await createUser({
-      username: teacher,
+      username: newUsername,
       password: password,
       role: "teacher",
       requestingNewPassword: false,
-      identity: teacher
+      identity: teacherName
     });
     fetchUsers()
-
+    console.log(success, message);
   }
 
   const [dialogDelete, setDialogDelete] = useState(false)
@@ -130,6 +163,7 @@ const Users = () => {
     >
       <Header></Header>
 
+      {dialogPassword && <Dialog_Password handleSubmitPassword={handleSubmitPassword} user={editUser} setDialog={setDialogPassword}></Dialog_Password>}
       {dialogDelete && <Dialog_Delete handleBack={handleDeleteBack} delete={deleteUser} id={deleteUserId} setDialog={setDialogDelete}></Dialog_Delete>}
       {dialogUser && <Dialog_User users={localUsers} mode={currentMode} students={students} createTeacherAccount={createTeacherAccount} createStudentAccount={createStudentAccount} setDialog={setDialogUser} ></Dialog_User>}
 
@@ -160,7 +194,6 @@ const Users = () => {
           maxW="40rem"
           justifyContent="space-evenly"
           alignItems={"center"}
-
         >
           <Heading
             color="gray.600"
@@ -227,6 +260,49 @@ const Users = () => {
           ></Input>
         </HStack>
 
+        <HStack
+          mt="0.5rem"
+
+          w="80%"
+          display="flex"
+          flexDir="row"
+          maxW="40rem"
+          justifyContent="space-evenly"
+          alignItems={"center"}
+        >
+
+          <Checkbox.Root
+            transition="all 0.3s"
+            _hover={{ transform: "translateY(-3px)" }}
+            variant="solid"
+            size="lg"
+            checked={checkedStudents}
+            onCheckedChange={(e) => setCheckedStudents(!!e.checked)}
+          >
+            <Checkbox.HiddenInput border="none" />
+            <Checkbox.Control bg="gray.100" border="2px solid gray" borderRadius="0.5rem">
+              <Checkbox.Indicator />
+            </Checkbox.Control>
+            <Checkbox.Label>Show Students</Checkbox.Label>
+          </Checkbox.Root>
+
+          <Checkbox.Root
+            transition="all 0.3s"
+            _hover={{ transform: "translateY(-3px)" }}
+            variant="solid"
+            size="lg"
+            checked={checkedTeachers}
+            onCheckedChange={(e) => setCheckedTeachers(!!e.checked)}
+          >
+            <Checkbox.HiddenInput />
+            <Checkbox.Control bg="gray.100" border="2px solid gray" borderRadius="0.5rem">
+              <Checkbox.Indicator />
+            </Checkbox.Control>
+            <Checkbox.Label>Show Teachers</Checkbox.Label>
+          </Checkbox.Root>
+
+        </HStack>
+
 
         <VStack
           w="100%"
@@ -241,21 +317,28 @@ const Users = () => {
             w="80%"
             maxW="40rem"
           >
-            <Box flex="5">
-              <Text ml="1rem" maxW="10rem">Name</Text>
+            <Box w="35%">
+              <Text
+                ml="1rem"
+                maxW={{ "xxs": "5rem", "xs": "4rem", sm: "8rem", md: "20rem" }}
+              >Name</Text>
             </Box>
-            <Center flex="5">
-              <Text paddingRight={{ "xxs": "0.4rem", sm: "0rem" }} >Username</Text>
+            <Box w="35%">
+              <Text
+                truncate
+                maxW={{ "xxs": "3rem", "xs": "5rem", sm: "8rem", md: "20rem" }}
+              >Username</Text>
+            </Box>
+            <Center
+              w="10%">
+              <Text ml={{ "xxs": "0.4rem", "xs": "0.5rem", sm: "0rem" }} >Password</Text>
             </Center>
-            <Center flex="1">
-              <Text paddingRight={{ "xxs": "0.4rem", sm: "0rem" }} >Password</Text>
-            </Center>
-            <Center flex="1">
-              <Text paddingLeft={{ "xxs": "0.4rem", sm: "0rem" }} ></Text>
-            </Center>
-            <Center flex="1">
+            <Box w="5%">
+              <Text  ></Text>
+            </Box>
+            <Box w="5%">
               <Text></Text>
-            </Center>
+            </Box>
           </HStack>
 
           <VStack
@@ -281,45 +364,42 @@ const Users = () => {
                       display="flex"
                       w="100%"
                       gap="0">
-                      <Box flex="4" >
+                      <Box w="35%" >
                         <Text
                           py="0.5rem"
-                          pr="0.5rem"
                           ml="1rem"
-                          maxW={{ "xxs": "5rem", "xs": "8rem", sm: "12rem", md: "20rem" }}
+                          maxW={{ "xxs": "5rem", "xs": "4rem", sm: "8rem", md: "20rem" }}
                           truncate
                         >{user.role === "student" ? students.find(student => student._id === user.identity).name : user.identity}</Text>
                       </Box>
-                      <Box flex="4" >
+                      <Box w="35%" >
                         <Text
                           py="0.5rem"
-                          pr="0.5rem"
-                          ml="1rem"
-                          maxW={{ "xxs": "5rem", "xs": "8rem", sm: "12rem", md: "20rem" }}
+                          maxW={{ "xxs": "3rem", "xs": "6rem", sm: "8rem", md: "20rem" }}
                           truncate
                         >{user.username}</Text>
                       </Box>
-                      <Center flex="1">
+                      <Center w="10%">
                         <Box
-
-                          bottom={{ "xxs": "0rem", sm: "0.7rem" }}
-                          right={{ "xxs": "0rem", sm: "1.5rem" }}
                           w="3rem"
                           h="3rem"
                           cursor="pointer"
-                          color="green.500"
-                          //onClick={() => handleForward(homework._id)}
+                          color={user.requestingNewPassword ? "orange.300" : "green.500"} 
+                          onClick={() => handleEditButton(user)}
                           transition="all 0.2s ease-in-out"
                           _hover={{ transform: "translateY(-3px)" }}
                         >
-                          <Center h="100%"><GoPencil size="2rem" /></Center>
+                          <Center h="100%">
+                            <Text fontWeight="bold" fontSize="2rem" pb="0.3rem" pr="0.2rem">{user.requestingNewPassword ? "!" : (null)}</Text>
+                            <GoPencil size="2rem" />
+                          </Center>
 
                         </Box>
                       </Center>
-                      <Center flex="1">
+                      <Center w="10%">
                         <Text>{user.role.charAt(0).toUpperCase()}</Text>
                       </Center>
-                      <Center flex="1">
+                      <Center w="10%" mr="0.2rem">
                         <Box
                           onClick={() => handleDeleteButton(user._id)}
                         >
