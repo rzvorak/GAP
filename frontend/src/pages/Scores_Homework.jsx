@@ -13,6 +13,7 @@ import { useHomeworkStore } from '../store/homework.js'
 
 import { AccordionItem, AccordionItemContent, AccordionItemTrigger, AccordionRoot } from '../components/ui/accordion'
 
+// TODO: points zero causes error
 const Scores_Homework = () => {
 
     const disappearOnMin = useBreakpointValue({ "min": "none", "xxs": "flex" })

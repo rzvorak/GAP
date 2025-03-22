@@ -23,6 +23,8 @@ import Settings from './pages/Settings';
 
 import Users from './pages/Users';
 
+import NotFound from './pages/NotFound'
+
 
 function App() {
 
@@ -79,6 +81,8 @@ function App() {
           <Route path="/students/student-view/profile" element={<Student_Profile />} />
           
         </Route>
+
+        <Route path="*" element={<NotFound />} /> 
 
       </Routes>
     </>
