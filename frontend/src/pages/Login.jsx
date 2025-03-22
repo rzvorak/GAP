@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react'
-import { Box, Button, Input, VStack, IconButton } from '@chakra-ui/react'
+import { Box, Button, Input, VStack, IconButton} from '@chakra-ui/react'
 import { motion, useAnimationFrame } from 'framer-motion';
 import { FaArrowLeft } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom';
 
+import { IoEyeOutline } from "react-icons/io5";
+import { IoEyeOffOutline } from "react-icons/io5";
+
 import { useUserStore } from '../store/user';
+import { InputGroup } from '../components/ui/input-group';
 
 const MotionVStack = motion.create(VStack);
 
@@ -16,7 +20,7 @@ const Login = () => {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [forgotPasswordUsername, setForgotPasswordUsername] = useState("")
 
-  const { fetchUsers, updateUser, users} = useUserStore();
+  const { fetchUsers, updateUser, users } = useUserStore();
   // sign out any time this page is visited
   useEffect(() => {
     fetchUsers()
@@ -49,13 +53,17 @@ const Login = () => {
     }
 
     // 'false' argument to avoid updating password
-    const {success} = await updateUser(user._id, false, {
+    const { success } = await updateUser(user._id, false, {
       ...user,
       requestingNewPassword: true
     })
     console.log("success: ", success)
-
   }
+
+  const [show, setShow] = useState(true)
+  const getDisplayValue = () => {
+    currentPassword;
+  };
 
   const navigate = useNavigate();
   const handleSignInButton = async () => {
@@ -100,16 +108,35 @@ const Login = () => {
           transition='all 0.3s'
           _hover={{ transform: "translateY(-3px)" }}
         ></Input>
-        <Input
-          placeholder="Password"
-          style={{ boxShadow: 'var(--box-shadow-classic)' }}
-          border="none"
-          value={currentPassword}
-          onChange={(e) => setCurrentPassword(e.target.value)}
-          borderRadius="0.5rem"
-          marginBottom="0.3rem"
-          transition='all 0.3s'
-          _hover={{ transform: "translateY(-3px)" }}></Input>
+
+        <InputGroup 
+        w="100%" 
+        transition='all 0.3s'
+        _hover={{ transform: "translateY(-3px)" }}
+        endElement={
+          <Box 
+          overflow="hidden"
+          h="100%" 
+          display="flex" 
+          color="green.500"
+          alignItems="center" 
+          mb="0.2rem"
+          onClick={() => setShow(!show)}>
+            {show ? <IoEyeOutline size="1.25rem" /> : <IoEyeOffOutline size="1.25rem"/>}
+          </Box>
+        }>
+          <Input
+            type={show ? "password" : "text"}
+            placeholder="Password"
+            style={{ boxShadow: 'var(--box-shadow-classic)'}}
+            border="none"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+            borderRadius="0.5rem"
+            marginBottom="0.3rem"
+          ></Input>
+        </InputGroup>
+
         <Button
           w="100%"
           color="gray.100"

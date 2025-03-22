@@ -97,6 +97,7 @@ const Header = () => {
     }
   }
 
+  // TODO: remove this
   const handleSettings = () => {
     if (location.pathname !== '/landing') {
       navigate('/landing');

@@ -2,6 +2,11 @@
     --box-shadow-classic: 2px 2px 3px 1px rgba(169, 169, 169, 0.2), -2px 2px 3px 1px rgba(169, 169, 169, 0.2);
 }
 
+/* remove microsoft edge's built-in password show icon */
+::-ms-reveal {
+    display: none
+}
+
 /* specifically to address black border on chakra select input */
 .chakra-select__trigger {
     border: none !important;

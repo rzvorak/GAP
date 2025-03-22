@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react'
-import { Input, Button } from '@chakra-ui/react'
+import { Input, Button, Box } from '@chakra-ui/react'
 import { IoClose } from "react-icons/io5";
+import { IoEyeOutline } from "react-icons/io5";
+import { IoEyeOffOutline } from "react-icons/io5";
 
-const Dialog_Comments = (props) => {
+import { InputGroup } from '../components/ui/input-group';
+
+
+const Dialog_Password = (props) => {
     const [fade, setFade] = useState(false);
     const [currentPassword, setCurrentPassword] = useState("");
+    const [show, setShow] = useState(true)
 
     const dialogContainer = {
         position: "fixed",
@@ -109,18 +115,33 @@ const Dialog_Comments = (props) => {
                 <div style={dialogBody}>
                     <div style={dialogBodyTextUsername}><p>Username: {props.user.username.length > 19 ? props.user.username.slice(0, 18) + "..." : props.user.username} </p></div>
                     <div style={dialogBodyText}><p>New Password: </p></div>
-                    <Input
-                        placeholder="New Password"
-                        style={{ boxShadow: 'var(--box-shadow-classic)' }}
-                        border="none"
+
+                    <InputGroup
                         w="80%"
-                        marginBottom="0.5rem"
-                        borderRadius="0.5rem"
                         transition='all 0.3s'
-                        maxLength={30}
-                        value={currentPassword}
-                        onChange={(e) => setCurrentPassword(e.target.value)}
-                        _hover={{ transform: "translateY(-3px)" }}></Input>
+                        _hover={{ transform: "translateY(-3px)" }}
+                        endElement={
+                            <Box
+                                h="100%"
+                                display="flex"
+                                color="green.500"
+                                alignItems="center"
+                                mb="0.2rem"
+                                onClick={() => setShow(!show)}>
+                                {show ? <IoEyeOutline size="1.25rem" /> : <IoEyeOffOutline size="1.25rem" />}
+                            </Box>
+                        }>
+                        <Input
+                            type={show ? "password" : "text"}
+                            placeholder="New Password"
+                            style={{ boxShadow: 'var(--box-shadow-classic)' }}
+                            border="none"
+                            value={currentPassword}
+                            onChange={(e) => setCurrentPassword(e.target.value)}
+                            borderRadius="0.5rem"
+                            marginBottom="0.5rem"
+                            ></Input>
+                    </InputGroup>
 
                     <div style={dialogFooter}>
                         <Button
@@ -145,4 +166,4 @@ const Dialog_Comments = (props) => {
     )
 }
 
-export default Dialog_Comments
+export default Dialog_Password
