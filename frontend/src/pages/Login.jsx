@@ -62,9 +62,6 @@ const Login = () => {
   }
 
   const [show, setShow] = useState(true)
-  const getDisplayValue = () => {
-    currentPassword;
-  };
 
   const navigate = useNavigate();
   const handleSignInButton = async () => {

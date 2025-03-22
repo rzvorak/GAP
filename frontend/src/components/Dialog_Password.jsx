@@ -126,7 +126,7 @@ const Dialog_Password = (props) => {
                                 display="flex"
                                 color="green.500"
                                 alignItems="center"
-                                mb="0.2rem"
+                                mb="0.4rem"
                                 onClick={() => setShow(!show)}>
                                 {show ? <IoEyeOutline size="1.25rem" /> : <IoEyeOffOutline size="1.25rem" />}
                             </Box>

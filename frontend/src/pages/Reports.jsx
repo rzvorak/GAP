@@ -45,6 +45,16 @@ const Reports = () => {
     navigate('/students')
   }
 
+  const calculateGrade = (percent) => {
+    if (percent < 0) return "-"
+    let grade = "F";
+    if (percent >= settings.cutoffs.A) grade = "A";
+    else if (percent >= settings.cutoffs.B) grade = "B";
+    else if (percent >= settings.cutoffs.C) grade = "C";
+    else if (percent >= settings.cutoffs.D) grade = "D";
+    return grade;
+  }
+
 
   const createHomeworkPDF = async (id) => {
 
@@ -52,6 +62,7 @@ const Reports = () => {
     let currentStudents = students.filter((student) => { return Object.keys(student.homeworkLog).includes(currentHomework._id) })
 
     const pdfDoc = await PDFDocument.create();
+    pdfDoc.setTitle(currentHomework.name)
     let page = pdfDoc.addPage([595, 842]);
 
     const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
@@ -137,19 +148,10 @@ const Reports = () => {
       color: rgb(0, 0, 0)
     })
 
-    const calculateGrade = (percent) => {
-      if (percent < 0) return "-"
-      let grade = "F";
-      if (percent >= settings.cutoffs.A) grade = "A";
-      else if (percent >= settings.cutoffs.B) grade = "B";
-      else if (percent >= settings.cutoffs.C) grade = "C";
-      else if (percent >= settings.cutoffs.D) grade = "D";
-      return grade;
-    }
 
     // student ranking logic
     let currentRank = 1;
-    const ranks = {};
+    const studentRanks = {};
     const studentScores = currentStudents.map((student) => [student._id, student.homeworkLog[currentHomework._id]])
     let gradeCounts = {
       "A": 0,
@@ -163,24 +165,24 @@ const Reports = () => {
     let sortedScores = studentScores.sort((a, b) => b[1] - a[1])
 
     for (let i = 0; i < sortedScores.length; ++i) {
-        let [id, score] = sortedScores[i];
+      let [id, score] = sortedScores[i];
 
-        ++gradeCounts[calculateGrade((score / currentHomework.points) * 100)]
-        ++gradeCounts["Total"]
+      ++gradeCounts[calculateGrade((score / currentHomework.points) * 100)]
+      ++gradeCounts["Total"]
 
-        if (i > 0 && score === sortedScores[i - 1][1]) {
-            ranks[id] = ranks[sortedScores[i - 1][0]];
-        } else {
-            ranks[id] = currentRank;
-        }
+      if (i > 0 && score === sortedScores[i - 1][1]) {
+        studentRanks[id] = studentRanks[sortedScores[i - 1][0]];
+      } else {
+        studentRanks[id] = currentRank;
+      }
 
-        currentRank++;
+      currentRank++;
     }
 
     // sort by rank then sort alphabetically
     currentStudents = currentStudents.sort((a, b) => {
-      if (ranks[a._id] !== ranks[b._id]) {
-        return ranks[a._id] - ranks[b._id]; 
+      if (studentRanks[a._id] !== studentRanks[b._id]) {
+        return studentRanks[a._id] - studentRanks[b._id];
       }
       if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
       if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
@@ -192,7 +194,7 @@ const Reports = () => {
     varX = 290
     const meanPercent = ((currentHomework.meanGrade / currentHomework.points) * 100).toFixed(1)
     const analysisCategories = [
-      "Class Mean:", 
+      "Class Mean:",
       (currentHomework.meanGrade != -1 ? currentHomework.meanGrade.toFixed(1) + "/" + currentHomework.points : "-"),
       (currentHomework.meanGrade != -1 ? meanPercent + "%" : "-"),
       calculateGrade(meanPercent)
@@ -247,7 +249,7 @@ const Reports = () => {
         student.homeworkLog[currentHomework._id] + "/" + currentHomework.points,
         percent + "%",
         calculateGrade(percent),
-        String(ranks[student._id])
+        String(studentRanks[student._id])
       ]
 
       page.drawLine({
@@ -278,39 +280,295 @@ const Reports = () => {
       }
     })
 
+
     const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes], { type: 'application/pdf' });
 
-    saveAs(blob, 'document.pdf');  // Triggers the file download
+    saveAs(blob, `${currentHomework.name}.pdf`);  // Triggers the file download
 
   }
-
-
-
-
-
-
 
 
   const createExamPDF = async (id) => {
+
     const currentExam = exams.find((exam) => exam._id === id)
+    let currentStudents = students.filter((student) => { return Object.keys(student.examLog).includes(currentExam._id) })
 
-    console.log("beginning pdf")
+
     const pdfDoc = await PDFDocument.create();
-    const page = pdfDoc.addPage([600, 400]);
+    const page = pdfDoc.addPage([842, 595]);
 
-    page.drawText(currentExam.type, {
-      x: 50,
-      y: 350,
-      size: 20,
+    const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+
+    // title
+    page.drawText(currentExam.type.charAt(0).toUpperCase() + currentExam.type.slice(1) + " Exam - " + currentExam.month, {
+      x: 25,
+      y: 595 - 60,
+      size: 30,
       color: rgb(0, 0, 0),
     });
+
+    // exam metadata
+    const examCategories = ["Class:", "Points:", "Date Scored:", "Date Created:"]
+    let varY = 595 - 100
+    examCategories.forEach((category) => {
+      page.drawText(category, {
+        x: 60,
+        y: varY,
+        size: 15,
+        color: rgb(0, 0, 0),
+      })
+      varY -= 30
+    })
+
+    // line by exam metadata
+    page.drawLine({
+      start: { x: 30, y: 595 - 85 },
+      end: { x: 30, y: 595 - 195 },
+      thickness: 2,
+      color: rgb(0, 0, 0)
+    })
+
+    // exam metadata values
+    const examCategoryValues = [
+      String(currentExam.class),
+      String(currentExam.points),
+      (currentExam.meanGrade != -1 ? currentExam.updatedAt.slice(0, 10) : "-"),
+      currentExam.createdAt.slice(0, 10)
+    ]
+    varY = 595 - 100
+    examCategoryValues.forEach((categoryValue) => {
+      page.drawText(categoryValue, {
+        x: 180,
+        y: varY,
+        size: 15,
+        color: rgb(0, 0, 0),
+      })
+      varY -= 30
+    })
+
+
+    // student ranking logic
+    let currentRank = 1;
+    const studentRanks = {};
+    const studentScoreSets = currentStudents.map((student) => [student._id, student.examLog[currentExam._id]])
+    const studentScoreTotals = currentStudents.map((student => [student._id, Object.values(student.examLog[currentExam._id]).reduce((sum, acc) => sum += acc, 0)]))
+
+    let subjectCounts = settings.subjects[currentExam.class].reduce((acc, subject) => {
+      acc[subject] = [0, { "A": 0, "B": 0, "C": 0, "D": 0, "F": 0 }];
+      return acc;
+    }, {});
+
+    currentStudents.forEach(student => {
+      Object.keys(student.examLog[currentExam._id]).forEach((subject) => {
+        // accumulate total subject score
+        subjectCounts[subject][0] += student.examLog[currentExam._id][subject]
+        // track subject grade counts
+        ++subjectCounts[subject][1][calculateGrade((student.examLog[currentExam._id][subject] / currentExam.points) * 100)]
+      })
+    })
+
+    let studentGradeCounts = {
+      "A": 0,
+      "B": 0,
+      "C": 0,
+      "D": 0,
+      "F": 0,
+      "Total": 0
+    }
+
+    let sortedScores = studentScoreTotals.sort((a, b) => b[1] - a[1])
+
+    const studentAverages = {}
+    for (let i = 0; i < sortedScores.length; ++i) {
+      let [id, score] = sortedScores[i];
+
+
+      let studentAverage = (score / (currentExam.points * settings.subjects[currentExam.class].length)) * 100
+      studentAverages[id] = studentAverage
+
+      ++studentGradeCounts[calculateGrade(studentAverage)]
+      ++studentGradeCounts["Total"]
+
+      if (i > 0 && score === sortedScores[i - 1][1]) {
+        studentRanks[id] = studentRanks[sortedScores[i - 1][0]];
+      } else {
+        studentRanks[id] = currentRank;
+      }
+
+      currentRank++;
+    }
+
+    let sortedSubjects = Object.keys(subjectCounts).map(subject => [subject, subjectCounts[subject][0]]).sort((a, b) => b[1] - a[1])
+    const subjectRanks = {}
+    currentRank = 1;
+    for (let i = 0; i < sortedSubjects.length; ++i) {
+      let [subject, score] = sortedSubjects[i];
+
+      if (i > 0 && score === sortedSubjects[i - 1][1]) {
+        subjectRanks[subject] = subjectRanks[sortedSubjects[i - 1][0]];
+      } else {
+        subjectRanks[subject] = currentRank
+      }
+      currentRank++
+    }
+
+    // console.log(subjectCounts)
+    // console.log(studentAverages)
+    // console.log(studentRanks)
+    // console.log(studentGradeCounts)
+
+    // lines by exam analysis
+    page.drawLine({
+      start: { x: 30, y: 595 - 230 },
+      end: { x: 260, y: 595 - 230 },
+      thickness: 2,
+      color: rgb(0, 0, 0)
+    })
+    page.drawLine({
+      start: { x: 30, y: 595 - 275 },
+      end: { x: 260, y: 595 - 275 },
+      thickness: 2,
+      color: rgb(0, 0, 0)
+    })
+    page.drawLine({
+      start: { x: 30, y: 595 - 370 },
+      end: { x: 260, y: 595 - 370 },
+      thickness: 2,
+      color: rgb(0, 0, 0)
+    })
+
+    // // exam analysis
+    // varX = 290
+    // const meanPercent = ((currentHomework.meanGrade / currentHomework.points) * 100).toFixed(1)
+    // const analysisCategories = [
+    //   "Class Mean:",
+    //   (currentHomework.meanGrade != -1 ? currentHomework.meanGrade.toFixed(1) + "/" + currentHomework.points : "-"),
+    //   (currentHomework.meanGrade != -1 ? meanPercent + "%" : "-"),
+    //   calculateGrade(meanPercent)
+    // ];
+    // analysisCategories.forEach(category => {
+    //   page.drawText(category, {
+    //     x: varX,
+    //     y: 842 - 112,
+    //     size: 15,
+    //     color: rgb(0, 0, 0),
+    //   })
+    //   varX += category === "Class Mean:" ? 140 : 60
+    // })
+
+
+    // // grade distribution
+    // varX = 290
+    // let varXAnalysis = 290
+    // Object.keys(gradeCounts).forEach((grade, index) => {
+    //   page.drawText(grade, {
+    //     x: varX,
+    //     y: 842 - 160,
+    //     size: 15,
+    //     color: rgb(0, 0, 0),
+    //   })
+    //   page.drawText(String(gradeCounts[grade]), {
+    //     x: varXAnalysis,
+    //     y: 842 - 200,
+    //     size: 15,
+    //     color: rgb(0, 0, 0),
+    //   })
+    //   varX += 45
+    //   varXAnalysis += index == 4 ? 52 : 45
+    // })
+
+    // if (currentStudents.length == 0) {
+    //   page.drawText("Not Yet Scored", {
+    //     x: 250,
+    //     y: 842 - 320,
+    //     size: 15,
+    //     color: rgb(0, 0, 0),
+    //   })
+    // }
+
+
+    // subject table headers
+    let varX = 400
+    const subjectCategories = ["A", "B", "C", "D", "F", "Average", "Grade", "Rank"];
+    subjectCategories.forEach(category => {
+      page.drawText(category, {
+        x: varX,
+        y: 595 - 100,
+        size: 15,
+        font: boldFont,
+        color: rgb(0, 0, 0),
+      })
+      varX += category.length > 1 ? 90 : 45
+    })
+
+    // top line for subject table
+    page.drawLine({
+      start: { x: 300, y: 595 - 125 },
+      end: { x: 842 - 30, y: 595 - 125 },
+      thickness: 2,
+      color: rgb(0, 0, 0)
+    })
+
+    // subject table
+    varY = 595 - 150
+    let lineY = 595 - 175
+    sortedSubjects.forEach((subject, index) => {
+
+      const subjectPercent = ((subjectCounts[subject[0]][0] / (currentExam.points * settings.subjects[currentExam.class].length)) * 100).toFixed(1)
+      let subjectStats = [
+        subject[0].split(" ")[0],
+        String(subjectCounts[subject[0]][1]["A"]),
+        String(subjectCounts[subject[0]][1]["B"]),
+        String(subjectCounts[subject[0]][1]["C"]),
+        String(subjectCounts[subject[0]][1]["D"]),
+        String(subjectCounts[subject[0]][1]["F"]),
+        subjectPercent + "%",
+        calculateGrade(subjectPercent),
+        String(subjectRanks[subject[0]])
+      ]
+
+      page.drawLine({
+        start: { x: 300, y: lineY },
+        end: { x: 842 - 30, y: lineY },
+        thickness: 2,
+        color: rgb(0, 0, 0)
+      })
+      lineY -= 40
+
+      varX = 300
+      subjectStats.forEach((stat, index) => {
+        page.drawText(stat, {
+          x: varX,
+          y: varY,
+          size: 15,
+          color: rgb(0, 0, 0),
+        })
+        varX += index === 0 ? 100 : index === 6 ? 100 : 45
+      })
+      varY -= 40
+
+    })
+
+
+
+
 
     const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes], { type: 'application/pdf' });
 
-    saveAs(blob, 'document.pdf');  // Triggers the file download
+    saveAs(blob, `${currentExam.type.charAt(0).toUpperCase() + currentExam.type.slice(1) + " " + currentExam.month}.pdf`);  // Triggers the file download
   }
+
+
+
+
+
+
+
+
+
 
   const createClassPDF = async (selectedClass) => {
 
