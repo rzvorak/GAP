@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { Box, Text, Input, VStack, IconButton } from '@chakra-ui/react'
+import React from 'react'
+import { Box, Text, VStack } from '@chakra-ui/react'
 
 
 const NotFound = () => {

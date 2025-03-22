@@ -7,8 +7,9 @@ import { Box, VStack, Heading, HStack, Input, Button, Text, Center, useBreakpoin
 import { IoClose } from "react-icons/io5";
 import { FaArrowLeft } from 'react-icons/fa';
 
-
 import { useStudentStore } from '../store/student.js';
+import { useUserStore } from '../store/user.js'
+
 import Dialog_Student from '../components/Dialog_Student.jsx'
 import Dialog_Delete from '../components/Dialog_Delete.jsx'
 
@@ -18,6 +19,7 @@ const Students = () => {
     const disappearOnMin = useBreakpointValue({ "min": "none", "xxs": "flex" })
 
     const { fetchStudents, createStudent, deleteStudent, students } = useStudentStore();
+    const { fetchUsers, deleteUser, users} = useUserStore();
     // forces react to re-rended properly when a new student is added
     const [localStudents, setLocalStudents] = useState([])
     const [allStudents, setAllStudents] = useState([])
@@ -43,8 +45,8 @@ const Students = () => {
 
     // runs once on initial render, re-calls every time a dependency (in array) changes
     useEffect(() => {
-        fetchStudents().then(() => setIsStudentsLoading(false));
-    }, [fetchStudents]);
+        fetchStudents().then(() => fetchUsers().then(() => setIsStudentsLoading(false)));
+    }, [fetchStudents, fetchUsers]);
 
     // runs every time students are updated
     useEffect(() => {
@@ -97,6 +99,15 @@ const Students = () => {
         setDialogDelete(!dialogDelete);
     }
 
+    const handleDelete = async (studentId) => {
+        await deleteStudent(studentId)
+        const userToDelete = users.find(user => user.role === "student" && user.identity === studentId)
+
+        if (userToDelete) {
+            await deleteUser(userToDelete._id)
+        }
+    }
+
     const navigate = useNavigate();
 
     // to conform with Dialog_Delete
@@ -121,7 +132,7 @@ const Students = () => {
             display="flex"
             flexDir={"column"}
         >
-            {dialogDelete && <Dialog_Delete handleBack={handleDeleteBack} delete={deleteStudent} id={deleteStudentId} setDialog={setDialogDelete}></Dialog_Delete>}
+            {dialogDelete && <Dialog_Delete handleBack={handleDeleteBack} delete={handleDelete} id={deleteStudentId} setDialog={setDialogDelete}></Dialog_Delete>}
             {dialogStudent && <Dialog_Student handleSubmitStudent={handleSubmitStudent} setDialog={setDialogStudent}></Dialog_Student>}
 
             <Header></Header>
