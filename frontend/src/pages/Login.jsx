@@ -37,6 +37,7 @@ const Login = () => {
 
     const data = await res.json();
     if (data.token) {
+      localStorage.setItem("identity", data.identity)
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.role);
       data.role !== "student" ? navigate("/landing") : navigate('/students/student-view', { state: { studentId: data.identity } })
