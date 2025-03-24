@@ -10,6 +10,8 @@ import { IoEyeOffOutline } from "react-icons/io5";
 import { useUserStore } from '../store/user';
 import { InputGroup } from '../components/ui/input-group';
 
+import { Toaster, toaster } from "../components/ui/toaster"
+
 const MotionVStack = motion.create(VStack);
 
 // TODO: request password stuff, alerts for wrong password / no find username
@@ -42,14 +44,22 @@ const Login = () => {
       localStorage.setItem("role", data.role);
       data.role !== "student" ? navigate("/landing") : navigate('/students/student-view', { state: { studentId: data.identity } })
     } else {
-      setAlertMessage(data.message);
+      toaster.create({
+        title: data.message,
+        type: "error",
+        duration: "2000"
+      })
     }
   };
 
   const handleRequestPassword = async () => {
     const user = users.find((user) => user.username === forgotPasswordUsername)
     if (!user) {
-      console.log("user not found")
+      toaster.create({
+        title: "User not found",
+        type: "error",
+        duration: "2000"
+      })
       return;
     }
 
@@ -58,7 +68,11 @@ const Login = () => {
       ...user,
       requestingNewPassword: true
     })
-    console.log("success: ", success)
+    toaster.create({
+      title: success ? "Request Submitted" : "Server Error",
+      type: success ? "success" : "error",
+      duration: "2000",
+    })
   }
 
   const [show, setShow] = useState(true)
@@ -80,6 +94,8 @@ const Login = () => {
       alignItems="center"
       overflow="hidden"
     >
+
+      <Toaster />
 
 
       <MotionVStack

@@ -10,6 +10,9 @@ import { FaArrowLeft } from 'react-icons/fa';
 import { NumberInputField, NumberInputRoot } from '../components/ui/number-input';
 import Dialog_Delete from '../components/Dialog_Delete.jsx'
 
+import { Toaster, toaster } from "../components/ui/toaster"
+
+
 // TODO: fix bug in which a new assignment is added to a student if the homework is entered but not saved
 const Homework = () => {
 
@@ -40,8 +43,6 @@ const Homework = () => {
     const [search, setSearch] = useState("")
     const [triggerLoad, setTriggerLoad] = useState(false)
     const [triggerSave, setTriggerSave] = useState(false)
-    // maybe use to make "-" on entry possible for grades
-    const [pressedSave, setPressedSave] = useState(false)
 
     // launch once on load, get students, homeworks, and settings
     useEffect(() => {
@@ -108,9 +109,7 @@ const Homework = () => {
         handleSaveButton()
     }, [triggerSave]);
 
-    const handleSaveButton = () => {
-        console.log("Saving student scores...");
-
+    const handleSaveButton = async (fromButton) => {
         const updatedGrades = {};
         const updatedStudents = allStudents.map(student => {
             const newScore = studentScores[student._id];
@@ -143,7 +142,6 @@ const Homework = () => {
 
         for (let i = 0; i < sortedScores.length; ++i) {
             let [id, score] = sortedScores[i];
-            console.log(score)
 
             sum += Number(score);
 
@@ -158,12 +156,20 @@ const Homework = () => {
 
         setStudentRanks(newRanks);
 
-        updateHomework(homeworkId, {
+        const {success} = await updateHomework(homeworkId, {
             ...currentHomework,
             meanGrade: sum / sortedScores.length
         })
 
         setCurrentMeanGrade(sortedScores.length != 0 ? sum / sortedScores.length : -1);
+
+        if (fromButton) {
+            toaster.create({
+                title: success ? "Homework saved" : "Error saving homework",
+                type: success ? "success" : "error",
+                duration: "2000"
+            })
+        }
     };
 
     useEffect(() => {
@@ -189,6 +195,7 @@ const Homework = () => {
         });
 
         deleteHomework(homeworkId);
+
     };
 
     const deleteButtonBreakpoint = useBreakpointValue({ "xxs": "", sm: "Homework" });
@@ -211,6 +218,8 @@ const Homework = () => {
             bg={"gray.100"}
             color="gray.900"
         >
+            <Toaster /> 
+
             <Header></Header>
 
             {dialog && <Dialog_Delete handleBack={handleBack} delete={handleDeleteHomework} id={homeworkId} setDialog={setDialog}></Dialog_Delete>}
@@ -233,7 +242,7 @@ const Homework = () => {
                     fontWeight={"400"}
                     whiteSpace={"normal"}
                     wordBreak="break-word"
-                    
+
                 >{currentHomework.name}</Heading>
             </Box>
 
@@ -308,13 +317,13 @@ const Homework = () => {
                             <Box flex="3">
                                 <Text ml="1rem" maxW="10rem">Name</Text>
                             </Box>
-                            <Center flex="2" marginRight={{"xxs": "0.4rem", "xs": "0.5rem", sm: "0rem"}}>
+                            <Center flex="2" marginRight={{ "xxs": "0.4rem", "xs": "0.5rem", sm: "0rem" }}>
                                 <Text>Score</Text>
                             </Center>
                             <Center flex="1">
                                 <Text>Grade</Text>
                             </Center>
-                            <Center flex="1" marginLeft={{"xxs": "0.4rem", "xs": "0.5rem", sm: "0rem"}}>
+                            <Center flex="1" marginLeft={{ "xxs": "0.4rem", "xs": "0.5rem", sm: "0rem" }}>
                                 <Text>Rank</Text>
                             </Center>
                         </HStack>
@@ -345,14 +354,14 @@ const Homework = () => {
                                             <Box flex="3">
                                                 <Text
                                                     ml="1rem"
-                                                    maxW={{ "xxs": "3.5rem","xs": "5.5rem", sm: "8rem", md: "14rem" }}
+                                                    maxW={{ "xxs": "3.5rem", "xs": "5.5rem", sm: "8rem", md: "14rem" }}
                                                     truncate>{student.name}</Text>
                                             </Box>
                                             <Center flex="2">
                                                 <NumberInputRoot
                                                     defaultValue={currentHomework.points}
                                                     minW="4rem"
-                                                    w={{ "xxs": "70%","xs": "75%", sm: "90%", md: "100%" }}
+                                                    w={{ "xxs": "70%", "xs": "75%", sm: "90%", md: "100%" }}
                                                     h="90%"
                                                     borderRadius="0.25rem"
                                                     step={1}
@@ -360,9 +369,10 @@ const Homework = () => {
                                                     onValueChange={(e) => {
                                                         const newValue = Math.max(0, Math.min(currentHomework.points, e.value))
                                                         setStudentScores(prevScores => ({
-                                                        ...prevScores,
-                                                        [student._id]: newValue
-                                                    }))}}
+                                                            ...prevScores,
+                                                            [student._id]: newValue
+                                                        }))
+                                                    }}
                                                     min={0}
                                                     max={currentHomework.points}
                                                     style={{ boxShadow: 'var(--box-shadow-classic)' }}
@@ -430,8 +440,7 @@ const Homework = () => {
                             _hover={{ transform: "translateY(-3px)" }}
                             marginLeft={{ "xxs": "0.5rem", "xs": "1rem", sm: "1.5rem" }}
                             onClick={() => {
-                                setPressedSave(true)
-                                handleSaveButton()
+                                handleSaveButton(true)
                             }}
                         >Save</Button>
                     </Box>

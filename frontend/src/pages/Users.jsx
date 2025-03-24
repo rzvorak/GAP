@@ -10,6 +10,8 @@ import { GoPencil } from "react-icons/go";
 import { useUserStore } from '../store/user';
 import { useStudentStore } from '../store/student'
 
+import { Toaster, toaster } from "../components/ui/toaster"
+
 import Dialog_User from '../components/Dialog_User';
 import Dialog_Delete from '../components/Dialog_Delete';
 import Dialog_Password from '../components/Dialog_Password'
@@ -48,7 +50,7 @@ const Users = () => {
   const [checkedStudents, setCheckedStudents] = useState(true)
   const [checkedTeachers, setCheckedTeachers] = useState(true)
   useEffect(() => {
-    setLocalUsers(allUsers.filter(user => user.username.toLowerCase().includes(search.toLowerCase()) && (checkedTeachers || user.role !== "teacher"  ) && (checkedStudents || user.role !== "student")))
+    setLocalUsers(allUsers.filter(user => user.username.toLowerCase().includes(search.toLowerCase()) && (checkedTeachers || user.role !== "teacher") && (checkedStudents || user.role !== "student")))
   }, [search, checkedStudents, checkedTeachers])
 
 
@@ -72,12 +74,16 @@ const Users = () => {
   }
 
   const handleSubmitPassword = async (newPassword) => {
-      const {success} = await updateUser(editUser._id, true, {
-        ...editUser,
-        password: newPassword,
-        requestingNewPassword: false
-      })
-      console.log("success: " , success)
+    const { success } = await updateUser(editUser._id, true, {
+      ...editUser,
+      password: newPassword,
+      requestingNewPassword: false
+    })
+    toaster.create({
+      title: success ? "Password saved" : "Error saving password",
+      type: success ? "success" : "error",
+      duration: "2000"
+    })
 
   }
 
@@ -107,9 +113,15 @@ const Users = () => {
       requestingNewPassword: false,
       identity: studentId
     });
+
+    toaster.create({
+      title: success ? "Account created successfully" : "Error creating account",
+      type: success ? "success" : "error",
+      duration: "2000"
+    })
+
     fetchUsers()
     fetchStudents()
-    console.log(success, message);
   }
 
   const createTeacherAccount = async (teacherName, password) => {
@@ -136,8 +148,15 @@ const Users = () => {
       requestingNewPassword: false,
       identity: teacherName
     });
+
+    toaster.create({
+      title: success ? "Account created successfully" : "Error creating account",
+      type: success ? "success" : "error",
+      duration: "2000"
+    })
+
     fetchUsers()
-    console.log(success, message);
+
   }
 
   const [dialogDelete, setDialogDelete] = useState(false)
@@ -149,7 +168,11 @@ const Users = () => {
 
   // to conform with Dialog_Delete
   const handleDeleteBack = () => {
-    console.log("User successfully deleted")
+    toaster.create({
+      title: "Account deleted successfully",
+      type: "success",
+      duration: "2000"
+    })
   }
 
   return (
@@ -161,6 +184,7 @@ const Users = () => {
       display="flex"
       flexDir={"column"}
     >
+      <Toaster />
       <Header></Header>
 
       {dialogPassword && <Dialog_Password handleSubmitPassword={handleSubmitPassword} user={editUser} setDialog={setDialogPassword}></Dialog_Password>}
@@ -384,7 +408,7 @@ const Users = () => {
                           w="3rem"
                           h="3rem"
                           cursor="pointer"
-                          color={user.requestingNewPassword ? "orange.300" : "green.500"} 
+                          color={user.requestingNewPassword ? "orange.300" : "green.500"}
                           onClick={() => handleEditButton(user)}
                           transition="all 0.2s ease-in-out"
                           _hover={{ transform: "translateY(-3px)" }}

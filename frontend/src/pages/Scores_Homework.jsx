@@ -11,6 +11,9 @@ import Dialog_Homework from '../components/Dialog_Homework'
 
 import { useHomeworkStore } from '../store/homework.js'
 
+
+import { Toaster, toaster } from "../components/ui/toaster"
+
 import { AccordionItem, AccordionItemContent, AccordionItemTrigger, AccordionRoot } from '../components/ui/accordion'
 
 // TODO: points zero causes error
@@ -68,7 +71,11 @@ const Scores_Homework = () => {
             class: Number(homeworkClass.slice(-1)),
             meanGrade: homeworkMeanGrade
         });
-        console.log(success, message)
+        toaster.create({
+            title: success ? "Homework created successfully" : "Error creating homework",
+            type: success ? "success" : "error",
+            duration: "2000"
+        })
         fetchHomeworks();
     }
 
@@ -81,6 +88,9 @@ const Scores_Homework = () => {
             display="flex"
             flexDir="column"
         >
+
+            <Toaster />
+
             {dialog && <Dialog_Homework subjects={subjects} handleSubmitHomework={handleSubmitHomework} setDialog={setDialog} selectedClass={selectedClass}></Dialog_Homework>}
 
             <Header></Header>
@@ -135,20 +145,20 @@ const Scores_Homework = () => {
                                         display="flex"
                                         style={{ boxShadow: 'var(--box-shadow-classic)' }}
                                     >
-                                            <Text 
+                                        <Text
                                             position="absolute"
-                                            lineClamp="1" 
-                                            maxWidth={{"xxs": "30%", "xs": "40%", sm: "50%"}}
-                                            >{homework.name}</Text>
-                                            <Box
-                                                position="absolute"
-                                                right="20%"
-                                                fontSize="sm"
-                                                bg="gray.200"
-                                                p="0.5rem"
-                                                borderRadius="0.7rem"
-                                                marginRight="1rem"
-                                            >{homework.subject.slice(0, 2)}</Box>
+                                            lineClamp="1"
+                                            maxWidth={{ "xxs": "30%", "xs": "40%", sm: "50%" }}
+                                        >{homework.name}</Text>
+                                        <Box
+                                            position="absolute"
+                                            right="20%"
+                                            fontSize="sm"
+                                            bg="gray.200"
+                                            p="0.5rem"
+                                            borderRadius="0.7rem"
+                                            marginRight="1rem"
+                                        >{homework.subject.slice(0, 2)}</Box>
 
                                     </AccordionItemTrigger>
                                     <AccordionItemContent

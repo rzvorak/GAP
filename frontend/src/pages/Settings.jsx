@@ -15,6 +15,7 @@ import { useExamStore } from '../store/exam.js'
 import Dialog_Delete from '../components/Dialog_Delete';
 import Dialog_Subjects from '../components/Dialog_Subjects';
 
+import { Toaster, toaster } from "../components/ui/toaster"
 import { AccordionItem, AccordionItemContent, AccordionItemTrigger, AccordionRoot } from '../components/ui/accordion'
 import { NumberInputField, NumberInputRoot } from '../components/ui/number-input';
 
@@ -61,7 +62,19 @@ const Settings = () => {
       distribution: localDistribution,
       cutoffs: localCutoffs,
       subjects: localSubjects,
+    }
 
+    const distributionCheck = Object.values(localDistribution).reduce((sum, acc) => sum += acc, 0) === 100;
+    const cutoffCheck = localCutoffs["A"] > localCutoffs["B"] && localCutoffs["B"] > localCutoffs["C"] && localCutoffs["C"] > localCutoffs["D"]
+
+    if (!distributionCheck || !cutoffCheck) {
+      toaster.create({
+        title: "Cannot save settings",
+        description: !distributionCheck ? (!cutoffCheck ? "Distribution must add up to 100 and cutoffs must be valid" : "Distribution must add up to 100") : (!cutoffCheck ? "Cutoffs must be valid" : null),
+        type: "error",
+        duration: "3000"
+      })
+      return;
     }
 
     const res = await fetch(`/api/settings`, {
@@ -72,7 +85,11 @@ const Settings = () => {
       body: JSON.stringify(updatedSettings),
     });
     const data = await res.json();
-    console.log("success:", data.success)
+    toaster.create({
+      title: data.success ? "Settings saved" : "Error saving settings",
+      type: data.success ? "success" : "error",
+      duration: "2000"
+    })
 
   }
 
@@ -96,12 +113,27 @@ const Settings = () => {
     setLocalDistribution(defaultSettings.distribution)
     setLocalCutoffs(defaultSettings.cutoffs)
     setLocalSubjects(defaultSettings.subjects)
+    toaster.create({
+      title: "Default settings restored",
+      description: "Make sure to save",
+      type: "success",
+      duration: "2000"
+    })
   }
 
   // for subjects logic
   const [dialogDeleteSubject, setDialogDeleteSubject] = useState(false)
   const [deleteId, setDeleteId] = useState({})
   const handleDeleteSubjectButton = (currentClass, subject) => {
+    if (localSubjects[currentClass].length <= 5) {
+      toaster.create({
+        title: "Cannot delete subject",
+        description: "Minimum of five subjects per class",
+        type: "error",
+        duration: "2000"
+      })
+      return;
+    }
     setDeleteId({ class: currentClass, subject: subject })
     setDialogDeleteSubject(!dialogDeleteSubject);
   }
@@ -112,6 +144,11 @@ const Settings = () => {
       (subject) => subject !== deleteId.subject
     );
     setLocalSubjects(updatedSubjects)
+    toaster.create({
+      title: "Subject deleted successfully",
+      type: "success",
+      duration: "2000"
+    })
   }
 
   const handleDeleteBack = () => {
@@ -126,6 +163,26 @@ const Settings = () => {
   }
 
   const handleSubmitSubject = (newSubject) => {
+    if (localSubjects[currentClass].length >= 8) {
+      toaster.create({
+        title: "Cannot create subject",
+        description: "Maximum of eight subjects per class",
+        type: "error",
+        duration: "3000"
+      })
+      return;
+    }
+
+    if (localSubjects[currentClass].includes(newSubject)) {
+      toaster.create({
+        title: "Cannot create subject",
+        description: "Subject already exists",
+        type: "error",
+        duration: "3000"
+      })
+      return;
+    }
+
     const updatedSubjects = {
       ...localSubjects,
       [currentClass]: [
@@ -134,6 +191,11 @@ const Settings = () => {
       ]
     }
     setLocalSubjects(updatedSubjects)
+    toaster.create({
+      title: "Subject added successfully",
+      type: "success",
+      duration: "2000"
+    })
   }
 
   const [dialogDeleteStudents, setDialogDeleteStudents] = useState(false)
@@ -160,7 +222,7 @@ const Settings = () => {
 
   const deleteAllHomework = async (ignore) => {
     homeworks.forEach(homework => {
-       deleteHomework(homework._id)
+      deleteHomework(homework._id)
     })
 
   }
@@ -199,13 +261,13 @@ const Settings = () => {
     >
       <Header></Header>
 
+      <Toaster />
+
       {dialogDeleteExams && <Dialog_Delete handleBack={handleDeleteBack} delete={deleteAllExams} id={"critical"} setDialog={setDialogDeleteExams}></Dialog_Delete>}
       {dialogDeleteHomework && <Dialog_Delete handleBack={handleDeleteBack} delete={deleteAllHomework} id={"critical"} setDialog={setDialogDeleteHomework}></Dialog_Delete>}
       {dialogDeleteStudents && <Dialog_Delete handleBack={handleDeleteBack} delete={deleteAllStudents} id={"critical"} setDialog={setDialogDeleteStudents}></Dialog_Delete>}
       {dialogDeleteSubject && <Dialog_Delete handleBack={handleDeleteBack} delete={deleteSubject} id={deleteId} setDialog={setDialogDeleteSubject}></Dialog_Delete>}
       {dialog && <Dialog_Subjects handleSubmitSubject={handleSubmitSubject} currentClass={currentClass} setDialog={setDialog}></Dialog_Subjects>}
-
-
 
 
       {!isSettingsLoading ? (
@@ -281,11 +343,14 @@ const Settings = () => {
               <HStack
                 w={{ "xxs": "50%", "xs": "60%", sm: "70%" }}
                 gap="0rem"
-              //bg="blue"
               >
                 <Box h="100%" borderRadius="0.1rem" w="0.25rem" bg="gray.700"></Box>
 
-                <Box h="80%" bg="green.500" borderRightRadius="0.5rem" w={localDistribution[type] + "%"}></Box>
+                <Box
+                  h="80%"
+                  bg={Object.values(localDistribution).reduce((sum, acc) => sum += acc, 0) === 100 ? "green.500" : "gray.200"}
+                  borderRightRadius="0.5rem" w={localDistribution[type] + "%"}
+                ></Box>
 
               </HStack>
             </Box>))}

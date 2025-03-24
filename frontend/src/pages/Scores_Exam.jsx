@@ -11,6 +11,8 @@ import Dialog_Exam from '../components/Dialog_Exam'
 
 import { useExamStore } from '../store/exam.js'
 
+import { Toaster, toaster } from "../components/ui/toaster"
+
 import { AccordionItem, AccordionItemContent, AccordionItemTrigger, AccordionRoot } from '../components/ui/accordion'
 
 const Scores_Exam = () => {
@@ -31,15 +33,15 @@ const Scores_Exam = () => {
         const fetchSettings = async () => {
             const res = await fetch('/api/settings');
             const data = await res.json();
-            
+
             setSubjects(data.data.subjects)
-          }
-          
+        }
+
         fetchExams().then(() => fetchSettings()).then(() => setIsExamLoading(false))
     }, [fetchExams]);
 
     useEffect(() => {
-        setLocalExams(exams.filter(exam => { return (exam.class == Number(selectedClass.slice(-1)) && exam.type === selectedType)}));
+        setLocalExams(exams.filter(exam => { return (exam.class == Number(selectedClass.slice(-1)) && exam.type === selectedType) }));
     }, [exams]);
 
     const navigate = useNavigate();
@@ -55,9 +57,8 @@ const Scores_Exam = () => {
     const handleAdd = () => {
         setDialog(!dialog);
     }
- 
+
     const handleSubmitExam = async (examPoints, examMonth, examMeanGrade) => {
-        console.log(selectedType, examPoints, examMonth, Number(selectedClass.slice(-1)), examMeanGrade)
         const { success, message } = await createExam({
             type: selectedType,
             points: examPoints,
@@ -66,7 +67,11 @@ const Scores_Exam = () => {
             class: Number(selectedClass.slice(-1)),
             meanGrade: examMeanGrade
         });
-        console.log(success, message)
+        toaster.create({
+            title: success ? "Exam created successfully" : "Error creating exam",
+            type: success ? "success" : "error",
+            duration: "2000"
+        })
         fetchExams();
     }
 
@@ -79,6 +84,8 @@ const Scores_Exam = () => {
             display="flex"
             flexDir="column"
         >
+
+            <Toaster />
             {dialog && <Dialog_Exam handleSubmitExam={handleSubmitExam} setDialog={setDialog} selectedType={selectedType} capitalizedType={capitalizedType} selectedClass={selectedClass}></Dialog_Exam>}
 
             <Header></Header>
@@ -133,20 +140,20 @@ const Scores_Exam = () => {
                                         display="flex"
                                         style={{ boxShadow: 'var(--box-shadow-classic)' }}
                                     >
-                                            <Text 
+                                        <Text
                                             position="absolute"
-                                            lineClamp="1" 
-                                            maxWidth={{"xxs": "30%", "xs": "40%", sm: "50%"}}
-                                            >{exam.type.charAt(0).toUpperCase()}{exam.type.slice(1)} Exam</Text>
-                                            <Box
-                                                position="absolute"
-                                                right="20%"
-                                                fontSize="sm"
-                                                bg="gray.200"
-                                                p="0.5rem"
-                                                borderRadius="0.7rem"
-                                                marginRight="1rem"
-                                            >{exam.month}</Box>
+                                            lineClamp="1"
+                                            maxWidth={{ "xxs": "30%", "xs": "40%", sm: "50%" }}
+                                        >{exam.type.charAt(0).toUpperCase()}{exam.type.slice(1)} Exam</Text>
+                                        <Box
+                                            position="absolute"
+                                            right="20%"
+                                            fontSize="sm"
+                                            bg="gray.200"
+                                            p="0.5rem"
+                                            borderRadius="0.7rem"
+                                            marginRight="1rem"
+                                        >{exam.month}</Box>
 
                                     </AccordionItemTrigger>
                                     <AccordionItemContent
