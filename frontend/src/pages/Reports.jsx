@@ -15,7 +15,7 @@ import Dialog_Report_Homework from '../components/Dialog_Report_Homework';
 import Dialog_Report_Class from '../components/Dialog_Report_Class';
 import Dialog_Report_Exam from '../components/Dialog_Report_Exam';
 
-
+// TODO: add little tags in corner for multiple pages understanding
 const Reports = () => {
   const disappearOnMin = useBreakpointValue({ "min": "none", "xxs": "flex" })
 
@@ -46,7 +46,8 @@ const Reports = () => {
   }
 
   const calculateGrade = (percent) => {
-    if (percent < 0) return "-"
+    console.log(percent)
+    if (percent < 0 || percent === null || isNaN(percent)) return "-"
     let grade = "F";
     if (percent >= settings.cutoffs.A) grade = "A";
     else if (percent >= settings.cutoffs.B) grade = "B";
@@ -336,7 +337,7 @@ const Reports = () => {
     const examCategoryValues = [
       String(currentExam.class),
       String(currentExam.points),
-      (currentExam.meanGrade != -1 ? currentExam.updatedAt.slice(0, 10) : "-"),
+      (currentExam.meanGrade != -1 && currentExam.meanGrade != null ? currentExam.updatedAt.slice(0, 10) : "-"),
       currentExam.createdAt.slice(0, 10)
     ]
     varY = 595 - 100
@@ -440,8 +441,8 @@ const Reports = () => {
     const meanPercent = ((currentExam.meanGrade / (subjects.length * currentExam.points)) * 100).toFixed(1)
     const analysisCategories = [
       "Class Mean:",
-      (currentExam.meanGrade != -1 ? meanPercent + "%" : "-"),
-      calculateGrade(meanPercent)
+      (currentExam.meanGrade == -1 || currentExam.meanGrade === null ? "-" :  meanPercent + "%" ),
+      (currentExam.meanGrade == -1 || currentExam.meanGrade === null ? "-" : calculateGrade(meanPercent))
     ];
     analysisCategories.forEach(category => {
       page.drawText(category, {
@@ -473,16 +474,6 @@ const Reports = () => {
       varX += 35
       varXAnalysis += index == 4 ? 46 : 35
     })
-
-    if (currentStudents.length == 0) {
-      page.drawText("Not Yet Scored", {
-        x: 250,
-        y: 842 - 320,
-        size: 15,
-        color: rgb(0, 0, 0),
-      })
-    }
-
 
     // subject table headers
     varX = 400
@@ -530,9 +521,9 @@ const Reports = () => {
         String(subjectCounts[subject[0]][1]["C"]),
         String(subjectCounts[subject[0]][1]["D"]),
         String(subjectCounts[subject[0]][1]["F"]),
-        subjectPercent + "%",
+        (isNaN(subjectPercent) || subjectPercent === null ? "-" : subjectPercent + "%"),
         calculateGrade(subjectPercent),
-        String(subjectRanks[subject[0]])
+        (isNaN(subjectPercent) ? "-" : String(subjectRanks[subject[0]]))
       ]
 
       if (index !== sortedSubjects.length - 1) {
