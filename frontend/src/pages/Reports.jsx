@@ -296,7 +296,7 @@ const Reports = () => {
 
 
     const pdfDoc = await PDFDocument.create();
-    const page = pdfDoc.addPage([842, 595]);
+    let page = pdfDoc.addPage([842, 595]);
 
     const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
@@ -310,7 +310,7 @@ const Reports = () => {
     });
 
     // exam metadata
-    const examCategories = ["Class:", "Points:", "Date Scored:", "Date Created:"]
+    const examCategories = ["Class:", "Points:", "Exam Scored:", "Exam Created:"]
     let varY = 595 - 100
     examCategories.forEach((category) => {
       page.drawText(category, {
@@ -414,11 +414,6 @@ const Reports = () => {
       currentRank++
     }
 
-    // console.log(subjectCounts)
-    // console.log(studentAverages)
-    // console.log(studentRanks)
-    // console.log(studentGradeCounts)
-
     // lines by exam analysis
     page.drawLine({
       start: { x: 30, y: 595 - 230 },
@@ -427,70 +422,69 @@ const Reports = () => {
       color: rgb(0, 0, 0)
     })
     page.drawLine({
-      start: { x: 30, y: 595 - 275 },
-      end: { x: 260, y: 595 - 275 },
+      start: { x: 30, y: 595 - 290 },
+      end: { x: 260, y: 595 - 290 },
       thickness: 2,
       color: rgb(0, 0, 0)
     })
     page.drawLine({
-      start: { x: 30, y: 595 - 370 },
-      end: { x: 260, y: 595 - 370 },
+      start: { x: 30, y: 595 - 400 },
+      end: { x: 260, y: 595 - 400 },
       thickness: 2,
       color: rgb(0, 0, 0)
     })
 
-    // // exam analysis
-    // varX = 290
-    // const meanPercent = ((currentHomework.meanGrade / currentHomework.points) * 100).toFixed(1)
-    // const analysisCategories = [
-    //   "Class Mean:",
-    //   (currentHomework.meanGrade != -1 ? currentHomework.meanGrade.toFixed(1) + "/" + currentHomework.points : "-"),
-    //   (currentHomework.meanGrade != -1 ? meanPercent + "%" : "-"),
-    //   calculateGrade(meanPercent)
-    // ];
-    // analysisCategories.forEach(category => {
-    //   page.drawText(category, {
-    //     x: varX,
-    //     y: 842 - 112,
-    //     size: 15,
-    //     color: rgb(0, 0, 0),
-    //   })
-    //   varX += category === "Class Mean:" ? 140 : 60
-    // })
+    // exam analysis
+    let varX = 35
+    const meanPercent = ((currentExam.meanGrade / (settings.subjects[currentExam.class].length * currentExam.points)) * 100).toFixed(1)
+    const analysisCategories = [
+      "Class Mean:",
+      (currentExam.meanGrade != -1 ? meanPercent + "%" : "-"),
+      calculateGrade(meanPercent)
+    ];
+    analysisCategories.forEach(category => {
+      page.drawText(category, {
+        x: varX,
+        y: 595 - 265,
+        size: 15,
+        color: rgb(0, 0, 0),
+      })
+      varX += category === "Class Mean:" ? 130 : 65
+    })
 
 
-    // // grade distribution
-    // varX = 290
-    // let varXAnalysis = 290
-    // Object.keys(gradeCounts).forEach((grade, index) => {
-    //   page.drawText(grade, {
-    //     x: varX,
-    //     y: 842 - 160,
-    //     size: 15,
-    //     color: rgb(0, 0, 0),
-    //   })
-    //   page.drawText(String(gradeCounts[grade]), {
-    //     x: varXAnalysis,
-    //     y: 842 - 200,
-    //     size: 15,
-    //     color: rgb(0, 0, 0),
-    //   })
-    //   varX += 45
-    //   varXAnalysis += index == 4 ? 52 : 45
-    // })
+    // grade distribution
+    varX = 40
+    let varXAnalysis = 40
+    Object.keys(studentGradeCounts).forEach((grade, index) => {
+      page.drawText(grade, {
+        x: varX,
+        y: 595 - 330,
+        size: 15,
+        color: rgb(0, 0, 0),
+      })
+      page.drawText(String(studentGradeCounts[grade]), {
+        x: varXAnalysis,
+        y: 595 - 370,
+        size: 15,
+        color: rgb(0, 0, 0),
+      })
+      varX += 35
+      varXAnalysis += index == 4 ? 46 : 35
+    })
 
-    // if (currentStudents.length == 0) {
-    //   page.drawText("Not Yet Scored", {
-    //     x: 250,
-    //     y: 842 - 320,
-    //     size: 15,
-    //     color: rgb(0, 0, 0),
-    //   })
-    // }
+    if (currentStudents.length == 0) {
+      page.drawText("Not Yet Scored", {
+        x: 250,
+        y: 842 - 320,
+        size: 15,
+        color: rgb(0, 0, 0),
+      })
+    }
 
 
     // subject table headers
-    let varX = 400
+    varX = 400
     const subjectCategories = ["A", "B", "C", "D", "F", "Average", "Grade", "Rank"];
     subjectCategories.forEach(category => {
       page.drawText(category, {
@@ -500,7 +494,7 @@ const Reports = () => {
         font: boldFont,
         color: rgb(0, 0, 0),
       })
-      varX += category.length > 1 ? 90 : 45
+      varX += category.length > 1 ? (category === "Grade" ? 65 : 80) : (category === "F" ? 35 : 45)
     })
 
     // top line for subject table
@@ -511,12 +505,27 @@ const Reports = () => {
       color: rgb(0, 0, 0)
     })
 
+    // bottom line for subject table
+    page.drawLine({
+      start: { x: 300, y: 595 - 400 },
+      end: { x: 842 - 30, y: 595 - 400 },
+      thickness: 2,
+      color: rgb(0, 0, 0)
+    })
+
     // subject table
-    varY = 595 - 150
-    let lineY = 595 - 175
+    varY = (((595 - 125) + (595 - 125 - ((400 - 125) / (sortedSubjects.length)))) / 2) - 5
+    const incrementY = (400 - 125) / (sortedSubjects.length)
+
+    let lineY = 595 - 125 - ((400 - 125) / (sortedSubjects.length))
+    const incrementLine = (400 - 125) / (sortedSubjects.length)
+
+    console.log(subjectCounts)
+
     sortedSubjects.forEach((subject, index) => {
 
-      const subjectPercent = ((subjectCounts[subject[0]][0] / (currentExam.points * settings.subjects[currentExam.class].length)) * 100).toFixed(1)
+      console.log('subject: ', subject, " total points: ", subject[1], " ")
+      const subjectPercent = ((subject[1] / (currentExam.points * currentStudents.length)) * 100).toFixed(1)
       let subjectStats = [
         subject[0].split(" ")[0],
         String(subjectCounts[subject[0]][1]["A"]),
@@ -529,27 +538,137 @@ const Reports = () => {
         String(subjectRanks[subject[0]])
       ]
 
-      page.drawLine({
-        start: { x: 300, y: lineY },
-        end: { x: 842 - 30, y: lineY },
-        thickness: 2,
-        color: rgb(0, 0, 0)
-      })
-      lineY -= 40
+      if (index !== sortedSubjects.length - 1) {
+        page.drawLine({
+          start: { x: 300, y: lineY },
+          end: { x: 842 - 30, y: lineY },
+          thickness: 2,
+          color: rgb(0, 0, 0)
+        })
+        lineY -= incrementLine
+      }
 
       varX = 300
-      subjectStats.forEach((stat, index) => {
+      subjectStats.forEach((stat, statIndex) => {
         page.drawText(stat, {
           x: varX,
           y: varY,
           size: 15,
           color: rgb(0, 0, 0),
         })
-        varX += index === 0 ? 100 : index === 6 ? 100 : 45
+        varX += statIndex === 0 ? 100 : (statIndex === 6 ? 85 : (statIndex === 7 ? 60 : 45))
+      })
+      varY -= incrementY
+    })
+
+    // exam table top line
+    page.drawLine({
+      start: { x: 30, y: 595 - 460 },
+      end: { x: 842 - 30, y: 595 - 460 },
+      thickness: 2,
+      color: rgb(0, 0, 0)
+    })
+
+    // exam table first vertical line
+    page.drawLine({
+      start: { x: 180, y: 595 - 430 },
+      end: { x: 180, y: 25 },
+      thickness: 2,
+      color: rgb(0, 0, 0)
+    })
+
+    // exam table name
+    page.drawText("Name", {
+      x: 30,
+      y: 595 - 440,
+      size: 15,
+      font: boldFont,
+      color: rgb(0, 0, 0),
+    })
+
+    //exam table additional constant categories
+    varX = 635
+    const constantCategories = ["Avg", "Grade", "Rank"];
+    constantCategories.forEach(category => {
+      page.drawText(category, {
+        x: varX,
+        y: 595 - 440,
+        size: 15,
+        font: boldFont,
+        color: rgb(0, 0, 0),
+      })
+      varX += category === "Grade" ? 65 : 55
+    })
+
+    // exam table second vertical line
+    page.drawLine({
+      start: { x: 610, y: 595 - 430 },
+      end: { x: 610, y: 25 },
+      thickness: 2,
+      color: rgb(0, 0, 0)
+    })
+
+
+    // exam table
+    varY = 595 - 485
+    lineY = 595 - 500
+    currentStudents.forEach((student, index) => {
+      let studentStats = [
+        (student.name.length > 18 ? student.name.slice(0, 15) + "..." : student.name),
+        studentAverages[student._id].toFixed(1) + "%",
+        calculateGrade(studentAverages[student._id]),
+        String(studentRanks[student._id])
+      ]
+
+      if (index != 2) {
+        page.drawLine({
+          start: { x: 30, y: lineY },
+          end: { x: 842 - 30, y: lineY },
+          thickness: 2,
+          color: rgb(0, 0, 0)
+        })
+        lineY -= 40
+      }
+
+      varX = 30
+      studentStats.forEach((stat, index) => {
+        page.drawText(stat, {
+          x: varX,
+          y: varY,
+          size: 15,
+          color: rgb(0, 0, 0),
+        })
+        varX += index === 0 ? 600 : (index === 1 ? 80 : 60)
       })
       varY -= 40
 
+      // account for page wrap
+      if (index == 2) {
+        page = pdfDoc.addPage([842, 595]);
+        varY = 595 - 65;
+        lineY = 595 - 40;
+
+        // exam table first vertical line
+        page.drawLine({
+          start: { x: 180, y: 595 - 40 },
+          end: { x: 180, y: 30 },
+          thickness: 2,
+          color: rgb(0, 0, 0)
+        })
+
+        // exam table second vertical line
+        page.drawLine({
+          start: { x: 610, y: 595 - 40 },
+          end: { x: 610, y: 25 },
+          thickness: 2,
+          color: rgb(0, 0, 0)
+        })
+      }
     })
+
+
+
+
 
 
 
@@ -573,7 +692,7 @@ const Reports = () => {
   const createClassPDF = async (selectedClass) => {
 
     const pdfDoc = await PDFDocument.create();
-    const page = pdfDoc.addPage([600, 400]);
+    let page = pdfDoc.addPage([600, 400]);
 
     page.drawText("Class PDF", {
       x: 50,

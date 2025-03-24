@@ -19,6 +19,7 @@ import { AccordionItem, AccordionItemContent, AccordionItemTrigger, AccordionRoo
 import { NumberInputField, NumberInputRoot } from '../components/ui/number-input';
 
 // TODO: handle change in subject affecting existing exams, possibly delete all exams when change and notify
+// TODO: add subject min and max and test exam report formatting
 const Settings = () => {
   const disappearOnMin = useBreakpointValue({ "min": "none", "xxs": "flex" })
 
