@@ -289,10 +289,12 @@ const Reports = () => {
   }
 
 
+  // TODO: cutoff subjects at certain length, ensure subjects fit in exam table
   const createExamPDF = async (id) => {
 
     const currentExam = exams.find((exam) => exam._id === id)
     let currentStudents = students.filter((student) => { return Object.keys(student.examLog).includes(currentExam._id) })
+    const subjects = settings.subjects[currentExam.class]
 
 
     const pdfDoc = await PDFDocument.create();
@@ -352,10 +354,9 @@ const Reports = () => {
     // student ranking logic
     let currentRank = 1;
     const studentRanks = {};
-    const studentScoreSets = currentStudents.map((student) => [student._id, student.examLog[currentExam._id]])
     const studentScoreTotals = currentStudents.map((student => [student._id, Object.values(student.examLog[currentExam._id]).reduce((sum, acc) => sum += acc, 0)]))
 
-    let subjectCounts = settings.subjects[currentExam.class].reduce((acc, subject) => {
+    let subjectCounts = subjects.reduce((acc, subject) => {
       acc[subject] = [0, { "A": 0, "B": 0, "C": 0, "D": 0, "F": 0 }];
       return acc;
     }, {});
@@ -385,7 +386,7 @@ const Reports = () => {
       let [id, score] = sortedScores[i];
 
 
-      let studentAverage = (score / (currentExam.points * settings.subjects[currentExam.class].length)) * 100
+      let studentAverage = (score / (currentExam.points * subjects.length)) * 100
       studentAverages[id] = studentAverage
 
       ++studentGradeCounts[calculateGrade(studentAverage)]
@@ -436,7 +437,7 @@ const Reports = () => {
 
     // exam analysis
     let varX = 35
-    const meanPercent = ((currentExam.meanGrade / (settings.subjects[currentExam.class].length * currentExam.points)) * 100).toFixed(1)
+    const meanPercent = ((currentExam.meanGrade / (subjects.length * currentExam.points)) * 100).toFixed(1)
     const analysisCategories = [
       "Class Mean:",
       (currentExam.meanGrade != -1 ? meanPercent + "%" : "-"),
@@ -520,11 +521,7 @@ const Reports = () => {
     let lineY = 595 - 125 - ((400 - 125) / (sortedSubjects.length))
     const incrementLine = (400 - 125) / (sortedSubjects.length)
 
-    console.log(subjectCounts)
-
     sortedSubjects.forEach((subject, index) => {
-
-      console.log('subject: ', subject, " total points: ", subject[1], " ")
       const subjectPercent = ((subject[1] / (currentExam.points * currentStudents.length)) * 100).toFixed(1)
       let subjectStats = [
         subject[0].split(" ")[0],
@@ -560,6 +557,8 @@ const Reports = () => {
       })
       varY -= incrementY
     })
+
+
 
     // exam table top line
     page.drawLine({
@@ -608,10 +607,33 @@ const Reports = () => {
       color: rgb(0, 0, 0)
     })
 
+    // exam table variable subject categories
+    varX = 180 + 20
+    subjects.forEach(subject => {
+      page.drawText(subject.slice(0,3), {
+        x: varX,
+        y: 595 - 440,
+        size: 15,
+        font: boldFont,
+        color: rgb(0, 0, 0),
+      })
+      varX += (610 - 180) / subjects.length
+    })
+
+    currentStudents = currentStudents.sort((a, b) => {
+      if (studentRanks[a._id] !== studentRanks[b._id]) {
+        return studentRanks[a._id] - studentRanks[b._id];
+      }
+      if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+      if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+      return 0;
+    })
+
 
     // exam table
     varY = 595 - 485
     lineY = 595 - 500
+    let pageCount = 1;
     currentStudents.forEach((student, index) => {
       let studentStats = [
         (student.name.length > 18 ? student.name.slice(0, 15) + "..." : student.name),
@@ -619,6 +641,20 @@ const Reports = () => {
         calculateGrade(studentAverages[student._id]),
         String(studentRanks[student._id])
       ]
+
+      varX = 180 + 10 
+      subjects.forEach(subject => {
+        let percent = ((student.examLog[currentExam._id][subject] / currentExam.points) * 100).toFixed(0)
+        page.drawText(percent + "% " + calculateGrade(percent), {
+          x: varX,
+          y: varY,
+          size: 12,
+          color: rgb(0, 0, 0),
+        })
+
+        varX += (610 - 180) / subjects.length
+      })
+
 
       if (index != 2) {
         page.drawLine({
@@ -643,7 +679,8 @@ const Reports = () => {
       varY -= 40
 
       // account for page wrap
-      if (index == 2) {
+      if (index == 2 || ((index - 15) % 13 == 0)) {
+        ++pageCount
         page = pdfDoc.addPage([842, 595]);
         varY = 595 - 65;
         lineY = 595 - 40;
