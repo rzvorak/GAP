@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from 'react'
+import { React, useState, useEffect, useCallback } from 'react'
 import { Box, VStack, Heading, useBreakpointValue, Spinner, Center, Text, SimpleGrid, HStack } from '@chakra-ui/react'
 import Header from '../components/Header'
 import { useNavigate, useLocation } from 'react-router-dom'
@@ -22,16 +22,13 @@ const Student_Scores = () => {
   const { fetchHomeworks, homeworks } = useHomeworkStore();
   const { fetchExams, exams } = useExamStore();
 
-  const [currentStudent, setCurrentStudent] = useState({});
+  const [currentStudent, setCurrentStudent] = useState(null);
 
-  const [localHomeworks, setLocalHomeworks] = useState([])
-  const [isHomeworkLoading, setIsHomeworkLoading] = useState(true)
+  const [localHomeworks, setLocalHomeworks] = useState([]);
+  const [localExams, setLocalExams] = useState([]);
 
-  const [localExams, setLocalExams] = useState([])
-  const [isExamLoading, setIsExamLoading] = useState(true)
-
-  const [settings, setSettings] = useState({})
-  const [subjects, setSubjects] = useState({})
+  const [settings, setSettings] = useState({});
+  const [subjects, setSubjects] = useState([]);
 
   const [overallPercent, setOverallPercent] = useState(-1);
   const [homeworkPercent, setHomeworkPercent] = useState(-1);
@@ -39,53 +36,53 @@ const Student_Scores = () => {
   const [monthlyPercent, setMonthlyPercent] = useState(-1);
   const [terminalPercent, setTerminalPercent] = useState(-1);
 
-
-  useEffect(() => {
-    fetchStudents()
-  }, [fetchStudents]);
-
-  useEffect(() => {
-    fetchExams()
-  }, [fetchExams]);
-
-  useEffect(() => {
-    fetchHomeworks()
-  }, [fetchHomeworks]);
+  const [isLoading, setIsLoading] = useState(true)
+  const [isExamLoading, setIsExamLoading] = useState(true)
+  const [isHomeworkLoading, setIsHomeworkLoading] = useState(true)
+ 
 
   useEffect(() => {
     const fetchSettings = async () => {
-      const res = await fetch('/api/settings')
-      const data = await res.json()
-      setSettings(data.data)
-      setSubjects(data.data.subjects)
-    }
-    fetchSettings();
-  }, [])
+      const res = await fetch("/api/settings");
+      const data = await res.json();
+      setSettings(data.data);
+      setSubjects(data.data.subjects);
+    };
+
+    fetchStudents()
+    .then(() => fetchHomeworks()
+    .then(() => fetchExams()
+    .then(() => fetchSettings()
+    .then(() => setIsLoading(false)))))
+  }, []);
 
   useEffect(() => {
-    if (!studentId || students.length === 0 || Object.keys(settings).length === 0) return;
+    if (isLoading || Object.keys(settings).length === 0) return;
 
-    const student = students.find(student => student._id === studentId);
+    const student = students.find((student) => student._id === studentId);
+    setCurrentStudent(student || null);
+  }, [students, settings]);
 
-    setCurrentStudent(student);
-  }, [students]);
-
+  // Set local exams for student
   useEffect(() => {
-    if (!currentStudent || !currentStudent.examLog) return;
-    setLocalExams(exams.filter((exam) => { return Object.keys(currentStudent.examLog).includes(exam._id) }));
+    if (isLoading || !currentStudent || !currentStudent.examLog || exams.length === 0) return;
+
+    setLocalExams(exams.filter((exam) => currentStudent.examLog.hasOwnProperty(exam._id)))
     setIsExamLoading(false)
-  }, [exams]);
+  }, [currentStudent, exams]);
 
+  // Set local homeworks for student
   useEffect(() => {
-    if (!currentStudent || !currentStudent.homeworkLog) return;
-    setLocalHomeworks(homeworks.filter((homework) => { return Object.keys(currentStudent.homeworkLog).includes(homework._id) }));
+    if (isLoading || !currentStudent || !currentStudent.homeworkLog || homeworks.length === 0) return;
+
+    setLocalHomeworks(homeworks.filter((homework) => currentStudent.homeworkLog.hasOwnProperty(homework._id)))
     setIsHomeworkLoading(false)
-  }, [homeworks]);
+  }, [currentStudent, homeworks]);
 
   const typeToPercent = { "homework": homeworkPercent, "monthly": monthlyPercent, "midterm": midtermPercent, "terminal": terminalPercent }
 
   useEffect(() => {
-    if (isHomeworkLoading || isExamLoading || !settings.subjects) return;
+    if (isHomeworkLoading || isExamLoading || !settings.subjects || !settings.distribution) return;
 
     setHomeworkPercent(localHomeworks.length !== 0 ? (localHomeworks.reduce((sum, homework) => sum += currentStudent.homeworkLog[homework._id], 0) / localHomeworks.reduce((sum, homework) => sum += homework.points, 0) * 100) : -2)
 
@@ -97,17 +94,20 @@ const Student_Scores = () => {
     setMidtermPercent(midtermExams.length !== 0 ? ((midtermExams.reduce((sum, exam) => sum += Object.values(currentStudent.examLog[exam._id]).reduce((sum, score) => sum + score, 0), 0) / midtermExams.reduce((sum, exam) => sum += exam.points * subjects[currentStudent.class].length, 0)) * 100) : -2)
     setTerminalPercent(terminalExams.length !== 0 ? ((terminalExams.reduce((sum, exam) => sum += Object.values(currentStudent.examLog[exam._id]).reduce((sum, score) => sum + score, 0), 0) / terminalExams.reduce((sum, exam) => sum += exam.points * subjects[currentStudent.class].length, 0)) * 100) : -2)
 
+  }, [isHomeworkLoading, isExamLoading])
+
+  useEffect(() => {
+    if (homeworkPercent == -1 || monthlyPercent == -1 || midtermPercent == -1 || terminalPercent == -1) return;
+
     // get new total weight based on types that have existing scores to consider
     let totalWeight = Object.keys(settings.distribution).reduce((sum, type) => sum += typeToPercent[type] !== -2 ? settings.distribution[type] : 0, 0)
-
 
     if (totalWeight === 0) {
       setOverallPercent(-2)
     } else {
       setOverallPercent(Object.keys(settings.distribution).reduce((sum, type) => sum += typeToPercent[type] !== -2 ? (settings.distribution[type] / totalWeight) * typeToPercent[type] : 0, 0))
     }
-
-  })
+  }, [homeworkPercent, monthlyPercent, midtermPercent, terminalPercent])
 
   const examGridColumns = useBreakpointValue({ "xxs": 2, sm: 3, md: 4, lg: 6, xl: 7 })
 
@@ -201,7 +201,7 @@ const Student_Scores = () => {
           >Homework</Heading>
         </Box>
 
-        {(!isHomeworkLoading) ? (localHomeworks.length !== 0 ? (
+        {(!isLoading) ? (localHomeworks.length !== 0 ? (
           <AccordionRoot
             w="80%"
 
@@ -308,7 +308,7 @@ const Student_Scores = () => {
           >Exams</Heading>
         </Box>
 
-        {(!isExamLoading) ? (localExams.length !== 0 ? (
+        {(!isLoading) ? (localExams.length !== 0 ? (
           <AccordionRoot
             w="80%"
             variant={"plain"}
