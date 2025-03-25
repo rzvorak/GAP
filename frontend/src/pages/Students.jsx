@@ -108,13 +108,13 @@ const Students = () => {
     }
 
     const handleDelete = async (studentId) => {
-        const {success} = await deleteStudent(studentId)
+        const { success } = await deleteStudent(studentId)
 
         const userToDelete = users.find(user => user.role === "student" && user.identity === studentId)
 
         if (userToDelete) {
             await deleteUser(userToDelete._id)
-        } 
+        }
 
         toaster.create({
             title: success ? "Student deleted successfully" : "Error deleting student",
@@ -169,6 +169,11 @@ const Students = () => {
                     display="flex"
                     alignItems="center"
                 >
+                    <Box ml="1rem" mt="0.25rem"
+                        cursor={"pointer"}
+                        onClick={handleBack}>
+                        <FaArrowLeft size="1.5rem" className='FaArrowLeft' />
+                    </Box>
                     <Heading
                         marginLeft="1rem"
                         color="gray.600"

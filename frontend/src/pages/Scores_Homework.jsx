@@ -11,7 +11,6 @@ import Dialog_Homework from '../components/Dialog_Homework'
 
 import { useHomeworkStore } from '../store/homework.js'
 
-
 import { Toaster, toaster } from "../components/ui/toaster"
 
 import { AccordionItem, AccordionItemContent, AccordionItemTrigger, AccordionRoot } from '../components/ui/accordion'
@@ -110,6 +109,11 @@ const Scores_Homework = () => {
                     alignItems="center"
                     marginBottom="1rem"
                 >
+                    <Box ml="1rem" mt="0.25rem"
+                        cursor={"pointer"}
+                        onClick={handleBack}>
+                        <FaArrowLeft size="1.5rem" className='FaArrowLeft' />
+                    </Box>
                     <Heading
                         marginLeft="1rem"
                         color="gray.600"

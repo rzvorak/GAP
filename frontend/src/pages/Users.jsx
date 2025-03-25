@@ -106,7 +106,7 @@ const Users = () => {
       newUsername += (max + 1)
     }
 
-    const { success, message } = await createUser({
+    const { success } = await createUser({
       username: newUsername,
       password: password,
       role: "student",
@@ -141,7 +141,7 @@ const Users = () => {
       newUsername += (max + 1)
     }
 
-    const { success, message } = await createUser({
+    const { success } = await createUser({
       username: newUsername,
       password: password,
       role: "teacher",
@@ -201,6 +201,11 @@ const Users = () => {
           h="4rem"
           display="flex"
           alignItems={"center"}>
+          <Box ml="1rem" mt="0.25rem"
+            cursor={"pointer"}
+            onClick={handleBack}>
+            <FaArrowLeft size="1.5rem" className='FaArrowLeft' />
+          </Box>
           <Heading
             marginLeft="1rem"
             color="gray.600"

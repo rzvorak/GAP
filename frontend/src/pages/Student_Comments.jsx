@@ -12,6 +12,9 @@ import Dialog_Delete from '../components/Dialog_Delete';
 
 import { useStudentStore } from '../store/student.js';
 
+import { Toaster, toaster } from "../components/ui/toaster"
+
+
 
 const Student_Comments = () => {
 
@@ -64,7 +67,12 @@ const Student_Comments = () => {
             ...currentStudent,
             comments: updatedComments
         })
-        console.log(success)
+
+        toaster.create({
+            title: success ? "Comment posted successfully" : "Error posting comment",
+            type: success ? "success" : "error",
+            duration: "2000"
+        })
     }
 
     const [dialogDelete, setDialogDelete] = useState(false)
@@ -76,7 +84,11 @@ const Student_Comments = () => {
 
     // to conform with Dialog_Delete
     const handleDeleteBack = () => {
-        console.log("Comment successfully deleted")
+        toaster.create({
+            title: "Comment deleted successfully",
+            type: "success",
+            duration: "2000"
+        })
     }
 
     const deleteComment = async (id) => {
@@ -103,6 +115,7 @@ const Student_Comments = () => {
             {dialog && <Dialog_Comments handleSubmitComment={handleSubmitComment} setDialog={setDialog}></Dialog_Comments>}
             {dialogDelete && <Dialog_Delete handleBack={handleDeleteBack} delete={deleteComment} id={deleteCommentId} setDialog={setDialogDelete}></Dialog_Delete>}
 
+            <Toaster />
 
             <Header></Header>
 
@@ -121,6 +134,11 @@ const Student_Comments = () => {
                     alignItems="center"
                     marginBottom="1rem"
                 >
+                    <Box ml="1rem" mt="0.25rem"
+                        cursor={"pointer"}
+                        onClick={handleBack}>
+                        <FaArrowLeft size="1.5rem" className='FaArrowLeft' />
+                    </Box>
                     <Heading
                         marginLeft="1rem"
                         color="gray.600"
@@ -140,50 +158,50 @@ const Student_Comments = () => {
                             <Box bg="gray.200" h="4rem" w="80%" display="flex" justifyContent="center" alignItems="center">No Comments Yet</Box>
                         ) :
 
-                        Object.keys(localComments).map((id, index) => (
-                            <VStack
-                                p="0.5rem"
-                                w="80%"
-                                borderRadius="0.5rem"
-                                display="flex"
-                                flexDir="column"
-                                bg="gray.100"
-                                key={index}
-                                style={{ boxShadow: 'var(--box-shadow-classic)' }}
-                                mb="0.75rem">
-
-                                <Box
-                                    display="flex"
-                                    w="100%"
+                            Object.keys(localComments).map((id, index) => (
+                                <VStack
                                     p="0.5rem"
-                                    flex="1"
-                                    flexDirection={"column"}
-                                    flexWrap="wrap"
-                                    alignItems={"flex-start"}
-                                    overflow="hidden"
-                                    fontStyle="italic"
-                                >"{localComments[id][2]}"</Box>
-                                <Box
+                                    w="80%"
+                                    borderRadius="0.5rem"
                                     display="flex"
-                                    flexDir="row"
-                                    pr="1rem"
-                                    mb="0.25rem"
-                                    w="100%"
-                                    justifyContent="space-between"
-                                >
-                                    {role !== "student" ? (
-                                        <Box onClick={() => handleDeleteButton(id)}>
-                                            <IoClose size="2rem" className="IoClose" />
-                                        </Box>
-                                    ) : (<Box></Box>)}
+                                    flexDir="column"
+                                    bg="gray.100"
+                                    key={index}
+                                    style={{ boxShadow: 'var(--box-shadow-classic)' }}
+                                    mb="0.75rem">
+
+                                    <Box
+                                        display="flex"
+                                        w="100%"
+                                        p="0.5rem"
+                                        flex="1"
+                                        flexDirection={"column"}
+                                        flexWrap="wrap"
+                                        alignItems={"flex-start"}
+                                        overflow="hidden"
+                                        fontStyle="italic"
+                                    >"{localComments[id][2]}"</Box>
+                                    <Box
+                                        display="flex"
+                                        flexDir="row"
+                                        pr="1rem"
+                                        mb="0.25rem"
+                                        w="100%"
+                                        justifyContent="space-between"
+                                    >
+                                        {role !== "student" ? (
+                                            <Box onClick={() => handleDeleteButton(id)}>
+                                                <IoClose size="2rem" className="IoClose" />
+                                            </Box>
+                                        ) : (<Box></Box>)}
 
 
-                                    <Text maxW={{ "xxs": "8rem", "xs": "12rem", sm: "19rem", md: "30rem" }}>
-                                        -{localComments[id][0]}, {localComments[id][1]}
-                                    </Text>
-                                </Box>
-                            </VStack>
-                        ))
+                                        <Text maxW={{ "xxs": "8rem", "xs": "12rem", sm: "19rem", md: "30rem" }}>
+                                            -{localComments[id][0]}, {localComments[id][1]}
+                                        </Text>
+                                    </Box>
+                                </VStack>
+                            ))
 
                     ) :
                         <Box marginBottom="2rem">

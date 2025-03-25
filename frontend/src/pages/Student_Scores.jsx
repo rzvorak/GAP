@@ -39,7 +39,7 @@ const Student_Scores = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [isExamLoading, setIsExamLoading] = useState(true)
   const [isHomeworkLoading, setIsHomeworkLoading] = useState(true)
- 
+
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -50,10 +50,10 @@ const Student_Scores = () => {
     };
 
     fetchStudents()
-    .then(() => fetchHomeworks()
-    .then(() => fetchExams()
-    .then(() => fetchSettings()
-    .then(() => setIsLoading(false)))))
+      .then(() => fetchHomeworks()
+        .then(() => fetchExams()
+          .then(() => fetchSettings()
+            .then(() => setIsLoading(false)))))
   }, []);
 
   useEffect(() => {
@@ -148,6 +148,11 @@ const Student_Scores = () => {
           h="4rem"
           display="flex"
           alignItems={"center"}>
+          <Box ml="1rem" mt="0.25rem"
+            cursor={"pointer"}
+            onClick={handleBack}>
+            <FaArrowLeft size="1.5rem" className='FaArrowLeft' />
+          </Box>
           <Heading
             marginLeft="1rem"
             color="gray.600"

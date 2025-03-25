@@ -62,8 +62,7 @@ const Homework = () => {
 
     // wait for students, homework, and settings then execute
     useEffect(() => {
-        // TODO: see how this interacts when all students and homeworks are cleared from database
-        if (!homeworkId || !settings.cutoffs || homeworks.length === 0 || students.length === 0) return;
+        if (!homeworkId || !settings.cutoffs) return;
 
         console.log("Processing students and homeworks...");
 
@@ -156,7 +155,7 @@ const Homework = () => {
 
         setStudentRanks(newRanks);
 
-        const {success} = await updateHomework(homeworkId, {
+        const { success } = await updateHomework(homeworkId, {
             ...currentHomework,
             meanGrade: sum / sortedScores.length
         })
@@ -218,7 +217,7 @@ const Homework = () => {
             bg={"gray.100"}
             color="gray.900"
         >
-            <Toaster /> 
+            <Toaster />
 
             <Header></Header>
 
@@ -230,12 +229,12 @@ const Homework = () => {
                 paddingBottom="1rem"
                 minHeight="4rem"
                 display={disappearOnMin}
-                flexDirection={"column"}
+                //flexDirection={"column"}
                 flexWrap="wrap"
                 alignItems={"flex-start"}
                 overflow="visible">
-                <Heading
-                    marginLeft="1rem"
+
+                <HStack
                     marginRight="1rem"
                     color="gray.600"
                     fontSize="2xl"
@@ -243,7 +242,14 @@ const Homework = () => {
                     whiteSpace={"normal"}
                     wordBreak="break-word"
 
-                >{currentHomework.name}</Heading>
+                >
+                    <Box ml="1rem" mr="0.5rem" mt="0.25rem"
+                        cursor={"pointer"}
+                        onClick={handleBack}>
+                        <FaArrowLeft size="1.5rem" className='FaArrowLeft' />
+                    </Box>
+                    <Text>{currentHomework.name}</Text>
+                </HStack>
             </Box>
 
 

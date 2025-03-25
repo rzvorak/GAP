@@ -11,6 +11,7 @@ import { IoWarningOutline } from "react-icons/io5";
 import { useStudentStore } from '../store/student.js';
 import { useHomeworkStore } from '../store/homework.js';
 import { useExamStore } from '../store/exam.js'
+import { useUserStore } from '../store/user';
 
 import Dialog_Delete from '../components/Dialog_Delete';
 import Dialog_Subjects from '../components/Dialog_Subjects';
@@ -27,6 +28,7 @@ const Settings = () => {
   const { fetchStudents, deleteStudent, students } = useStudentStore();
   const { fetchHomeworks, deleteHomework, homeworks } = useHomeworkStore();
   const { fetchExams, deleteExam, exams } = useExamStore();
+  const { fetchUsers, deleteUser, users } = useUserStore();
 
   const [settings, setSettings] = useState({})
   const [localDistribution, setLocalDistribution] = useState({})
@@ -50,11 +52,10 @@ const Settings = () => {
     fetchStudents()
     fetchHomeworks()
     fetchExams()
+    fetchUsers()
+
   }, [])
 
-  useEffect(() => {
-
-  })
 
   const handleSaveButton = async () => {
 
@@ -86,7 +87,7 @@ const Settings = () => {
     });
     const data = await res.json();
     toaster.create({
-      title: data.success ? "Settings saved" : "Error saving settings",
+      title: data.success ? "Settings saved successfully" : "Error saving settings",
       type: data.success ? "success" : "error",
       duration: "2000"
     })
@@ -152,7 +153,7 @@ const Settings = () => {
   }
 
   const handleDeleteBack = () => {
-    console.log("Successfully deleted")
+    
   }
 
   const [dialog, setDialog] = useState(false);
@@ -214,22 +215,46 @@ const Settings = () => {
   }
 
   const deleteAllExams = async (ignore) => {
+    let count = exams.length;
     exams.forEach(exam => {
       deleteExam(exam._id)
+      --count;
+    })
+
+    toaster.create({
+      title: (count > 0 ? "Deleting all exams..." : "Exams deleted successfully"),
+      type: (count > 0 ? "loading" : "success"),
+      duration: "2000"
     })
 
   }
 
   const deleteAllHomework = async (ignore) => {
+    let count = homeworks.length;
     homeworks.forEach(homework => {
       deleteHomework(homework._id)
+      --count;
     })
 
+    toaster.create({
+      title: (count > 0 ? "Deleting all homework..." : "Homework deleted successfully"),
+      type: (count > 0 ? "loading" : "success"),
+      duration: "2000"
+    })
   }
 
   const deleteAllStudents = async (ignore) => {
+    let count = students.length;
     students.forEach(student => {
       deleteStudent(student._id)
+      deleteUser(users.find(user => user.identity === student._id))
+      --count;
+    })
+
+    toaster.create({
+      title: (count > 0 ? "Deleting all students..." : "Students deleted successfully"),
+      type: (count > 0 ? "loading" : "success"),
+      duration: "2000"
     })
   }
 
@@ -282,6 +307,11 @@ const Settings = () => {
             h="4rem"
             display="flex"
             alignItems={"center"}>
+            <Box ml="1rem" mt="0.25rem"
+              cursor={"pointer"}
+              onClick={handleBack}>
+              <FaArrowLeft size="1.5rem" className='FaArrowLeft' />
+            </Box>
             <Heading
               marginLeft="1rem"
               color="gray.600"
@@ -521,11 +551,6 @@ const Settings = () => {
             ))}
           </SimpleGrid>
 
-
-
-
-
-
           <Box
             w="80%"
             h={{ sm: "3rem" }}
@@ -537,9 +562,6 @@ const Settings = () => {
               fontWeight={"400"}
             >Student Information:</Heading>
           </Box>
-
-
-
 
           <AccordionRoot
             w="80%"

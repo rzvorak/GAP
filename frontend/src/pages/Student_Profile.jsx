@@ -12,6 +12,9 @@ import { AccordionItem, AccordionItemContent, AccordionItemTrigger, AccordionRoo
 
 import { useStudentStore } from '../store/student.js';
 
+import { Toaster, toaster } from "../components/ui/toaster"
+
+
 
 const Student_Profile = () => {
 
@@ -55,7 +58,11 @@ const Student_Profile = () => {
             ...currentStudent,
             profile: updatedProfile
         })
-        console.log(success)
+        toaster.create({
+            title: success ? "Information saved successfully" : "Error saving information",
+            type: success ? "success" : "error",
+            duration: "2000"
+        })
     }
 
     // TODO: potentially make global, ensure can't have duplicate
@@ -65,7 +72,7 @@ const Student_Profile = () => {
         "Pupil's Medical Information": ["Doctor's Full Name", "Hospital", "Hospital Location", "Mobile", "Health Concerns", "Regular Medication (if any)"],
         "Emergency Contact and Safety": ["Emergency Contact Name", "Emergency Contact Relation", "Emergency Contact Mobile", "Allowed to pick up child", "Not allowed to pick up child"],
         "Confirmation": ["Pupil is registed in", "Headmaster Full Name", "Signature", "Date"]
-    } 
+    }
 
     return (
         <Box
@@ -77,10 +84,10 @@ const Student_Profile = () => {
             flexDir="column"
         >
 
+            <Toaster />
+            
             {dialog && <Dialog_Profile categories={categories} editCategory={editCategory} currentProfile={currentStudent.profile} handleSubmit={handleSubmit} setDialog={setDialog}></Dialog_Profile>}
-
             {!dialog && <Header></Header>}
-
             {!dialog && currentStudent.profile && currentStudent.name ? (
 
                 <VStack
@@ -98,6 +105,11 @@ const Student_Profile = () => {
                         alignItems="center"
                         marginBottom="1rem"
                     >
+                        <Box ml="1rem" mt="0.25rem"
+                            cursor={"pointer"}
+                            onClick={handleBack}>
+                            <FaArrowLeft size="1.5rem" className='FaArrowLeft' />
+                        </Box>
                         <Heading
                             marginLeft="1rem"
                             color="gray.600"
@@ -193,12 +205,12 @@ const Student_Profile = () => {
                     </Box>
 
                 </VStack>) : (
-                
+
                 !dialog &&
                 <Box w="100%" display="flex" justifyContent="center" pt="17rem">
                     <Spinner marginTop="2rem" color="green.500" borderWidth="4px" cosize="xl" />
                 </Box>
-                    
+
             )}
         </Box >
     )
