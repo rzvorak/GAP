@@ -19,7 +19,7 @@ function _optionalChain(ops) {
   }
   return value
 }
-;('use client')
+; ('use client')
 
 import {
   Toaster as ChakraToaster,
@@ -40,13 +40,19 @@ export const Toaster = () => {
     <Portal>
       <ChakraToaster toaster={toaster} insetInline={{ mdDown: '4' }}>
         {(toast) => (
-          <Toast.Root bg={toast.type === "success" ? "green.500" : "red.600"} width={{"xxs": "100%", sm: "sm"}} style={{ boxShadow: "none" }}>
+          <Toast.Root
+            bg={toast.type === "success" ? "green.500" : "red.600"}
+            height={toast.description ? "5rem" : "4rem"}
+            width={{ "xxs": "100%", sm: "sm" }}
+            style={{ boxShadow: "none" }}
+            paddingTop={toast.description ? "1rem" : "1.4rem"}
+          >
             {toast.type === 'loading' ? (
               <Spinner size='sm' color='blue.solid' />
             ) : (
               <Toast.Indicator />
             )}
-            <Stack  gap='1' flex='1' maxWidth='100%'>
+            <Stack gap='1' flex='1' maxWidth='100%'>
               {toast.title && <Toast.Title color={toast.type === "success" ? "gray.100" : "gray.100"}>{toast.title}</Toast.Title>}
               {toast.description && (
                 <Toast.Description>{toast.description}</Toast.Description>

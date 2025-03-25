@@ -12,7 +12,7 @@ import Dialog_Delete from '../components/Dialog_Delete.jsx'
 
 import { Toaster, toaster } from "../components/ui/toaster"
 
-
+// TODO: save toast still needed
 const Exam = () => {
 
     const disappearOnMin = useBreakpointValue({ "min": "none", "xxs": "flex" })
@@ -45,8 +45,6 @@ const Exam = () => {
     const [search, setSearch] = useState("")
     const [triggerLoad, setTriggerLoad] = useState(false)
     const [triggerSave, setTriggerSave] = useState(false)
-    // maybe use to make "-" on entry possible for grades
-    const [pressedSave, setPressedSave] = useState(false)
 
     // launch once on load, get students, exams, and settings
     useEffect(() => {
@@ -67,7 +65,7 @@ const Exam = () => {
 
     // wait for students, exams, and settings then execute
     useEffect(() => {
-        if (!examId || !settings.cutoffs || !settings.subjects ||  exams.length === 0 || students.length === 0) return;
+        if (!examId || !settings.cutoffs || !settings.subjects || exams.length === 0 || students.length === 0) return;
 
         console.log("Processing students and exams...");
 
@@ -216,6 +214,16 @@ const Exam = () => {
         deleteExam(examId);
     };
 
+    const calculateGrade = (percent) => {
+        if (percent < 0) return "-"
+        let grade = "F";
+        if (percent >= settings.cutoffs.A) grade = "A";
+        else if (percent >= settings.cutoffs.B) grade = "B";
+        else if (percent >= settings.cutoffs.C) grade = "C";
+        else if (percent >= settings.cutoffs.D) grade = "D";
+        return grade;
+      }
+
     const deleteButtonBreakpoint = useBreakpointValue({ "xxs": "", sm: "Exam" });
 
 
@@ -362,26 +370,35 @@ const Exam = () => {
                                                     truncate
                                                 >{student.name}</Text>
                                                 <Text
+                                                    textAlign="center"
                                                     flex="1"
                                                     maxW={{ "xxs": "3.5rem", "xs": "5.5rem", sm: "6rem", md: "14rem" }}
                                                     truncate
                                                 >{((studentOverallScores[student._id]) / (subjects[currentExam.class].length * currentExam.points) * 100).toFixed(2)}%</Text>
                                                 <Text
+                                                    textAlign="center"
                                                     flex="1"
+                                                    maxW={{ "xxs": "1.5rem", "xs": "2rem", sm: "3rem", md: "6rem" }}
+                                                    truncate
+                                                >{calculateGrade((studentOverallScores[student._id]) / (subjects[currentExam.class].length * currentExam.points) * 100)}</Text>
+                                                <Text
+                                                    textAlign="center"
+                                                    flex="1"
+                                                    mr="0.5rem"
                                                     maxW={{ "xxs": "3.5rem", "xs": "5.5rem", sm: "6rem", md: "14rem" }}
                                                     truncate
                                                 >Rank: {studentRanks[student._id] || "-"}</Text>
                                             </Box>
 
-                                            <SimpleGrid 
-                                            columns={3} 
-                                            pb="1rem"
+                                            <SimpleGrid
+                                                columns={3}
+                                                pb="1rem"
                                             >
 
                                                 {subjects[currentExam.class].map((subject, index) => (
                                                     <VStack key={index} ml="0.5rem" mr="0.5rem" mb="0.5rem">
-                                                        <Text pt="0.5rem" truncate maxW={{"xxs": "3rem", "xs": "6rem", sm: "8rem", }} >{subject}</Text>
-                                                        <NumberInputRoot                                                            
+                                                        <Text pt="0.5rem" truncate maxW={{ "xxs": "3rem", "xs": "6rem", sm: "8rem", }} >{subject}</Text>
+                                                        <NumberInputRoot
                                                             minW="4rem"
                                                             w={{ "xxs": "70%", "xs": "75%", sm: "90%", md: "100%" }}
                                                             h="50%"

@@ -44,6 +44,8 @@ const Homework = () => {
     const [triggerLoad, setTriggerLoad] = useState(false)
     const [triggerSave, setTriggerSave] = useState(false)
 
+    const [isStatsLoading, setIsStatsLoading] = useState(true)
+
     // launch once on load, get students, homeworks, and settings
     useEffect(() => {
         async function fetchAll() {
@@ -109,6 +111,7 @@ const Homework = () => {
     }, [triggerSave]);
 
     const handleSaveButton = async (fromButton) => {
+        setIsStatsLoading(true)
         const updatedGrades = {};
         const updatedStudents = allStudents.map(student => {
             const newScore = studentScores[student._id];
@@ -161,6 +164,8 @@ const Homework = () => {
         })
 
         setCurrentMeanGrade(sortedScores.length != 0 ? sum / sortedScores.length : -1);
+
+        setIsStatsLoading(false)
 
         if (fromButton) {
             toaster.create({
@@ -259,21 +264,35 @@ const Homework = () => {
                     w="80%"
                     maxW="40rem"
                 >
-                    <Box
-                        borderRadius="1.2rem"
-                        paddingLeft="1rem"
-                        display="flex"
-                        flexDir="column"
-                        bg="gray.200">
-                        <Text lineClamp="1" marginRight="1rem" marginTop="1rem">Points: {currentHomework.points}</Text>
-                        <Text lineClamp="1" marginRight="1rem" marginTop="1rem">Subject: {currentHomework.subject}</Text>
-                        <Text lineClamp="1" marginRight="1rem" marginTop="1rem">Class Mean Grade: {currentMeanGrade == -1 ? "Not yet scored" : (((currentMeanGrade / currentHomework.points) * 100).toFixed(1) + "%   ,  " + currentMeanGrade.toFixed(2) + " / " + currentHomework.points.toFixed(2))} </Text>
-                        <Text lineClamp="1" marginRight="1rem" marginY="1rem">Date Created: {String(currentHomework.createdAt).slice(0, 10)} </Text>
-                    </Box>
+                    {isStatsLoading ? (
+                        <Box
+                            borderRadius="1.2rem"
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                            flexDir="column"
+                            bg="gray.200"
+                            h="11rem">
+                            <Spinner mr="1rem" color="gray.300" borderWidth="4px" cosize="xl" />
+                        </Box>
+                    ) : (
+                        <Box
+                            borderRadius="1.2rem"
+                            paddingLeft="1rem"
+                            display="flex"
+                            flexDir="column"
+                            bg="gray.200"
+                            h="11rem">
+                            <Text lineClamp="1" marginRight="1rem" marginTop="1rem">Points: {currentHomework.points}</Text>
+                            <Text lineClamp="1" marginRight="1rem" marginTop="1rem">Subject: {currentHomework.subject}</Text>
+                            <Text lineClamp="1" marginRight="1rem" marginTop="1rem">Class Mean Grade: {currentMeanGrade == -1 ? "Not yet scored" : (((currentMeanGrade / currentHomework.points) * 100).toFixed(1) + "%   ,  " + currentMeanGrade.toFixed(2) + " / " + currentHomework.points.toFixed(2))} </Text>
+                            <Text lineClamp="1" marginRight="1rem" marginY="1rem">Date Created: {String(currentHomework.createdAt).slice(0, 10)} </Text>
+                        </Box>
+                    )}
+
                 </Box>
 
                 <Box w="80%"
-                    //bg="green.100"
                     maxW="40rem"
                     paddingBottom="1rem"
                 >

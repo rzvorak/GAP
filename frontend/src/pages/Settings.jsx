@@ -551,17 +551,6 @@ const Settings = () => {
             ))}
           </SimpleGrid>
 
-          <Box
-            w="80%"
-            h={{ sm: "3rem" }}
-            display="flex"
-            alignItems={"center"}>
-            <Heading
-              color="gray.600"
-              fontSize="xl"
-              fontWeight={"400"}
-            >Student Information:</Heading>
-          </Box>
 
           <AccordionRoot
             w="80%"
@@ -569,6 +558,8 @@ const Settings = () => {
             collapsible
             multiple
             borderRadius="0"
+            mt="1rem"
+            
           >
             <AccordionItem
               borderRadius="0"
@@ -585,22 +576,14 @@ const Settings = () => {
               >
 
                 <Box w="100%" display="flex" justifyContent="center">
-                  <Box mt="0.25rem" mr="0.5rem">
-                    <IoWarningOutline size="1rem" color="orange" />
+                <Box mt="0.2rem" mr="0.5rem">
+                    <IoWarningOutline size="1.2rem" color="black" />
                   </Box>
-
                   System Reset
-
-                  <Box mt="0.25rem" ml="0.5rem">
-                    <IoWarningOutline size="1rem" color="orange" />
-                  </Box>
                 </Box>
-
 
               </AccordionItemTrigger>
               <AccordionItemContent
-
-                //bg="gray.200"
                 p="1rem"
               >
                 <VStack w="100%">
