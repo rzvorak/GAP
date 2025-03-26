@@ -204,9 +204,9 @@ const Reports = () => {
     const meanPercent = ((currentHomework.meanGrade / currentHomework.points) * 100).toFixed(1)
     const analysisCategories = [
       "Class Mean:",
-      (currentHomework.meanGrade != -1 ? currentHomework.meanGrade.toFixed(1) + "/" + currentHomework.points : "-"),
-      (currentHomework.meanGrade != -1 ? meanPercent + "%" : "-"),
-      calculateGrade(meanPercent)
+      (currentHomework.meanGrade != -1 && currentHomework.meanGrade !== null ? currentHomework.meanGrade.toFixed(1) + "/" + currentHomework.points : "-"),
+      (currentHomework.meanGrade != -1 && currentHomework.meanGrade !== null ? meanPercent + "%" : "-"),
+      (currentHomework.meanGrade !== null ? calculateGrade(meanPercent) : "-")
     ];
     analysisCategories.forEach(category => {
       page.drawText(category, {
@@ -303,7 +303,6 @@ const Reports = () => {
     saveAs(blob, `${"Class" + currentHomework.class + "_" + currentHomework.name + "_" + currentHomework.createdAt.slice(0,4)}.pdf`);  // Triggers the file download
 
   }
-
 
   // TODO: cutoff subjects at certain length, ensure subjects fit in exam table
   const createExamPDF = async (id) => {
