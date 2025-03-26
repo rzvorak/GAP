@@ -76,6 +76,14 @@ const Reports = () => {
       color: rgb(0, 0, 0),
     });
 
+    // corner
+    page.drawText("Green Apple Pre & Primary School " + currentHomework.createdAt.slice(0, 4), {
+      x: 595 - 200,
+      y: 842 - 20,
+      size: 10,
+      color: rgb(0, 0, 0),
+    });
+
     // homework metadata
     const homeworkCategories = ["Class:", "Subject:", "Points:", "Date Scored:", "Date Created:"]
     let varY = 842 - 100
@@ -276,6 +284,13 @@ const Reports = () => {
       // account for page wrap
       if ((index - 12) % 19 == 0) {
         page = pdfDoc.addPage([595, 842]);
+        // corner
+        page.drawText("Green Apple Pre & Primary School " + currentHomework.createdAt.slice(0, 4), {
+          x: 595 - 200,
+          y: 842 - 20,
+          size: 10,
+          color: rgb(0, 0, 0),
+        });
         varY = 842 - 65;
         lineY = 842 - 40;
       }
@@ -285,7 +300,7 @@ const Reports = () => {
     const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes], { type: 'application/pdf' });
 
-    saveAs(blob, `${currentHomework.name}.pdf`);  // Triggers the file download
+    saveAs(blob, `${"Class" + currentHomework.class + "_" + currentHomework.name + "_" + currentHomework.createdAt.slice(0,4)}.pdf`);  // Triggers the file download
 
   }
 
@@ -305,10 +320,18 @@ const Reports = () => {
 
 
     // title
-    page.drawText(currentExam.type.charAt(0).toUpperCase() + currentExam.type.slice(1) + " Exam - " + currentExam.month, {
+    page.drawText(currentExam.type.charAt(0).toUpperCase() + currentExam.type.slice(1) + " Exam - " + currentExam.month + " " + currentExam.createdAt.slice(0, 4), {
       x: 25,
       y: 595 - 60,
       size: 30,
+      color: rgb(0, 0, 0),
+    });
+
+    // corner
+    page.drawText("Green Apple Pre & Primary School: " + currentExam.type.charAt(0).toUpperCase() + currentExam.type.slice(1) + " Exam - " + currentExam.month + " " + currentExam.createdAt.slice(0, 4), {
+      x: 842 - 300,
+      y: 595 - 20,
+      size: 10,
       color: rgb(0, 0, 0),
     });
 
@@ -441,7 +464,7 @@ const Reports = () => {
     const meanPercent = ((currentExam.meanGrade / (subjects.length * currentExam.points)) * 100).toFixed(1)
     const analysisCategories = [
       "Class Mean:",
-      (currentExam.meanGrade == -1 || currentExam.meanGrade === null ? "-" :  meanPercent + "%" ),
+      (currentExam.meanGrade == -1 || currentExam.meanGrade === null ? "-" : meanPercent + "%"),
       (currentExam.meanGrade == -1 || currentExam.meanGrade === null ? "-" : calculateGrade(meanPercent))
     ];
     analysisCategories.forEach(category => {
@@ -601,7 +624,7 @@ const Reports = () => {
     // exam table variable subject categories
     varX = 180 + 20
     subjects.forEach(subject => {
-      page.drawText(subject.slice(0,3), {
+      page.drawText(subject.slice(0, 3), {
         x: varX,
         y: 595 - 440,
         size: 15,
@@ -633,7 +656,7 @@ const Reports = () => {
         String(studentRanks[student._id])
       ]
 
-      varX = 180 + 10 
+      varX = 180 + 10
       subjects.forEach(subject => {
         let percent = ((student.examLog[currentExam._id][subject] / currentExam.points) * 100).toFixed(0)
         page.drawText(percent + "% " + calculateGrade(percent), {
@@ -691,21 +714,20 @@ const Reports = () => {
           thickness: 2,
           color: rgb(0, 0, 0)
         })
+
+        page.drawText("Green Apple Pre & Primary School: " + currentExam.type.charAt(0).toUpperCase() + currentExam.type.slice(1) + " Exam - " + currentExam.month + " " + currentExam.createdAt.slice(0, 4), {
+          x: 842 - 300,
+          y: 595 - 20,
+          size: 10,
+          color: rgb(0, 0, 0),
+        });
       }
     })
-
-
-
-
-
-
-
-
 
     const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes], { type: 'application/pdf' });
 
-    saveAs(blob, `${currentExam.type.charAt(0).toUpperCase() + currentExam.type.slice(1) + " " + currentExam.month}.pdf`);  // Triggers the file download
+    saveAs(blob, `${"Class" + currentExam.class + "_" + currentExam.type.charAt(0).toUpperCase() + currentExam.type.slice(1) + "_" + currentExam.month + "_" + currentExam.createdAt.slice(0, 4)}.pdf`);  // Triggers the file download
   }
 
 
