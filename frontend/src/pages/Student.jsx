@@ -14,6 +14,9 @@ import { useStudentStore } from '../store/student.js';
 import { useHomeworkStore } from '../store/homework.js';
 import { useExamStore } from '../store/exam.js'
 
+import Dialog_Report_Student from '../components/Dialog_Report_Student';
+
+
 const Student = () => {
 
     const role = localStorage.getItem("role")
@@ -32,8 +35,13 @@ const Student = () => {
     const [settings, setSettings] = useState({})
 
     const navigate = useNavigate();
+    const [reportDialog, setReportDialog] = useState(false)
     const handleForward = (box) => {
-        navigate('/students/student-view/' + box.split(" ")[1].toLowerCase(), { state: { studentId: studentId, currentStudent: currentStudent } });
+        if (box === "Create Report") {
+            setReportDialog(!reportDialog)
+        } else {
+            navigate('/students/student-view/' + box.split(" ")[1].toLowerCase(), { state: { studentId: studentId, currentStudent: currentStudent } });
+        }
     }
 
     const handleBack = () => {
@@ -64,10 +72,9 @@ const Student = () => {
         console.log("Processing students and homeworks...");
 
         const student = students.find(student => student._id === studentId);
-        // TODO: make sure can't nav to comments until loaded
         setCurrentStudent(student);
-
     }, [triggerLoad]);
+
 
     const boxes = ["See Scores", "Create Report", "Student Profile", role !== "student" ? "Add Comments" : "View Comments"]
     const iconSize = useBreakpointValue({ "xxs": "3rem", "xs": "4rem", sm: "5rem", md: "7rem", lg: "9rem" });
@@ -94,6 +101,7 @@ const Student = () => {
             display="flex"
             flexDir="column"
         >
+            {reportDialog && <Dialog_Report_Student setDialog={setReportDialog} studentId={currentStudent._id}></Dialog_Report_Student>}
             <Header></Header>
 
             <HStack

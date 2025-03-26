@@ -10,8 +10,6 @@ import { useExamStore } from '../store/exam.js'
 
 import { AccordionItem, AccordionItemContent, AccordionItemTrigger, AccordionRoot } from '../components/ui/accordion'
 
-
-// TODO: fix weird load issue 
 const Student_Scores = () => {
   const disappearOnMin = useBreakpointValue({ "min": "none", "xxs": "flex" })
 
@@ -234,7 +232,7 @@ const Student_Scores = () => {
                   <Text
                     position="absolute"
                     lineClamp="1"
-                    maxWidth={{ "xxs": "10%", "xs": "40%", sm: "50%" }}
+                    maxWidth={{ "xxs": "10%", "xs": "25%", sm: "35%" }}
                   >{homework.name}</Text>
 
                   <HStack
@@ -340,7 +338,7 @@ const Student_Scores = () => {
                   <Text
                     position="absolute"
                     lineClamp="1"
-                    maxWidth={{ "xxs": "30%", "xs": "40%", sm: "50%" }}
+                    maxWidth={{ "xxs": "30%", "xs": "25%", sm: "35%" }}
                   >{exam.type.charAt(0).toUpperCase()}{exam.type.slice(1)} Exam</Text>
 
                   <HStack
@@ -353,8 +351,6 @@ const Student_Scores = () => {
                       p="0.5rem"
                       borderRadius="0.7rem"
                     >{exam.month}</Box>
-
-                    { }
                     <Box
                       w="4rem"
                       fontSize="sm"
