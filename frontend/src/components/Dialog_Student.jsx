@@ -122,10 +122,10 @@ const Dialog = ({ setDialog, handleSubmitStudent }) => {
   };
 
   const handleSubmitButton = async () => {
-    if (currentName !== "") {
-      await handleSubmitStudent(currentName, selectedClass);
-      handleExit();
-    } 
+      if (currentName !== "") {
+        await handleSubmitStudent(currentName, selectedClass);
+        handleExit();
+      } 
   }
 
   const handleExit = () => {
