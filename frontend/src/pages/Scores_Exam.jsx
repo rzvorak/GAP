@@ -60,6 +60,21 @@ const Scores_Exam = () => {
     }
 
     const handleSubmitExam = async (examPoints, examMonth, examMeanGrade) => {
+        const now = new Date()
+        exams.forEach(exam => {
+            console.log(exam.type, selectedType)
+        })
+
+        if (exams.find(exam => exam.type === selectedType && exam.month === examMonth && String(exam.class) === selectedClass.slice(-1) && String(exam.createdAt.slice(0, 4)) === String(now.getFullYear()))) {
+            toaster.create({
+                title: "Cannot create exam",
+                description: "Exam already exists",
+                type: "error",
+                duration: "3000"
+            })
+            return;
+        }
+
         const { success, message } = await createExam({
             type: selectedType,
             points: examPoints,
@@ -154,7 +169,7 @@ const Scores_Exam = () => {
                                             p="0.5rem"
                                             borderRadius="0.7rem"
                                             marginRight="1rem"
-                                        >{exam.month}</Box>
+                                        >{exam.month} {exam.createdAt.slice(0,4)}</Box>
 
                                     </AccordionItemTrigger>
                                     <AccordionItemContent

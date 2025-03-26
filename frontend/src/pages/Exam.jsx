@@ -267,7 +267,7 @@ const Exam = () => {
                     whiteSpace={"normal"}
                     wordBreak="break-word"
 
-                >{currentExam.type.charAt(0).toUpperCase()}{currentExam.type.slice(1)} Exam ({currentExam.month})</Heading>
+                >{currentExam.type.charAt(0).toUpperCase()}{currentExam.type.slice(1)} Exam ({currentExam.month} {currentExam.createdAt.slice(0,4)})</Heading>
             </Box>
 
 

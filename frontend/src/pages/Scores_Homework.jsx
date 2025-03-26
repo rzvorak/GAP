@@ -58,12 +58,21 @@ const Scores_Homework = () => {
         // prevent entry before load
         if (Object.keys(subjects).length === 0) {
             return;
-
         }
         setDialog(!dialog);
     }
 
     const handleSubmitHomework = async (homeworkName, homeworkPoints, homeworkSubject, homeworkClass, homeworkMeanGrade) => {
+        if (homeworks.find(homework => homework.name.toLowerCase() === homeworkName.toLowerCase() && homework.subject === homeworkSubject)) {
+            toaster.create({
+                title: "Cannot create homework",
+                description: "Homework with same name and subject exists",
+                type: "error",
+                duration: "3000"
+            })
+            return;
+        }
+
         const { success, message } = await createHomework({
             name: homeworkName,
             points: homeworkPoints,
@@ -141,7 +150,7 @@ const Scores_Homework = () => {
                                     bg="gray.200"
                                     marginBottom="1rem"
                                     key={index}
-                                    value={homework.name}>
+                                    value={homework._id}>
                                     <AccordionItemTrigger
                                         p="0.75rem"
                                         cursor="pointer"
@@ -207,8 +216,6 @@ const Scores_Homework = () => {
                             <Spinner color="green.500" borderWidth="4px" cosize="xl" />
                         </Box>
                     }
-
-
 
                     <Box onClick={handleAdd}><AddButton></AddButton></Box>
 

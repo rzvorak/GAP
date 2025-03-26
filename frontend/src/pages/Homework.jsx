@@ -273,7 +273,7 @@ const Homework = () => {
                             flexDir="column"
                             bg="gray.200"
                             h="11rem">
-                            <Spinner mr="1rem" color="gray.300" borderWidth="4px" cosize="xl" />
+                            <Spinner mr="1rem" color="gray.400" borderWidth="4px" cosize="xl" />
                         </Box>
                     ) : (
                         <Box
