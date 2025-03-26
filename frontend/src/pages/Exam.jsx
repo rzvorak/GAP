@@ -65,7 +65,7 @@ const Exam = () => {
 
     // wait for students, exams, and settings then execute
     useEffect(() => {
-        if (!examId || !settings.cutoffs || !settings.subjects || exams.length === 0 || students.length === 0) return;
+        if (!examId || !settings.cutoffs || !settings.subjects) return;
 
         console.log("Processing students and exams...");
 
@@ -483,7 +483,7 @@ const Exam = () => {
                             _hover={{ transform: "translateY(-3px)" }}
                             marginLeft={{ "xxs": "0.5rem", "xs": "1rem", sm: "1.5rem" }}
                             onClick={() => {
-                                setPressedSave(true)
+                                //setPressedSave(true)
                                 handleSaveButton()
                             }}
                         >Save</Button>

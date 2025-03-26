@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Input, Button, Box } from '@chakra-ui/react'
+import { Input, Button, Box, Spinner } from '@chakra-ui/react'
 import { IoClose } from "react-icons/io5";
 import { IoEyeOutline } from "react-icons/io5";
 import { IoEyeOffOutline } from "react-icons/io5";
@@ -84,10 +84,14 @@ const Dialog_Password = (props) => {
         alignItems: "center",
     }
 
+    const [cooldown, setCooldown] = useState(false)
     const handleSubmitButton = async () => {
         if (currentPassword !== "") {
-            await props.handleSubmitPassword(currentPassword);
-            handleExit();
+            if (!cooldown) {
+                setCooldown(true)
+                await props.handleSubmitPassword(currentPassword);
+                handleExit();
+            }
         }
     }
 
@@ -140,25 +144,30 @@ const Dialog_Password = (props) => {
                             onChange={(e) => setCurrentPassword(e.target.value)}
                             borderRadius="0.5rem"
                             marginBottom="0.5rem"
-                            ></Input>
+                        ></Input>
                     </InputGroup>
 
                     <div style={dialogFooter}>
-                        <Button
-                            w="55%"
-                            h="2.5rem"
-                            borderRadius={"4rem"}
-                            borderWidth="2px"
-                            disabled={(currentPassword === "")}
-                            bg={(currentPassword === "") ? "gray.300" : "green.500"}
-                            color="gray.100"
-                            fontSize="lg"
-                            transition="all 0.3s"
-                            cursor={(currentPassword === "") ? "auto" : "pointer"}
-                            _hover={{ bg: (currentPassword === "") ? "gray.300" : "green.600" }}
-                            onClick={handleSubmitButton}
-                        >Save Password</Button>
-
+                        {!cooldown ? (
+                            <Button
+                                w="55%"
+                                h="2.5rem"
+                                borderRadius={"4rem"}
+                                borderWidth="2px"
+                                disabled={(currentPassword === "")}
+                                bg={(currentPassword === "") ? "gray.300" : "green.500"}
+                                color="gray.100"
+                                fontSize="lg"
+                                transition="all 0.3s"
+                                cursor={(currentPassword === "") ? "auto" : "pointer"}
+                                _hover={{ bg: (currentPassword === "") ? "gray.300" : "green.600" }}
+                                onClick={handleSubmitButton}
+                            >Save Password</Button>
+                        ) : (
+                            <Box w="80%" display="flex" alignItems="center" justifyContent="center">
+                                <Spinner color="green.500" borderWidth="4px" cosize="xl" />
+                            </Box>
+                        )}
                     </div>
                 </div>
             </div>

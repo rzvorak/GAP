@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react'
-import { Button } from '@chakra-ui/react'
+import React, { useState, useEffect } from 'react'
+import { Button, Box, Spinner } from '@chakra-ui/react'
 import { IoClose } from "react-icons/io5";
 
 
@@ -17,7 +17,7 @@ const Dialog_Report_Class = (props) => {
     zIndex: "4",
     opacity: fade ? "1" : "0",
     transition: "all 0.1s ease-in-out"
-    
+
   }
 
   const dialog = {
@@ -28,7 +28,7 @@ const Dialog_Report_Class = (props) => {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    userSelect: "none",  
+    userSelect: "none",
   }
 
   const dialogHeader = {
@@ -105,7 +105,7 @@ const Dialog_Report_Class = (props) => {
     7: false,
   });
 
-  const [selectedClass, setSelectedClass] = useState(1); 
+  const [selectedClass, setSelectedClass] = useState(1);
 
   const handleHover = (classId, isHovered) => {
     setHoverState(prevState => ({
@@ -118,12 +118,16 @@ const Dialog_Report_Class = (props) => {
   const handleClassSelect = (classId) => {
     if (selectedClass !== classId) {
       setSelectedClass(classId);
-    } 
+    }
   };
 
+  const [cooldown, setCooldown] = useState(false)
   const handleSubmitButton = async () => {
-    await props.createClassPDF(selectedClass);
-    handleExit();
+    if (!cooldown) {
+      setCooldown(true)
+      await props.createClassPDF(selectedClass);
+      handleExit();
+    }
   }
 
   const handleExit = () => {
@@ -151,7 +155,7 @@ const Dialog_Report_Class = (props) => {
 
           <div style={dialogBodyText}><p>Class: </p></div>
           <div style={dialogClassSelect}>
-          {[1, 2, 3, 4, 5, 6, 7].map(classId => (
+            {[1, 2, 3, 4, 5, 6, 7].map(classId => (
               <div
                 key={classId}
                 onClick={() => handleClassSelect(classId)}
@@ -166,20 +170,25 @@ const Dialog_Report_Class = (props) => {
         </div>
 
         <div style={dialogFooter}>
-          <Button
-            w="60%"
-            h="2.5rem"
-            borderRadius={"4rem"}
-            borderWidth="2px"
-            color="gray.100" 
-            fontSize="lg"
-            transition="all 0.3s"
-            bg="green.500"
-            cursor="pointer"
-            _hover={{bg: "green.600"}}
-            onClick={handleSubmitButton}
-          >Download PDF</Button>
-
+          {!cooldown ? (
+            <Button
+              w="60%"
+              h="2.5rem"
+              borderRadius={"4rem"}
+              borderWidth="2px"
+              color="gray.100"
+              fontSize="lg"
+              transition="all 0.3s"
+              bg="green.500"
+              cursor="pointer"
+              _hover={{ bg: "green.600" }}
+              onClick={handleSubmitButton}
+            >Download PDF</Button>
+          ) : (
+            <Box w="100%" display="flex" alignItems="center" justifyContent="center">
+              <Spinner color="green.500" borderWidth="4px" cosize="xl" />
+            </Box>
+          )}
         </div>
       </div>
     </div>

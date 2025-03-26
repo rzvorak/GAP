@@ -15,6 +15,7 @@ import { Toaster, toaster } from "../components/ui/toaster"
 
 import { AccordionItem, AccordionItemContent, AccordionItemTrigger, AccordionRoot } from '../components/ui/accordion'
 
+// TODO: add years and duplicate handling
 const Scores_Exam = () => {
 
     const disappearOnMin = useBreakpointValue({ "min": "none", "xxs": "flex" })

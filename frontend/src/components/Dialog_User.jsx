@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Button, Box, createListCollection, Input, VStack } from '@chakra-ui/react'
+import { Button, Box, createListCollection, Input, Spinner } from '@chakra-ui/react'
 import { IoClose } from "react-icons/io5";
 import { SelectContent, SelectItem, SelectRoot, SelectTrigger, SelectValueText } from '../components/ui/select';
 
@@ -81,10 +81,13 @@ const Dialog_User = (props) => {
     const [currentStudent, setCurrentStudent] = useState("")
     const [currentTeacher, setCurrentTeacher] = useState("")
 
+    const [cooldown, setCooldown] = useState(false)
     const handleSubmitButton = async () => {
-        props.mode === "student" ? await props.createStudentAccount(currentStudent[0], currentPassword) : await props.createTeacherAccount(currentTeacher, currentPassword)
-
-        handleExit();
+        if (!cooldown) {
+            setCooldown(true)
+            props.mode === "student" ? await props.createStudentAccount(currentStudent[0], currentPassword) : await props.createTeacherAccount(currentTeacher, currentPassword)
+            handleExit();
+        }
     }
 
     const handleExit = () => {
@@ -212,21 +215,26 @@ const Dialog_User = (props) => {
                 </div>
 
                 <div style={dialogFooter}>
-                    <Button
-                        w="55%"
-                        h="2.5rem"
-                        borderRadius={"4rem"}
-                        borderWidth="2px"
-                        disabled={currentStudent === "" && currentTeacher === ""}
-                        bg={currentStudent === "" && currentTeacher === "" ? "gray.300" : "green.500"}
-                        color="gray.100"
-                        fontSize="lg"
-                        transition="all 0.3s"
-                        cursor={currentStudent === "" && currentTeacher === "" ? "auto" : "pointer"}
-                        _hover={{ bg: currentStudent === "" && currentTeacher === "" ? "gray.300" : "green.600" }}
-                        onClick={handleSubmitButton}
-                    >Create Account</Button>
-
+                    {!cooldown ? (
+                        <Button
+                            w="55%"
+                            h="2.5rem"
+                            borderRadius={"4rem"}
+                            borderWidth="2px"
+                            disabled={currentStudent === "" && currentTeacher === ""}
+                            bg={currentStudent === "" && currentTeacher === "" ? "gray.300" : "green.500"}
+                            color="gray.100"
+                            fontSize="lg"
+                            transition="all 0.3s"
+                            cursor={currentStudent === "" && currentTeacher === "" ? "auto" : "pointer"}
+                            _hover={{ bg: currentStudent === "" && currentTeacher === "" ? "gray.300" : "green.600" }}
+                            onClick={handleSubmitButton}
+                        >Create Account</Button>
+                    ) : (
+                        <Box w="100%" display="flex" alignItems="center" justifyContent="center">
+                            <Spinner color="green.500" borderWidth="4px" cosize="xl" />
+                        </Box>
+                    )}
                 </div>
             </div>
         </div>

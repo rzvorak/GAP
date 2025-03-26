@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Input, Button, Textarea } from '@chakra-ui/react'
+import { Input, Button, Textarea, Box, Spinner } from '@chakra-ui/react'
 import { IoClose } from "react-icons/io5";
 
 const Dialog_Comments = (props) => {
@@ -71,10 +71,14 @@ const Dialog_Comments = (props) => {
         alignItems: "center",
     }
 
+    const [cooldown, setCooldown] = useState(false)
     const handleSubmitButton = async () => {
         if (currentName !== "" && currentRole != "" && currentComment != "") {
-            await props.handleSubmitComment(currentName, currentRole, currentComment);
-            handleExit();
+            if (!cooldown) {
+                setCooldown(true)
+                await props.handleSubmitComment(currentName, currentRole, currentComment);
+                handleExit();
+            }
         }
     }
 
@@ -145,21 +149,26 @@ const Dialog_Comments = (props) => {
                         _hover={{ transform: "translateY(-3px)" }}></Textarea>
 
                     <div style={dialogFooter}>
-                        <Button
-                            w="55%"
-                            h="2.5rem"
-                            borderRadius={"4rem"}
-                            borderWidth="2px"
-                            disabled={(currentName === "" || currentRole === "" || currentComment === "")}
-                            bg={(currentName === "" || currentRole === "" || currentComment === "") ? "gray.300" : "green.500"}
-                            color="gray.100"
-                            fontSize="lg"
-                            transition="all 0.3s"
-                            cursor={(currentName === "" || currentRole === "" || currentComment === "") ? "auto" : "pointer"}
-                            _hover={{ bg: (currentName === "" || currentRole === "" || currentComment === "") ? "gray.300" : "green.600" }}
-                            onClick={handleSubmitButton}
-                        >Post Comment</Button>
-
+                        {!cooldown ? (
+                            <Button
+                                w="55%"
+                                h="2.5rem"
+                                borderRadius={"4rem"}
+                                borderWidth="2px"
+                                disabled={(currentName === "" || currentRole === "" || currentComment === "")}
+                                bg={(currentName === "" || currentRole === "" || currentComment === "") ? "gray.300" : "green.500"}
+                                color="gray.100"
+                                fontSize="lg"
+                                transition="all 0.3s"
+                                cursor={(currentName === "" || currentRole === "" || currentComment === "") ? "auto" : "pointer"}
+                                _hover={{ bg: (currentName === "" || currentRole === "" || currentComment === "") ? "gray.300" : "green.600" }}
+                                onClick={handleSubmitButton}
+                            >Post Comment</Button>
+                        ) : (
+                            <Box w="80%" display="flex" alignItems="center" justifyContent="center">
+                                <Spinner color="green.500" borderWidth="4px" cosize="xl" />
+                            </Box>
+                        )}
                     </div>
                 </div>
             </div>

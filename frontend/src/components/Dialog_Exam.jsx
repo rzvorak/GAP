@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Button } from '@chakra-ui/react'
+import { Button, Box, Spinner } from '@chakra-ui/react'
 import { IoClose } from "react-icons/io5";
 import { NumberInputField, NumberInputRoot } from '../components/ui/number-input';
 
@@ -145,9 +145,13 @@ const Dialog_Exam = (props) => {
         }
     };
 
+    const [cooldown, setCooldown] = useState(false)
     const handleSubmitButton = async () => {
-        await props.handleSubmitExam(currentPoints, selectedMonth, -1)
-        handleExit();
+        if (!cooldown) {
+            setCooldown(true)
+            await props.handleSubmitExam(currentPoints, selectedMonth, -1)
+            handleExit();
+        }
     }
 
     const handleExit = () => {
@@ -212,7 +216,7 @@ const Dialog_Exam = (props) => {
                                     onMouseEnter={() => handleHover(props.selectedType === "midterm" ? "Apr" : "Jun", true)}
                                     onMouseLeave={() => handleHover(props.selectedType === "midterm" ? "Apr" : "Jun", false)}
                                     style={dialogTerm}>
-        
+
                                     <div style={dialogMonthButton(hoverState[props.selectedType === "midterm" ? "Apr" : "Jun"], selectedMonth === (props.selectedType === "midterm" ? "Apr" : "Jun"))}></div>
                                     {props.selectedType === "midterm" ? "Term 1 (Apr)" : "Term 1 (Jun)"}
                                 </div>
@@ -222,7 +226,7 @@ const Dialog_Exam = (props) => {
                                     onMouseEnter={() => handleHover(props.selectedType === "midterm" ? "Sep" : "Dec", true)}
                                     onMouseLeave={() => handleHover(props.selectedType === "midterm" ? "Sep" : "Dec", false)}
                                     style={dialogTerm}>
-        
+
                                     <div style={dialogMonthButton(hoverState[props.selectedType === "midterm" ? "Sep" : "Dec"], selectedMonth === (props.selectedType === "midterm" ? "Sep" : "Dec"))}></div>
                                     {props.selectedType === "midterm" ? "Term 2 (Sep)" : "Term 2 (Dec)"}
                                 </div>
@@ -251,20 +255,24 @@ const Dialog_Exam = (props) => {
                 </div>
 
                 <div style={dialogFooter}>
-                    <Button
-                        w="50%"
-                        h="2.5rem"
-                        borderRadius={"4rem"}
-                        borderWidth="2px"
-                        bg="green.500"
-                        color="gray.100"
-                        fontSize="lg"
-                        transition="all 0.3s"
-                        cursor="pointer"
-                        _hover={{ bg: "green.600" }}
-                        onClick={handleSubmitButton}
-                    >Create Exam</Button>
-
+                    {!cooldown ? (
+                        <Button
+                            w="50%"
+                            h="2.5rem"
+                            borderRadius={"4rem"}
+                            borderWidth="2px"
+                            bg="green.500"
+                            color="gray.100"
+                            fontSize="lg"
+                            transition="all 0.3s"
+                            cursor="pointer"
+                            _hover={{ bg: "green.600" }}
+                            onClick={handleSubmitButton}
+                        >Create Exam</Button>) : (
+                        <Box w="100%" display="flex" alignItems="center" justifyContent="center">
+                            <Spinner color="green.500" borderWidth="4px" cosize="xl" />
+                        </Box>
+                    )}
                 </div>
             </div>
         </div>

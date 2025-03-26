@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Input, Button, Textarea } from '@chakra-ui/react'
+import { Input, Button, Spinner, Box } from '@chakra-ui/react'
 import { IoClose } from "react-icons/io5";
 
 const Dialog_Subjects = (props) => {
@@ -69,10 +69,14 @@ const Dialog_Subjects = (props) => {
         alignItems: "center",
     }
 
+    const [cooldown, setCooldown] = useState(false)
     const handleSubmitButton = () => {
         if (currentSubject !== "") {
-            props.handleSubmitSubject(currentSubject);
-            handleExit();
+            if (!cooldown) {
+                setCooldown(true)
+                props.handleSubmitSubject(currentSubject);
+                handleExit();
+            }
         }
     }
 
@@ -113,25 +117,30 @@ const Dialog_Subjects = (props) => {
                         _hover={{ transform: "translateY(-3px)" }}></Input>
 
                     <div style={dialogFooter}>
-                        <Button
-                            w="55%"
-                            h="2.5rem"
-                            borderRadius={"4rem"}
-                            borderWidth="2px"
-                            disabled={(currentSubject === "")}
-                            bg={(currentSubject === "") ? "gray.300" : "green.500"}
-                            color="gray.100"
-                            fontSize="lg"
-                            transition="all 0.3s"
-                            cursor={(currentSubject === "") ? "auto" : "pointer"}
-                            _hover={{ bg: (currentSubject === "") ? "gray.300" : "green.600" }}
-                            onClick={handleSubmitButton}
-                        >Save Subject</Button>
-
+                        {!cooldown ? (
+                            <Button
+                                w="55%"
+                                h="2.5rem"
+                                borderRadius={"4rem"}
+                                borderWidth="2px"
+                                disabled={(currentSubject === "")}
+                                bg={(currentSubject === "") ? "gray.300" : "green.500"}
+                                color="gray.100"
+                                fontSize="lg"
+                                transition="all 0.3s"
+                                cursor={(currentSubject === "") ? "auto" : "pointer"}
+                                _hover={{ bg: (currentSubject === "") ? "gray.300" : "green.600" }}
+                                onClick={handleSubmitButton}
+                            >Save Subject</Button>
+                        ) : (
+                            <Box w="100%" display="flex" alignItems="center" justifyContent="center">
+                                <Spinner color="green.500" borderWidth="4px" cosize="xl" />
+                            </Box>
+                        )}
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     )
 }
 

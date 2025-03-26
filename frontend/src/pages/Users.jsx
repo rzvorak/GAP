@@ -91,7 +91,7 @@ const Users = () => {
 
     const currentStudent = students.find(student => student._id === studentId)
 
-    const splitName = currentStudent.trim().name.toLowerCase().split(" ")
+    const splitName = currentStudent.name.trim().toLowerCase().split(" ")
     let newUsername = currentStudent.name.toLowerCase().charAt(0) + splitName[splitName.length - 1]
     const existing = users.filter(user => user.username.startsWith(newUsername)).map(user => user.username.slice(newUsername.length, user.username.length))
 

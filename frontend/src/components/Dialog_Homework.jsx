@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import { Input, Button, createListCollection } from '@chakra-ui/react'
+import { Input, Button, createListCollection, Box, Spinner } from '@chakra-ui/react'
 import { IoClose } from "react-icons/io5";
 import { SelectContent, SelectItem, SelectRoot, SelectTrigger, SelectValueText } from '../components/ui/select';
 import { NumberInputField, NumberInputRoot } from '../components/ui/number-input';
 
-
+// TODO: homeowkr with same name get paired
 const Dialog_Homework = (props) => {
   const [fade, setFade] = useState(false);
   const [currentName, setCurrentName] = useState("");
@@ -74,10 +74,13 @@ const Dialog_Homework = (props) => {
     alignItems: "center",
   }
 
+  const [cooldown, setCooldown] = useState(false)
   const handleSubmitButton = async () => {
-    console.log(currentName, currentPoints, currentSubject[0])
-    await props.handleSubmitHomework(currentName, currentPoints, currentSubject[0], props.selectedClass, -1)
-    handleExit();
+    if (!cooldown) {
+      setCooldown(true)
+      await props.handleSubmitHomework(currentName, currentPoints, currentSubject[0], props.selectedClass, -1)
+      handleExit();
+    }
   }
 
   const handleExit = () => {
@@ -180,21 +183,26 @@ const Dialog_Homework = (props) => {
         </div>
 
         <div style={dialogFooter}>
-          <Button
-            w="60%"
-            h="2.5rem"
-            borderRadius={"4rem"}
-            borderWidth="2px"
-            disabled={currentName === "" || currentSubject === ""}
-            bg={currentName === "" || currentSubject === "" ? "gray.300" : "green.500"}
-            color="gray.100"
-            fontSize="lg"
-            transition="all 0.3s"
-            cursor={currentName === "" ? "auto" : "pointer"}
-            _hover={{ bg: currentName === "" ? "gray.300" : "green.600" }}
-            onClick={handleSubmitButton}
-          >Create Homework</Button>
-
+          {!cooldown ? (
+            <Button
+              w="60%"
+              h="2.5rem"
+              borderRadius={"4rem"}
+              borderWidth="2px"
+              disabled={currentName === "" || currentSubject === ""}
+              bg={currentName === "" || currentSubject === "" ? "gray.300" : "green.500"}
+              color="gray.100"
+              fontSize="lg"
+              transition="all 0.3s"
+              cursor={currentName === "" ? "auto" : "pointer"}
+              _hover={{ bg: currentName === "" ? "gray.300" : "green.600" }}
+              onClick={handleSubmitButton}
+            >Create Homework</Button>
+          ) : (
+            <Box w="100%" display="flex" alignItems="center" justifyContent="center">
+              <Spinner color="green.500" borderWidth="4px" cosize="xl" />
+            </Box>
+          )}
         </div>
       </div>
     </div>

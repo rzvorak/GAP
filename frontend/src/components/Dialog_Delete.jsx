@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Button } from '@chakra-ui/react'
+import { Button, Box, Spinner } from '@chakra-ui/react'
 import { IoClose } from "react-icons/io5";
 
 const Dialog_Delete = (props) => {
@@ -41,10 +41,14 @@ const Dialog_Delete = (props) => {
     paddingTop: "0.25rem"
   }
 
+  const [cooldown, setCooldown] = useState(false)
   const handleConfirmButton = async () => {
-    await props.delete(props.id);  
-    handleExit();
-    props.handleBack();
+    if (!cooldown) {
+      setCooldown(true)
+      await props.delete(props.id);
+      handleExit();
+      props.handleBack();
+    }
   }
 
   const handleExit = () => {
@@ -62,19 +66,24 @@ const Dialog_Delete = (props) => {
     <div style={dialogContainer}>
       <div style={dialog}>
         <div style={dialogHeader}>
-          <Button
-            w="80%"
-            h="2.5rem"
-            borderRadius={"4rem"}
-            borderWidth="2px"
-            bg={(props.id !== "critical" ? "green.500" : "red.500" )}
-            color="gray.100"
-            fontSize="lg"
-            transition="all 0.3s"
-            cursor="pointer"
-            _hover={{bg: (props.id !== "critical" ? "green.600" : "red.600" ) }}
-            onClick={handleConfirmButton}
-          >Confirm Deletion</Button>
+          {!cooldown ? (
+            <Button
+              w="80%"
+              h="2.5rem"
+              borderRadius={"4rem"}
+              borderWidth="2px"
+              bg={(props.id !== "critical" ? "green.500" : "red.500")}
+              color="gray.100"
+              fontSize="lg"
+              transition="all 0.3s"
+              cursor="pointer"
+              _hover={{ bg: (props.id !== "critical" ? "green.600" : "red.600") }}
+              onClick={handleConfirmButton}
+            >Confirm Deletion</Button>) : (
+            <Box w="80%" display="flex" alignItems="center" justifyContent="center">
+              <Spinner color="green.500" borderWidth="4px" cosize="xl" />
+            </Box>
+          )}
           <div onClick={() => handleExit()}>
             <IoClose size="2rem" className="IoClose" />
           </div>

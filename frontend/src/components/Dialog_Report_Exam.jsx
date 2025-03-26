@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Button, createListCollection } from '@chakra-ui/react'
+import { Button, createListCollection, Box, Spinner } from '@chakra-ui/react'
 import { IoClose } from "react-icons/io5";
 import { SelectContent, SelectItem, SelectRoot, SelectTrigger, SelectValueText } from '../components/ui/select';
 
@@ -149,10 +149,13 @@ const Dialog_Report_Exam = (props) => {
     setCurrentExam("")
   };
 
+  const [cooldown, setCooldown] = useState(false)
   const handleSubmitButton = async () => {
-    console.log(currentExam[0])
-    await props.createExamPDF(currentExam[0])
-    handleExit();
+    if (!cooldown) {
+      setCooldown(true)
+      await props.createExamPDF(currentExam[0])
+      handleExit();
+    }
   }
 
   const handleExit = () => {
@@ -174,7 +177,7 @@ const Dialog_Report_Exam = (props) => {
 
   const frameworks = createListCollection({ items: filteredExams });
 
-  const types = createListCollection({items: [{label: "Monthly", value: "Monthly"}, {label: "Midterm", value: "Midterm"}, {label: "Terminal", value: "Terminal"}]})
+  const types = createListCollection({ items: [{ label: "Monthly", value: "Monthly" }, { label: "Midterm", value: "Midterm" }, { label: "Terminal", value: "Terminal" }] })
 
 
   return (
@@ -285,21 +288,26 @@ const Dialog_Report_Exam = (props) => {
         </div>
 
         <div style={dialogFooter}>
-          <Button
-            w="60%"
-            h="2.5rem"
-            borderRadius={"4rem"}
-            borderWidth="2px"
-            disabled={currentExam === ""}
-            bg={currentExam === "" ? "gray.300" : "green.500"}
-            color="gray.100"
-            fontSize="lg"
-            transition="all 0.3s"
-            cursor={currentExam === "" ? "auto" : "pointer"}
-            _hover={{ bg: currentExam === "" ? "gray.300" : "green.600" }}
-            onClick={handleSubmitButton}
-          >Download PDF</Button>
-
+          {!cooldown ? (
+            <Button
+              w="60%"
+              h="2.5rem"
+              borderRadius={"4rem"}
+              borderWidth="2px"
+              disabled={currentExam === ""}
+              bg={currentExam === "" ? "gray.300" : "green.500"}
+              color="gray.100"
+              fontSize="lg"
+              transition="all 0.3s"
+              cursor={currentExam === "" ? "auto" : "pointer"}
+              _hover={{ bg: currentExam === "" ? "gray.300" : "green.600" }}
+              onClick={handleSubmitButton}
+            >Download PDF</Button>
+          ) : (
+            <Box w="100%" display="flex" alignItems="center" justifyContent="center">
+              <Spinner color="green.500" borderWidth="4px" cosize="xl" />
+            </Box>
+          )}
         </div>
       </div>
     </div>

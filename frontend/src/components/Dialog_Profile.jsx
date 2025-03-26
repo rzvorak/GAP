@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Input, Button } from '@chakra-ui/react'
+import { Input, Button, Box, Spinner } from '@chakra-ui/react'
 import { IoClose } from "react-icons/io5";
 
 const Dialog_Profile = (props) => {
@@ -11,8 +11,6 @@ const Dialog_Profile = (props) => {
         width: "100%",
         minHeight: "100vh",
         height: `${(6.4 * props.categories[props.editCategory].length) + 5 + 6 + 2}rem`,
-
-
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -77,9 +75,13 @@ const Dialog_Profile = (props) => {
 
     }
 
+    const [cooldown, setCooldown] = useState(false)
     const handleSubmitButton = async () => {
-        await props.handleSubmit(localProfile);
-        handleExit();
+        if (!cooldown) {
+            setCooldown(true)
+            await props.handleSubmit(localProfile);
+            handleExit();
+        }
     }
 
     const handleExit = () => {
@@ -130,20 +132,25 @@ const Dialog_Profile = (props) => {
 
 
                 <div style={dialogFooter}>
-                    <Button
-                        w="55%"
-                        h="2.5rem"
-                        borderRadius={"4rem"}
-                        borderWidth="2px"
-                        bg= "green.500"
-                        color="gray.100"
-                        fontSize="lg"
-                        transition="all 0.3s"
-                        cursor="pointer"
-                        _hover={{ bg: "green.600" }}
-                        onClick={handleSubmitButton}
-                    >Save Information</Button>
-
+                    {!cooldown ? (
+                        <Button
+                            w="55%"
+                            h="2.5rem"
+                            borderRadius={"4rem"}
+                            borderWidth="2px"
+                            bg="green.500"
+                            color="gray.100"
+                            fontSize="lg"
+                            transition="all 0.3s"
+                            cursor="pointer"
+                            _hover={{ bg: "green.600" }}
+                            onClick={handleSubmitButton}
+                        >Save Information</Button>
+                    ) : (
+                        <Box w="80%" display="flex" alignItems="center" justifyContent="center">
+                            <Spinner color="green.500" borderWidth="4px" cosize="xl" />
+                        </Box>
+                    )}
                 </div>
 
             </div>

@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react'
-import { Input, Button } from '@chakra-ui/react'
+import React, { useState, useEffect } from 'react'
+import { Input, Button, Box, Spinner } from '@chakra-ui/react'
 import { IoClose } from "react-icons/io5";
 
 const Dialog = ({ setDialog, handleSubmitStudent }) => {
@@ -17,7 +17,7 @@ const Dialog = ({ setDialog, handleSubmitStudent }) => {
     zIndex: "4",
     opacity: fade ? "1" : "0",
     transition: "all 0.1s ease-in-out"
-    
+
   }
 
   const dialog = {
@@ -28,7 +28,7 @@ const Dialog = ({ setDialog, handleSubmitStudent }) => {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    userSelect: "none",  
+    userSelect: "none",
   }
 
   const dialogHeader = {
@@ -105,7 +105,7 @@ const Dialog = ({ setDialog, handleSubmitStudent }) => {
     7: false,
   });
 
-  const [selectedClass, setSelectedClass] = useState(1); 
+  const [selectedClass, setSelectedClass] = useState(1);
 
   const handleHover = (classId, isHovered) => {
     setHoverState(prevState => ({
@@ -118,14 +118,18 @@ const Dialog = ({ setDialog, handleSubmitStudent }) => {
   const handleClassSelect = (classId) => {
     if (selectedClass !== classId) {
       setSelectedClass(classId);
-    } 
+    }
   };
 
+  const [cooldown, setCooldown] = useState(false)
   const handleSubmitButton = async () => {
-      if (currentName !== "") {
+    if (currentName !== "") {
+      if (!cooldown) {
+        setCooldown(true)
         await handleSubmitStudent(currentName, selectedClass);
         handleExit();
-      } 
+      }
+    }
   }
 
   const handleExit = () => {
@@ -166,7 +170,7 @@ const Dialog = ({ setDialog, handleSubmitStudent }) => {
 
           <div style={dialogBodyText}><p>Class: </p></div>
           <div style={dialogClassSelect}>
-          {[1, 2, 3, 4, 5, 6, 7].map(classId => (
+            {[1, 2, 3, 4, 5, 6, 7].map(classId => (
               <div
                 key={classId}
                 onClick={() => handleClassSelect(classId)}
@@ -181,21 +185,26 @@ const Dialog = ({ setDialog, handleSubmitStudent }) => {
         </div>
 
         <div style={dialogFooter}>
-          <Button
-            w="50%"
-            h="2.5rem"
-            borderRadius={"4rem"}
-            borderWidth="2px"
-            color="gray.100" 
-            fontSize="lg"
-            transition="all 0.3s"
-            disabled={currentName === ""}
-            bg={currentName === "" ? "gray.300" : "green.500"}
-            cursor={currentName === "" ? "auto" : "pointer"}
-            _hover={{bg: currentName === "" ? "gray.300" : "green.600"}}
-            onClick={handleSubmitButton}
-          >Add Student</Button>
-
+          {!cooldown ? (
+            <Button
+              w="50%"
+              h="2.5rem"
+              borderRadius={"4rem"}
+              borderWidth="2px"
+              color="gray.100"
+              fontSize="lg"
+              transition="all 0.3s"
+              disabled={currentName === ""}
+              bg={currentName === "" ? "gray.300" : "green.500"}
+              cursor={currentName === "" ? "auto" : "pointer"}
+              _hover={{ bg: currentName === "" ? "gray.300" : "green.600" }}
+              onClick={handleSubmitButton}
+            >Add Student</Button>
+          ) : (
+            <Box w="100%" display="flex" alignItems="center" justifyContent="center">
+              <Spinner color="green.500" borderWidth="4px" cosize="xl" />
+            </Box>
+          )}
         </div>
       </div>
     </div>
