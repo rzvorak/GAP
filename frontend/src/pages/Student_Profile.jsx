@@ -15,10 +15,11 @@ import { useStudentStore } from '../store/student.js';
 import { Toaster, toaster } from "../components/ui/toaster"
 
 
-
 const Student_Profile = () => {
 
     const disappearOnMin = useBreakpointValue({ "min": "none", "xxs": "flex" })
+
+    const role = localStorage.getItem("role")
 
     const location = useLocation();
     const studentId = location.state?.studentId;
@@ -48,7 +49,6 @@ const Student_Profile = () => {
     const [dialog, setDialog] = useState(false);
     const [editCategory, setEditCategory] = useState("")
     const handleEdit = (category) => {
-        console.log(category)
         setEditCategory(category)
         setDialog(!dialog);
     }
@@ -85,7 +85,7 @@ const Student_Profile = () => {
         >
 
             <Toaster />
-            
+
             {dialog && <Dialog_Profile categories={categories} editCategory={editCategory} currentProfile={currentStudent.profile} handleSubmit={handleSubmit} setDialog={setDialog}></Dialog_Profile>}
             {!dialog && <Header></Header>}
             {!dialog && currentStudent.profile && currentStudent.name ? (
@@ -98,24 +98,42 @@ const Student_Profile = () => {
                     flexDir="column"
                     flex="1"
                 >
+
                     <Box
                         w="100%"
-                        h="4rem"
-                        display="flex"
-                        alignItems="center"
-                        marginBottom="1rem"
+                        paddingTop="1rem"
+                        paddingBottom="1rem"
+                        minHeight="4rem"
+                        display={disappearOnMin}
+                        flexWrap="wrap"
+                        alignItems={"flex-start"}
+                        overflow="visible"
                     >
-                        <Box ml="1rem" mt="0.25rem"
-                            cursor={"pointer"}
-                            onClick={handleBack}>
-                            <FaArrowLeft size="1.5rem" className='FaArrowLeft' />
-                        </Box>
-                        <Heading
-                            marginLeft="1rem"
+                        <HStack
+                            marginRight="10%"
+                            w="90%"
+                            maxW="40rem"
                             color="gray.600"
                             fontSize="2xl"
                             fontWeight={"400"}
-                        >{currentStudent.name}'s Information</Heading>
+                            whiteSpace={"normal"}
+                            wordBreak="break-word"
+                            display="flex"
+                            flexDir="row"
+                            justifyContent="space-between"
+                        >
+                            <Box
+                                display="flex"
+                                flexDir="row"
+                                alignItems="center">
+                                <Box ml="1rem" mt="0.25rem"
+                                    cursor={"pointer"}
+                                    onClick={handleBack}>
+                                    <FaArrowLeft size="1.5rem" className='FaArrowLeft' />
+                                </Box>
+                                <Text ml="1rem">{currentStudent.name}'s Information</Text>
+                            </Box>
+                        </HStack>
                     </Box>
 
 
@@ -166,21 +184,24 @@ const Student_Profile = () => {
                                                 ))}
                                             </Box>
 
-                                            <Box
-                                                position={{ "xxs": "relative", sm: "absolute" }}
-                                                bottom={{ "xxs": "0rem", sm: "0.7rem" }}
-                                                right={{ "xxs": "0rem", sm: "1.5rem" }}
-                                                w="3rem"
-                                                h="3rem"
-                                                cursor="pointer"
-                                                color="green.500"
-                                                onClick={() => handleEdit(category)}
-                                                transition="all 0.2s ease-in-out"
-                                                _hover={{ transform: "translateY(-3px)" }}
-                                            >
-                                                <Center h="100%"><GoPencil size="2rem" /></Center>
+                                            {role !== "student" ? (
+                                                <Box
+                                                    position={{ "xxs": "relative", sm: "absolute" }}
+                                                    bottom={{ "xxs": "0rem", sm: "0.7rem" }}
+                                                    right={{ "xxs": "0rem", sm: "1.5rem" }}
+                                                    w="3rem"
+                                                    h="3rem"
+                                                    cursor="pointer"
+                                                    color="green.500"
+                                                    onClick={() => handleEdit(category)}
+                                                    transition="all 0.2s ease-in-out"
+                                                    _hover={{ transform: "translateY(-3px)" }}
+                                                >
+                                                    <Center h="100%"><GoPencil size="2rem" /></Center>
 
-                                            </Box>
+                                                </Box>
+                                            ) : (null)}
+
                                         </Box>
                                     </AccordionItemContent>
                                 </AccordionItem>
