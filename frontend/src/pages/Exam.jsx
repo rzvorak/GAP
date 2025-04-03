@@ -50,7 +50,6 @@ const Exam = () => {
 
     const [isStatsLoading, setIsStatsLoading] = useState(true)
 
-
     // launch once on load, get students, exams, and settings
     useEffect(() => {
         async function fetchAll() {
@@ -323,19 +322,30 @@ const Exam = () => {
                     maxW="40rem"
                     minHeight="4rem"
                 >
-                    <Button
-                        mt="0.2rem"
-                        borderRadius={"4rem"}
-                        w={{ "xxs": "3.5rem", "xs": "5rem", sm: "6rem" }}
-                        bg="green.500"
-                        color="gray.100"
-                        fontSize={{ sm: "lg", lg: "xl" }}
-                        transition="all 0.3s"
-                        _hover={{ transform: "translateY(-3px)" }}
-                        onClick={() => {
-                            handleSaveButton(true)
-                        }}
-                    >Save</Button>
+                    {!isStatsLoading ? (
+                        <Button
+                            mt="0.2rem"
+                            borderRadius={"4rem"}
+                            w={{ "xxs": "3.5rem", "xs": "5rem", sm: "6rem" }}
+                            bg="green.500"
+                            color="gray.100"
+                            fontSize={{ sm: "lg", lg: "xl" }}
+                            transition="all 0.3s"
+                            _hover={{ transform: "translateY(-3px)" }}
+                            onClick={() => {
+                                handleSaveButton(true)
+                            }}
+                        >Save</Button>
+                    ) : (
+                        <Box
+                            w={{ "xxs": "3.5rem", "xs": "5rem", sm: "6rem" }}
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center">
+                            <Spinner color="green.500" borderWidth="4px" cosize="xl" />
+                        </Box>
+                    )}
+
                 </Box>
 
                 <Box
@@ -537,7 +547,7 @@ const Exam = () => {
                         <FaArrowLeft size="1.5rem" className='FaArrowLeft' />
                     </Box>
 
-                    <Box>
+                    <Box display="flex" flexDir="row">
                         <Button
                             borderRadius={"4rem"}
                             w={{ "xxs": "4.5rem", "xs": "6rem", sm: "12rem" }}
@@ -551,19 +561,31 @@ const Exam = () => {
                             _hover={{ transform: "translateY(-3px)" }}
                         >Delete {deleteButtonBreakpoint}</Button>
 
-                        <Button
-                            borderRadius={"4rem"}
-                            w={{ "xxs": "3.5rem", "xs": "5rem", sm: "6rem" }}
-                            bg="green.500"
-                            color="gray.100"
-                            fontSize={{ sm: "lg", lg: "xl" }}
-                            transition="all 0.3s"
-                            _hover={{ transform: "translateY(-3px)" }}
-                            marginLeft={{ "xxs": "0.5rem", "xs": "1rem", sm: "1.5rem" }}
-                            onClick={() => {
-                                handleSaveButton(true)
-                            }}
-                        >Save</Button>
+                        {!isStatsLoading ? (
+                            <Button
+                                borderRadius={"4rem"}
+                                w={{ "xxs": "3.5rem", "xs": "5rem", sm: "6rem" }}
+                                bg="green.500"
+                                color="gray.100"
+                                fontSize={{ sm: "lg", lg: "xl" }}
+                                transition="all 0.3s"
+                                _hover={{ transform: "translateY(-3px)" }}
+                                marginLeft={{ "xxs": "0.5rem", "xs": "1rem", sm: "1.5rem" }}
+                                onClick={() => {
+                                    handleSaveButton(true)
+                                }}
+                            >Save</Button>
+                        ) : (
+                            <Box
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="center"
+                                w={{ "xxs": "3.5rem", "xs": "5rem", sm: "6rem" }}
+                                marginLeft={{ "xxs": "0.5rem", "xs": "1rem", sm: "1.5rem" }}
+                            >
+                                <Spinner color="green.500" borderWidth="4px" cosize="xl" />
+                            </Box>
+                        )}
                     </Box>
                 </HStack>
 
