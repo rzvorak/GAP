@@ -16,6 +16,8 @@ import { Toaster, toaster } from "../components/ui/toaster"
 const Exam = () => {
 
     const disappearOnMin = useBreakpointValue({ "min": "none", "xxs": "flex" })
+    const disappearSaveButton = useBreakpointValue({ "min": "none", "xs": "flex" })
+
 
     const location = useLocation();
     const examId = location.state?.examId;
@@ -45,6 +47,9 @@ const Exam = () => {
     const [search, setSearch] = useState("")
     const [triggerLoad, setTriggerLoad] = useState(false)
     const [triggerSave, setTriggerSave] = useState(false)
+
+    const [isStatsLoading, setIsStatsLoading] = useState(true)
+
 
     // launch once on load, get students, exams, and settings
     useEffect(() => {
@@ -118,12 +123,11 @@ const Exam = () => {
     // trigger save to properly load everything
     useEffect(() => {
         if (!triggerSave) return;
-        handleSaveButton()
+        handleSaveButton(false)
     }, [triggerSave]);
 
-    const handleSaveButton = () => {
-        console.log("Saving student scores...");
-
+    const handleSaveButton = async (fromButton) => {
+        setIsStatsLoading(true)
         const updatedGrades = {};
         const updatedOverallScores = {};
         const updatedStudents = allStudents.map(student => {
@@ -181,12 +185,22 @@ const Exam = () => {
 
         setStudentRanks(newRanks);
 
-        updateExam(examId, {
+        const { success } = await updateExam(examId, {
             ...currentExam,
             meanGrade: sum / sortedScores.length
         })
 
         setCurrentMeanGrade(sortedScores.length != 0 ? sum / sortedScores.length : -1);
+
+        setIsStatsLoading(false)
+
+        if (fromButton) {
+            toaster.create({
+                title: success ? "Exam saved" : "Error saving exam",
+                type: success ? "success" : "error",
+                duration: "2000"
+            })
+        }
     };
 
     useEffect(() => {
@@ -222,7 +236,7 @@ const Exam = () => {
         else if (percent >= settings.cutoffs.C) grade = "C";
         else if (percent >= settings.cutoffs.D) grade = "D";
         return grade;
-      }
+    }
 
     const deleteButtonBreakpoint = useBreakpointValue({ "xxs": "", sm: "Exam" });
 
@@ -245,6 +259,7 @@ const Exam = () => {
             color="gray.900"
         >
             <Header></Header>
+            <Toaster></Toaster>
 
             {dialog && <Dialog_Delete handleBack={handleBack} delete={handleDeleteExam} id={examId} setDialog={setDialog}></Dialog_Delete>}
 
@@ -257,36 +272,99 @@ const Exam = () => {
                 flexDirection={"column"}
                 flexWrap="wrap"
                 alignItems={"flex-start"}
-                overflow="visible">
-                <Heading
-                    marginLeft="1rem"
-                    marginRight="1rem"
+                overflow="visible"
+            >
+                <HStack
+                    marginRight="10%"
+                    w="70%"
+                    maxW="40rem"
                     color="gray.600"
                     fontSize="2xl"
                     fontWeight={"400"}
                     whiteSpace={"normal"}
                     wordBreak="break-word"
+                    display="flex"
+                    flexDir="row"
+                    justifyContent="space-between"
+                >
+                    <Box
+                        display="flex"
+                        flexDir="row"
+                        alignItems="center">
+                        <Box ml="1rem" mt="0.25rem"
+                            cursor={"pointer"}
+                            onClick={handleBack}>
+                            <FaArrowLeft size="1.5rem" className='FaArrowLeft' />
+                        </Box>
+                        <Heading
+                            marginLeft="1rem"
+                            marginRight="1rem"
+                            color="gray.600"
+                            fontSize="2xl"
+                            fontWeight={"400"}
+                            whiteSpace={"normal"}
+                            wordBreak="break-word"
+                        >{currentExam.type.charAt(0).toUpperCase()}{currentExam.type.slice(1)} Exam ({currentExam.month} {currentExam.createdAt.slice(0, 4)})</Heading>
+                    </Box>
+                </HStack>
 
-                >{currentExam.type.charAt(0).toUpperCase()}{currentExam.type.slice(1)} Exam ({currentExam.month} {currentExam.createdAt.slice(0,4)})</Heading>
             </Box>
 
 
             <VStack gap="0" display={disappearOnMin} flex="1" w="100%">
 
                 <Box
+                    top="5rem"
+                    position="absolute"
+                    w="80%"
+                    display={disappearSaveButton}
+                    justifyContent="flex-end"
+                    alignItems="center"
+                    maxW="40rem"
+                    minHeight="4rem"
+                >
+                    <Button
+                        mt="0.2rem"
+                        borderRadius={"4rem"}
+                        w={{ "xxs": "3.5rem", "xs": "5rem", sm: "6rem" }}
+                        bg="green.500"
+                        color="gray.100"
+                        fontSize={{ sm: "lg", lg: "xl" }}
+                        transition="all 0.3s"
+                        _hover={{ transform: "translateY(-3px)" }}
+                        onClick={() => {
+                            handleSaveButton(true)
+                        }}
+                    >Save</Button>
+                </Box>
+
+                <Box
                     w="80%"
                     maxW="40rem"
                 >
-                    <Box
-                        borderRadius="1.2rem"
-                        paddingLeft="1rem"
-                        display="flex"
-                        flexDir="column"
-                        bg="gray.200">
-                        <Text lineClamp="1" marginRight="1rem" marginTop="1rem">Points: {currentExam.points}</Text>
-                        <Text lineClamp="1" marginRight="1rem" marginTop="1rem">Class Mean Grade: {currentMeanGrade == -1 ? "Not yet scored" : (((currentMeanGrade / (subjects[currentExam.class].length * currentExam.points)) * 100).toFixed(1) + "%")}</Text>
-                        <Text lineClamp="1" marginRight="1rem" marginY="1rem">Date Created: {String(currentExam.createdAt).slice(0, 10)} </Text>
-                    </Box>
+                    {isStatsLoading ? (
+                        <Box
+                            borderRadius="1.2rem"
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                            flexDir="column"
+                            bg="gray.200"
+                            h="8.5rem">
+                            <Spinner mr="1rem" color="gray.400" borderWidth="4px" cosize="xl" />
+                        </Box>
+                    ) : (
+                        <Box
+                            borderRadius="1.2rem"
+                            paddingLeft="1rem"
+                            display="flex"
+                            flexDir="column"
+                            bg="gray.200">
+                            <Text lineClamp="1" marginRight="1rem" marginTop="1rem">Points: {currentExam.points}</Text>
+                            <Text lineClamp="1" marginRight="1rem" marginTop="1rem">Class Mean Grade: {currentMeanGrade == -1 ? "Not yet scored" : (((currentMeanGrade / (subjects[currentExam.class].length * currentExam.points)) * 100).toFixed(1) + "%")}</Text>
+                            <Text lineClamp="1" marginRight="1rem" marginY="1rem">Date Created: {String(currentExam.createdAt).slice(0, 10)} </Text>
+                        </Box>
+                    )}
                 </Box>
 
                 <Box w="80%"
@@ -483,8 +561,7 @@ const Exam = () => {
                             _hover={{ transform: "translateY(-3px)" }}
                             marginLeft={{ "xxs": "0.5rem", "xs": "1rem", sm: "1.5rem" }}
                             onClick={() => {
-                                //setPressedSave(true)
-                                handleSaveButton()
+                                handleSaveButton(true)
                             }}
                         >Save</Button>
                     </Box>

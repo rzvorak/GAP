@@ -121,6 +121,11 @@ const Scores_Exam = () => {
                     alignItems="center"
                     marginBottom="1rem"
                 >
+                    <Box ml="1rem" mt="0.25rem"
+                        cursor={"pointer"}
+                        onClick={handleBack}>
+                        <FaArrowLeft size="1.5rem" className='FaArrowLeft' />
+                    </Box>
                     <Heading
                         marginLeft="1rem"
                         color="gray.600"
@@ -169,7 +174,7 @@ const Scores_Exam = () => {
                                             p="0.5rem"
                                             borderRadius="0.7rem"
                                             marginRight="1rem"
-                                        >{exam.month} {exam.createdAt.slice(0,4)}</Box>
+                                        >{exam.month} {exam.createdAt.slice(0, 4)}</Box>
 
                                     </AccordionItemTrigger>
                                     <AccordionItemContent

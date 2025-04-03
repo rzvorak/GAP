@@ -17,6 +17,7 @@ import { Toaster, toaster } from "../components/ui/toaster"
 const Homework = () => {
 
     const disappearOnMin = useBreakpointValue({ "min": "none", "xxs": "flex" })
+    const disappearSaveButton = useBreakpointValue({"min": "none", "xs": "flex"})
 
     const location = useLocation();
     const homeworkId = location.state?.homeworkId;
@@ -88,8 +89,6 @@ const Homework = () => {
                 else if (percent >= settings.cutoffs.B) grade = "B";
                 else if (percent >= settings.cutoffs.C) grade = "C";
                 else if (percent >= settings.cutoffs.D) grade = "D";
-
-                console.log(student.homeworkLog[homeworkId] == null)
 
                 newGrades[student._id] = student.homeworkLog[homeworkId] == null ? grade : "-";
             });
@@ -237,28 +236,64 @@ const Homework = () => {
                 //flexDirection={"column"}
                 flexWrap="wrap"
                 alignItems={"flex-start"}
-                overflow="visible">
+                overflow="visible"
+            >
 
                 <HStack
-                    marginRight="1rem"
+                    marginRight="10%"
+                    w="70%"
+                    maxW="40rem"
                     color="gray.600"
                     fontSize="2xl"
                     fontWeight={"400"}
                     whiteSpace={"normal"}
                     wordBreak="break-word"
-
+                    display="flex"
+                    flexDir="row"
+                    justifyContent="space-between"
                 >
-                    <Box ml="1rem" mr="0.5rem" mt="0.25rem"
-                        cursor={"pointer"}
-                        onClick={handleBack}>
-                        <FaArrowLeft size="1.5rem" className='FaArrowLeft' />
+                    <Box
+                        display="flex"
+                        flexDir="row"
+                        alignItems="center">
+                        <Box ml="1rem" mt="0.25rem"
+                            cursor={"pointer"}
+                            onClick={handleBack}>
+                            <FaArrowLeft size="1.5rem" className='FaArrowLeft' />
+                        </Box>
+                        <Text ml="1rem">{currentHomework.name}</Text>
                     </Box>
-                    <Text>{currentHomework.name}</Text>
                 </HStack>
             </Box>
 
 
+
             <VStack gap="0" display={disappearOnMin} flex="1" w="100%">
+
+                <Box
+                    top="5rem"
+                    position="absolute"
+                    w="80%"
+                    display={disappearSaveButton}
+                    justifyContent="flex-end"
+                    alignItems="center"
+                    maxW="40rem"
+                    minHeight="4rem"
+                >
+                    <Button
+                        mt="0.2rem"
+                        borderRadius={"4rem"}
+                        w={{ "xxs": "3.5rem", "xs": "5rem", sm: "6rem" }}
+                        bg="green.500"
+                        color="gray.100"
+                        fontSize={{ sm: "lg", lg: "xl" }}
+                        transition="all 0.3s"
+                        _hover={{ transform: "translateY(-3px)" }}
+                        onClick={() => {
+                            handleSaveButton(true)
+                        }}
+                    >Save</Button>
+                </Box>
 
                 <Box
                     w="80%"
@@ -289,6 +324,7 @@ const Homework = () => {
                             <Text lineClamp="1" marginRight="1rem" marginY="1rem">Date Created: {String(currentHomework.createdAt).slice(0, 10)} </Text>
                         </Box>
                     )}
+
 
                 </Box>
 
